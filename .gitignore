@@ -209,6 +209,11 @@ tempCodeRunnerFile.py
 # PyPI configuration file
 .pypirc
 
+# Local application secrets
+.env
+.env.*
+!.env.example
+
 # Marimo
 marimo/_static/
 marimo/_lsp/

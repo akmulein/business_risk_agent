@@ -1,0 +1,167 @@
+[
+  {
+    "company_reports": {
+      "report_id": "report-2026-09-01-7707083893",
+      "report_date": "2026-09-01",
+      "inn": "7707083893",
+      "ogrn": "1027700132195",
+      "short_name": "ПАО СБЕРБАНК",
+      "full_name": "Публичное акционерное общество «Сбербанк России»",
+      "risk_level": "MEDIUM",
+      "zsk_risk_level": "GREEN",
+      "kpp": "773601001",
+      "address": "г. Москва",
+      "company_size": "Крупное предприятие",
+      "staff": "Более 1000",
+      "registration_date": "1991-06-20",
+      "years_from_registration": 35,
+      "status": "действующая",
+      "status_date": "2026-09-01",
+      "share_capital": 67760844000,
+      "branches_count": 2,
+      "raw_report_json": {}
+    },
+    "structure_items": [
+      {
+        "id": "structure-1",
+        "report_id": "report-2026-09-01-7707083893",
+        "company_inn": "7707083893",
+        "item_type": "founder",
+        "item_index": 0,
+        "name": "Пример акционера из тестовой карточки",
+        "role": "founder",
+        "share": 50,
+        "amount": 33880422000,
+        "active": true
+      },
+      {
+        "id": "structure-2",
+        "report_id": "report-2026-09-01-7707083893",
+        "company_inn": "7707083893",
+        "item_type": "director",
+        "item_index": 0,
+        "name": "Тестовый руководитель",
+        "role": "director",
+        "position": "Президент",
+        "active": true
+      },
+      {
+        "id": "structure-3",
+        "report_id": "report-2026-09-01-7707083893",
+        "company_inn": "7707083893",
+        "item_type": "activity",
+        "item_index": 0,
+        "role": "main",
+        "code": "64.19",
+        "description": "Денежное посредничество прочее",
+        "active": true
+      }
+    ],
+    "financial_reports": [
+      {
+        "report_id": "report-2026-09-01-7707083893",
+        "company_inn": "7707083893",
+        "year": 2024,
+        "proceeds": 180000000,
+        "profit": 24000000,
+        "total_assets": 500000000,
+        "current_assets_total": 300000000,
+        "stocks": 10000000,
+        "receivables": 90000000,
+        "bankroll": 200000000,
+        "total_liabilities": 500000000,
+        "capitals": 310000000,
+        "long_term_duties_total": 90000000,
+        "short_term_liabilities_total": 100000000,
+        "borrowed_funds": 30000000,
+        "accounts_payable": 70000000,
+        "sustainability": 0.58,
+        "solvency": 1.5,
+        "profitability": 0.13
+      },
+      {
+        "report_id": "report-2026-09-01-7707083893",
+        "company_inn": "7707083893",
+        "year": 2025,
+        "proceeds": 210000000,
+        "profit": 31000000,
+        "total_assets": 570000000,
+        "total_liabilities": 570000000,
+        "capitals": 350000000,
+        "sustainability": 0.61,
+        "solvency": 1.7,
+        "profitability": 0.15
+      }
+    ],
+    "risk_factors": [
+      {
+        "report_id": "report-2026-09-01-7707083893",
+        "company_inn": "7707083893",
+        "sign": "positive",
+        "item_index": 0,
+        "code": "LONG_HISTORY",
+        "name": "Длительный срок деятельности",
+        "chapter": "Общая информация"
+      }
+    ],
+    "arbitration": [
+      {
+        "id": "arbitration-1",
+        "report_id": "report-2026-09-01-7707083893",
+        "company_inn": "7707083893",
+        "source": "by_year",
+        "year": 2025,
+        "role": "plaintiff",
+        "case_status": "all",
+        "case_count": 4,
+        "amount": 8000000
+      },
+      {
+        "id": "arbitration-2",
+        "report_id": "report-2026-09-01-7707083893",
+        "company_inn": "7707083893",
+        "source": "by_year",
+        "year": 2025,
+        "role": "defendant",
+        "case_status": "all",
+        "case_count": 1,
+        "amount": 150000
+      }
+    ],
+    "legal_events": [
+      {
+        "report_id": "report-2026-09-01-7707083893",
+        "company_inn": "7707083893",
+        "event_type": "inspection",
+        "item_index": 0,
+        "external_id": "TEST-1",
+        "status": "завершена без нарушений",
+        "title": "Плановая проверка",
+        "details_json": {}
+      },
+      {
+        "report_id": "report-2026-09-01-7707083893",
+        "company_inn": "7707083893",
+        "event_type": "license",
+        "item_index": 0,
+        "external_id": "TEST-LICENSE",
+        "status": "ACTIVE",
+        "title": "Тестовая лицензия",
+        "details_json": {}
+      }
+    ],
+    "procurements": [
+      {
+        "report_id": "report-2026-09-01-7707083893",
+        "company_inn": "7707083893",
+        "item_index": 0,
+        "year": 2025,
+        "federal_law_code": "44-ФЗ",
+        "tender_admitted_count": 10,
+        "tender_winner_count": 7,
+        "contract_signed_count": 6,
+        "contract_signed_amount": 12500000
+      }
+    ]
+  }
+]
