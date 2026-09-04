@@ -1,0 +1,48 @@
+name: counterparty-mongo
+
+services:
+  mongo:
+    image: mongo:${MONGO_IMAGE_TAG:-7.0}
+    container_name: contractor-mongo
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DATABASE}
+    ports:
+      - "${MONGO_PORT:-27017}:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          mongosh --quiet --username "$${MONGO_INITDB_ROOT_USERNAME}"
+          --password "$${MONGO_INITDB_ROOT_PASSWORD}"
+          --authenticationDatabase admin
+          --eval "db.adminCommand('ping').ok" | grep 1
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  mongo-seed:
+    image: mongo:${MONGO_IMAGE_TAG:-7.0}
+    restart: "no"
+    depends_on:
+      mongo:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      MONGO_HOST: mongo
+      MONGO_INTERNAL_PORT: "27017"
+      MONGO_SEED_FILE: /seed/contractors_audit.snapshot.json
+    volumes:
+      - ../data/raw/contractors_audit.snapshot.json:/seed/contractors_audit.snapshot.json:ro
+      - ./scripts:/seed/scripts:ro
+    entrypoint: ["/bin/sh", "/seed/scripts/seed.sh"]
+
+volumes:
+  mongo_data:
