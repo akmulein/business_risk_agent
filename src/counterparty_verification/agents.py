@@ -9,15 +9,12 @@ from pydantic_ai.models.openrouter import OpenRouterModel
 from pydantic_ai.providers.openrouter import OpenRouterProvider
 
 from .domain import AnalysisSummary, ChapterResult, CounterpartyCard, RiskLevel
+from .prompt_constants import (
+    EVALUATOR_INSTRUCTIONS,
+    QUESTION_ANSWER_INSTRUCTIONS,
+    SPECIALIST_INSTRUCTIONS,
+)
 from .settings import Settings
-
-
-SYSTEM_GROUNDING = """
-You analyze exactly one counterparty. Use only the JSON supplied in the user
-message. Never use general knowledge, web data, or assumptions. If a fact is
-missing, state that the data is insufficient. Keep numbers and statuses exact.
-Reply in Russian.
-""".strip()
 
 
 class GroundedText(BaseModel):
@@ -44,6 +41,8 @@ def _chapter_fields(chapter: ChapterResult) -> set[str]:
     fields = {item.field for item in chapter.evidence}
     for factor in chapter.factors:
         fields.update(item.field for item in factor.evidence)
+    for observation in chapter.observations:
+        fields.update(item.field for item in observation.evidence)
     return fields
 
 
@@ -69,8 +68,7 @@ class SpecialistAgent:
             Agent(
                 _model(settings),
                 output_type=GroundedText,
-                instructions=SYSTEM_GROUNDING
-                + "\nRewrite the supplied deterministic chapter conclusion clearly.",
+                instructions=SPECIALIST_INSTRUCTIONS,
             )
             if self.enabled
             else None
@@ -97,12 +95,7 @@ class EvaluatorAgent:
             Agent(
                 _model(settings),
                 output_type=EvaluatorOutput,
-                instructions=SYSTEM_GROUNDING
-                + """
-Aggregate all chapter results. Every statement must cite one or more exact
-evidence field paths present in those chapter results. Do not invent a new risk
-factor. Mention sections with insufficient data.
-""",
+                instructions=EVALUATOR_INSTRUCTIONS,
             )
             if self.enabled
             else None
@@ -147,6 +140,11 @@ factor. Mention sections with insufficient data.
         factors = [
             factor.title for chapter in chapters for factor in chapter.factors
         ]
+        factors += [
+            observation.title
+            for chapter in chapters
+            for observation in chapter.observations
+        ]
         return AnalysisSummary(
             risk_level=risk,
             summary=f"Итоговый уровень риска: {risk.value}. {conclusions}",
@@ -161,11 +159,7 @@ class QuestionAnswerAgent:
             Agent(
                 _model(settings),
                 output_type=GroundedText,
-                instructions=SYSTEM_GROUNDING
-                + """
-Answer the question only from the card and analysis. Cite exact field paths.
-If the answer is absent, say so and return no evidence fields.
-""",
+                instructions=QUESTION_ANSWER_INSTRUCTIONS,
             )
             if self.enabled
             else None

@@ -42,6 +42,8 @@
   двумя попытками; локальный адаптер используется в тестах.
 - `src/counterparty_verification/agents.py` — конфигурация Pydantic AI через
   OpenRouter, specialist/evaluator/Q&A и проверки ссылок на исходные поля.
+- `src/counterparty_verification/prompt_constants.py` — единая точка изменения
+  всех UPPER_CASE-промптов для MCP и LLM-агентов.
 - `src/counterparty_verification/services.py` — параллельный запуск всех глав,
   частичный результат при отказе одной главы и TTL-хранилище Q&A-сессий.
 - `src/counterparty_verification/api.py` — FastAPI-приложение и обработка
