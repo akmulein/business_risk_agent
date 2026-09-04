@@ -14,6 +14,15 @@ class RiskLevel(StrEnum):
     UNKNOWN = "UNKNOWN"
 
 
+class BatchAnalysisStatus(StrEnum):
+    SUCCESS = "success"
+    NOT_FOUND = "not_found"
+    ERROR = "error"
+
+
+MAX_BATCH_INNS = 10
+
+
 class CompanyReport(BaseModel):
     model_config = ConfigDict(extra="allow")
 
@@ -201,23 +210,27 @@ class AnalysisSummary(BaseModel):
 
 
 def validate_inn(value: str) -> str:
-    if not value.isdigit() or len(value) != 10:
-        raise ValueError("ИНН юридического лица должен содержать 10 цифр")
+    if not value.isdigit() or len(value) not in (10, 12):
+        raise ValueError("ИНН должен содержать 10 или 12 цифр")
     digits = [int(char) for char in value]
-    weights = (2, 4, 10, 3, 5, 9, 4, 6, 8)
-    checksum = sum(digit * weight for digit, weight in zip(digits[:9], weights))
-    if checksum % 11 % 10 != digits[9]:
+    if len(digits) == 10:
+        weights = (2, 4, 10, 3, 5, 9, 4, 6, 8)
+        checksums = ((digits[:9], weights, digits[9]),)
+    else:
+        checksums = (
+            (digits[:10], (7, 2, 4, 10, 3, 5, 9, 4, 6, 8), digits[10]),
+            (
+                digits[:11],
+                (3, 7, 2, 4, 10, 3, 5, 9, 4, 6, 8),
+                digits[11],
+            ),
+        )
+    if any(
+        sum(a * b for a, b in zip(part, weights)) % 11 % 10 != expected
+        for part, weights, expected in checksums
+    ):
         raise ValueError("Некорректная контрольная сумма ИНН")
     return value
-
-
-class AnalysisRequest(BaseModel):
-    inn: str
-
-    @field_validator("inn")
-    @classmethod
-    def valid_inn(cls, value: str) -> str:
-        return validate_inn(value.strip())
 
 
 class AnalysisResponse(BaseModel):
@@ -226,6 +239,26 @@ class AnalysisResponse(BaseModel):
     summary: str
     risk_level: RiskLevel
     chapters: list[ChapterResult]
+
+
+class AnalysisRequest(BaseModel):
+    inns: list[str] = Field(min_length=1, max_length=MAX_BATCH_INNS)
+
+    @field_validator("inns")
+    @classmethod
+    def valid_inns(cls, values: list[str]) -> list[str]:
+        return [validate_inn(value.strip()) for value in values]
+
+
+class BatchAnalysisItem(BaseModel):
+    inn: str
+    status: BatchAnalysisStatus
+    analysis: AnalysisResponse | None = None
+    error: str | None = None
+
+
+class BatchAnalysisResponse(BaseModel):
+    results: list[BatchAnalysisItem]
 
 
 class QuestionRequest(BaseModel):

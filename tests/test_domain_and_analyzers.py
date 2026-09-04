@@ -11,11 +11,29 @@ from counterparty_verification.domain import (
 
 
 def test_validates_legal_entity_inn() -> None:
-    assert AnalysisRequest(inn="7707083893").inn == "7707083893"
+    assert AnalysisRequest(inns=["7707083893"]).inns == ["7707083893"]
     with pytest.raises(ValidationError):
-        AnalysisRequest(inn="7707083894")
+        AnalysisRequest(inns=["7707083894"])
     with pytest.raises(ValidationError):
-        AnalysisRequest(inn="123")
+        AnalysisRequest(inns=["123"])
+
+
+def test_validates_individual_entrepreneur_inn() -> None:
+    assert AnalysisRequest(inns=["772377037026"]).inns == ["772377037026"]
+    with pytest.raises(ValidationError):
+        AnalysisRequest(inns=["772377037027"])
+
+
+def test_batch_accepts_at_most_ten_inns() -> None:
+    request = AnalysisRequest(
+        inns=["7707083893", "772377037026"]
+    )
+    assert request.inns == ["7707083893", "772377037026"]
+
+    with pytest.raises(ValidationError):
+        AnalysisRequest(inns=[])
+    with pytest.raises(ValidationError):
+        AnalysisRequest(inns=["7707083893"] * 11)
 
 
 @pytest.mark.parametrize("tool_name", ANALYZERS)
