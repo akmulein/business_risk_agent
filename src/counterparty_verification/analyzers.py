@@ -3,7 +3,18 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any
 
-from .domain import ChapterResult, CounterpartyCard, Evidence, RiskFactor, RiskLevel
+from .domain import (
+    ChapterResult,
+    CounterpartyCard,
+    Evidence,
+    Observation,
+    RiskFactor,
+    RiskLevel,
+)
+from .legal_rules import LegalView
+from .legal_rules import build_view as build_legal_view
+from .legal_rules import run_checks as run_legal_checks
+from .structure_rules import LegalForm, StructureView, build_view, run_checks
 
 
 def _risk_max(*levels: RiskLevel) -> RiskLevel:
@@ -83,139 +94,147 @@ def analyze_general(card: CounterpartyCard) -> ChapterResult:
 
 
 def analyze_structure(card: CounterpartyCard) -> ChapterResult:
-    founders = [
-        item for item in card.structure_items if item.item_type == "founder"
-    ]
-    active_founders = [item for item in founders if item.active is not False]
-    managers = [
-        item for item in card.structure_items if item.item_type == "director"
-    ]
-    manager = managers[0] if managers else None
-    activities = [
-        item for item in card.structure_items if item.item_type == "activity"
-    ]
-    factors: list[RiskFactor] = []
-    if founders and not active_founders:
-        factors.append(
-            _factor(
-                "Нет активных учредителей",
-                "Все перечисленные учредители помечены неактивными.",
-                RiskLevel.MEDIUM,
-                "structure_items.active",
-                [item.model_dump(mode="json") for item in founders],
-            )
-        )
-    evidence = [
-        Evidence(
-            field="structure_items",
-            value=[item.model_dump(mode="json") for item in card.structure_items],
-        ),
-    ]
-    sufficient = bool(card.structure_items)
-    risk = _risk_max(*(factor.severity for factor in factors), RiskLevel.LOW)
+    """Describes the ownership and management structure and what to look at.
+
+    The chapter deliberately assigns no risk level: it lists observations with
+    the fields they came from, and the verdict is left to the analyst.
+    """
+    view = build_view(card)
+    observations = run_checks(view)
+    sufficient = bool(view.founders or view.director or view.activities)
     return ChapterResult(
         chapter="structure",
-        risk_level=risk if sufficient else RiskLevel.UNKNOWN,
+        risk_level=RiskLevel.UNKNOWN,
         conclusion=(
-            f"Активных учредителей: {len(active_founders)}; "
-            f"руководитель: {manager.name if manager else 'не указан'}; "
-            f"видов деятельности: {len(activities)}."
+            _structure_conclusion(view, observations)
             if sufficient
-            else "Недостаточно данных об учредителях и руководстве."
+            else "Недостаточно данных об учредителях, руководстве и видах деятельности."
         ),
-        factors=factors,
-        evidence=evidence,
+        observations=observations,
+        evidence=_structure_evidence(view),
         data_sufficient=sufficient,
     )
+
+
+def _structure_conclusion(view: StructureView, observations: list[Observation]) -> str:
+    form = {
+        LegalForm.SOLE_TRADER: "индивидуальный предприниматель",
+        LegalForm.NON_PROFIT: "некоммерческая организация",
+    }.get(view.legal_form, "коммерческая организация")
+    director = view.director
+    parts = [f"Форма: {form}."]
+    if view.is_company:
+        share = view.total_active_share
+        share_text = f", суммарная доля {share:g}%" if share is not None else ""
+        parts.append(f"Активных учредителей: {len(view.active_founders)}{share_text}.")
+    else:
+        parts.append("Уставный капитал и доли участия для этой формы не применяются.")
+    if director is not None:
+        position = director.item.position or "должность не указана"
+        parts.append(f"Руководитель: {director.item.name or 'не указан'} ({position}).")
+    elif view.parents:
+        parts.append(f"Управляющая организация: {view.parents[0].label}.")
+    else:
+        parts.append("Руководитель: не указан.")
+    parts.append(
+        f"Видов деятельности: {len(view.activities)}, "
+        f"связанных организаций: {len(view.related)}, "
+        f"филиалов: {len(view.branches)}."
+    )
+    if observations:
+        titles = "; ".join(item.title.lower() for item in observations)
+        parts.append(f"Стоит обратить внимание: {titles}.")
+    else:
+        parts.append(
+            "По структуре и руководству вопросов, требующих внимания, не найдено."
+        )
+    return " ".join(parts)
+
+
+def _structure_evidence(view: StructureView) -> list[Evidence]:
+    evidence = [
+        Evidence(field="company_reports.ogrn", value=view.report.ogrn),
+        Evidence(
+            field="company_reports.share_capital", value=view.report.share_capital
+        ),
+        Evidence(
+            field="company_reports.registration_date",
+            value=str(view.report.registration_date)
+            if view.report.registration_date
+            else None,
+        ),
+    ]
+    if view.director is not None:
+        evidence.append(view.director.evidence("name"))
+        evidence.append(view.director.evidence("position"))
+    if view.main_activity is not None:
+        evidence.append(view.main_activity.evidence("code"))
+    return evidence
 
 
 def analyze_legal(card: CounterpartyCard) -> ChapterResult:
-    factors: list[RiskFactor] = []
-    active_exec = [
-        item
-        for item in card.legal_events
-        if item.event_type == "execution" and item.active is True
-    ]
-    active_amount = sum(float(item.amount or 0) for item in active_exec)
-    if active_exec:
-        factors.append(
-            _factor(
-                "Активные исполнительные производства",
-                f"Количество: {len(active_exec)}, сумма: {active_amount:g}.",
-                RiskLevel.HIGH,
-                "legal_events",
-                [item.model_dump(mode="json") for item in active_exec],
-            )
-        )
-    violations = [
-        item
-        for item in card.legal_events
-        if item.event_type == "inspection"
-        and "наруш" in str(item.status or "").lower()
-    ]
-    if violations:
-        factors.append(
-            _factor(
-                "Нарушения по результатам проверок",
-                f"Проверок с нарушениями: {len(violations)}.",
-                RiskLevel.MEDIUM,
-                "legal_events.status",
-                [item.model_dump(mode="json") for item in violations],
-            )
-        )
-    expired = [
-        item
-        for item in card.legal_events
-        if item.event_type == "license" and item.status == "EXPIRED"
-    ]
-    if expired:
-        factors.append(
-            _factor(
-                "Истёкшие лицензии",
-                f"Истёкших лицензий: {len(expired)}.",
-                RiskLevel.MEDIUM,
-                "legal_events.status",
-                [item.model_dump(mode="json") for item in expired],
-            )
-        )
-    defendant_amount = sum(
-        float(item.amount or 0)
-        for item in card.arbitration
-        if item.role == "defendant"
-    )
-    if defendant_amount > 0:
-        factors.append(
-            _factor(
-                "Арбитражные дела в роли ответчика",
-                f"Сумма требований по годовым данным: {defendant_amount:g}.",
-                RiskLevel.MEDIUM,
-                "arbitration",
-                [item.model_dump(mode="json") for item in card.arbitration],
-            )
-        )
+    """Describes arbitration, enforcement, inspections and licenses.
+
+    The chapter deliberately assigns no risk level: it lists observations with
+    the fields they came from, and the verdict is left to the analyst.
+    """
+    view = build_legal_view(card)
+    observations = run_legal_checks(view)
     sufficient = bool(card.arbitration or card.legal_events)
-    risk = _risk_max(*(factor.severity for factor in factors), RiskLevel.LOW)
     return ChapterResult(
         chapter="legal",
-        risk_level=risk if sufficient else RiskLevel.UNKNOWN,
+        risk_level=RiskLevel.UNKNOWN,
         conclusion=(
-            f"Юридических факторов риска найдено: {len(factors)}."
+            _legal_conclusion(view, observations)
             if sufficient
             else "Недостаточно данных для анализа юридических рисков."
         ),
-        factors=factors,
-        evidence=[
-            Evidence(
-                field="arbitration",
-                value=[item.model_dump(mode="json") for item in card.arbitration],
-            ),
-            Evidence(
-                field="legal_events",
-                value=[item.model_dump(mode="json") for item in card.legal_events],
-            ),
-        ],
+        observations=observations,
+        evidence=_legal_evidence(view),
         data_sufficient=sufficient,
     )
+
+
+def _legal_conclusion(view: LegalView, observations: list[Observation]) -> str:
+    name = view.report.full_name or view.report.short_name or "Организация"
+    parts = [
+        (
+            f"{name}: исполнительных производств {len(view.executions)} "
+            f"(активных {len(view.active_executions)}), "
+            f"проверок {len(view.inspections)}, лицензий {len(view.licenses)}."
+        )
+    ]
+    pending = view.status_bucket("defendant", "pending")
+    appealed = view.status_bucket("defendant", "appealed")
+    if pending.has_cases or appealed.has_cases:
+        parts.append(
+            f"Открытых дел ответчика: {pending.count}, "
+            f"обжалованных: {appealed.count}."
+        )
+    if observations:
+        titles = "; ".join(item.title.lower() for item in observations)
+        parts.append(f"Стоит обратить внимание: {titles}.")
+    else:
+        parts.append("По юридическим рискам вопросов, требующих внимания, не найдено.")
+    return " ".join(parts)
+
+
+def _legal_evidence(view: LegalView) -> list[Evidence]:
+    evidence = [
+        Evidence(field="company_reports.inn", value=view.report.inn),
+        Evidence(
+            field="company_reports.report_date",
+            value=str(view.report.report_date) if view.report.report_date else None,
+        ),
+    ]
+    common = view.common_arbitration
+    if common is not None:
+        evidence.append(common.evidence("case_count"))
+        evidence.append(common.evidence("amount"))
+    proceeds = view.finance_evidence("proceeds")
+    if proceeds is not None:
+        evidence.append(proceeds)
+    return evidence
 
 
 def analyze_reputation(card: CounterpartyCard) -> ChapterResult:
