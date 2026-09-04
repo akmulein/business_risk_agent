@@ -1,75 +1,64 @@
-# MongoDB setup for counterparty reports
+# MongoDB: база отчётов контрагентов
 
-This setup imports the source snapshot without changing its document structure:
+## Устройство
 
-`../data/raw/contractors_audit.snapshot.json`
+- Docker image: `mongo:7.0`.
+- Database: `counterparties`.
+- Collection: `reports`.
+- Один элемент исходного JSON — один документ MongoDB.
+- Источник: `../data/raw/contractors_audit.snapshot.json`.
+- Данные MongoDB сохраняются в Docker volume `counterparty-mongo_mongo_data`.
+- `mongo-seed` создаёт индексы и импортирует документы по исходному `_id`.
 
-One array element becomes one document in `counterparties.reports`. MongoDB
-Extended JSON values such as `$date` are stored using their BSON equivalents;
-the business data itself is not recalculated, normalized, or validated.
+Содержание отчётов не изменяется. Extended JSON (`$date`, `$numberLong`) при
+импорте преобразуется в соответствующие BSON-типы MongoDB.
 
-## Start
+## Запуск
 
 ```bash
 cd mongo_setup
 cp .env.example .env
+nano .env
 ```
 
-Set a non-default password in `.env`, then run:
+В `.env` замените `MONGO_ROOT_PASSWORD=change_me`, затем выполните:
 
 ```bash
+docker compose pull
 docker compose up -d
-```
-
-The `mongo` service keeps the database in the `mongo_data` volume. The
-`mongo-seed` service waits for MongoDB, creates indexes, imports all 100 source
-documents, and exits successfully.
-
-## Verify
-
-```bash
 docker compose ps -a
-docker compose exec mongo mongosh \
-  --username contractors_admin \
-  --password YOUR_PASSWORD \
+docker compose logs mongo-seed
+```
+
+Ожидаемое состояние:
+
+- `contractor-mongo` — `healthy`;
+- `mongo-seed` — `Exited (0)`;
+- в логах seed — `100 document(s) imported successfully`.
+
+## Подключение
+
+Из приложения на хосте:
+
+```text
+mongodb://contractors_admin:<password>@localhost:27017/counterparties?authSource=admin
+```
+
+Из контейнера в том же Compose/network:
+
+```text
+mongodb://contractors_admin:<password>@mongo:27017/counterparties?authSource=admin
+```
+
+Проверка количества документов:
+
+```bash
+docker compose exec mongo sh -lc 'mongosh --quiet \
+  --username "$MONGO_INITDB_ROOT_USERNAME" \
+  --password "$MONGO_INITDB_ROOT_PASSWORD" \
   --authenticationDatabase admin \
-  counterparties \
-  --eval 'db.reports.countDocuments({})'
+  "$MONGO_INITDB_DATABASE" \
+  --eval "db.reports.countDocuments({})"'
 ```
 
-Expected result: `100`.
-
-Find the latest report by INN:
-
-```javascript
-db.reports.findOne(
-  { "report.baseInfo.inn": "1684017097" },
-  {},
-  { sort: { "report.reportDate": -1 } }
-)
-```
-
-## Re-import
-
-The seed uses source `_id` values as upsert keys, so it can be run repeatedly:
-
-```bash
-docker compose run --rm mongo-seed
-```
-
-## Stop
-
-Keep the data:
-
-```bash
-docker compose down
-```
-
-Delete the local MongoDB volume as well:
-
-```bash
-docker compose down -v
-```
-
-The last command is destructive and should only be used when a clean local
-database is required.
+Ожидаемый результат: `100`.
