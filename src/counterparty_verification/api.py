@@ -1,4 +1,5 @@
 import asyncio
+from contextlib import asynccontextmanager
 from typing import Annotated
 
 from fastapi import Depends, FastAPI, HTTPException, Request, status
@@ -11,7 +12,11 @@ from .domain import (
     QuestionResponse,
 )
 from .mcp_client import HttpMcpAnalysisClient
-from .repositories import JsonCounterpartyRepository, PostgresCounterpartyRepository
+from .repositories import (
+    JsonCounterpartyRepository,
+    MongoCounterpartyRepository,
+    PostgresCounterpartyRepository,
+)
 from .services import (
     AnalysisService,
     AnalysisSessionNotFoundError,
@@ -25,16 +30,35 @@ from .settings import Settings, get_settings
 
 def create_app(settings: Settings | None = None) -> FastAPI:
     config = settings or get_settings()
+
+    if config.repository_backend == "postgres":
+        repository = PostgresCounterpartyRepository(config.database_url)
+    elif config.repository_backend == "mongo":
+        repository = MongoCounterpartyRepository(
+            config.mongodb_url,
+            config.mongodb_database,
+            config.mongodb_collection,
+        )
+    elif config.repository_backend == "mock":
+        repository = JsonCounterpartyRepository(config.mock_data_path)
+    else:
+        raise ValueError(
+            "REPOSITORY_BACKEND must be one of: mock, postgres, mongo"
+        )
+
+    @asynccontextmanager
+    async def lifespan(_: FastAPI):
+        yield
+        close = getattr(repository, "close", None)
+        if close is not None:
+            await close()
+
     app = FastAPI(
         title=config.app_name,
         version="0.1.0",
+        lifespan=lifespan,
     )
 
-    repository = (
-        PostgresCounterpartyRepository(config.database_url)
-        if config.repository_backend == "postgres"
-        else JsonCounterpartyRepository(config.mock_data_path)
-    )
     sessions = InMemorySessionStore(config.session_ttl_seconds)
     analysis_service = AnalysisService(
         repository=repository,

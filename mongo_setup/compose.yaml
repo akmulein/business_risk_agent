@@ -39,6 +39,7 @@ services:
       MONGO_HOST: mongo
       MONGO_INTERNAL_PORT: "27017"
       MONGO_SEED_FILE: /seed/contractors_audit.snapshot.json
+      MONGO_READ_COLLECTION: ${MONGO_READ_COLLECTION:-counterparty_cards}
     volumes:
       - ../data/raw/contractors_audit.snapshot.json:/seed/contractors_audit.snapshot.json:ro
       - ./scripts:/seed/scripts:ro

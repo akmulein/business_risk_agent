@@ -26,6 +26,12 @@ class Settings(BaseSettings):
     database_url: str = (
         "postgresql+asyncpg://postgres:postgres@localhost:5432/counterparties"
     )
+    mongodb_url: str = (
+        "mongodb://contractors_admin:change_me@localhost:27017/"
+        "counterparties?authSource=admin"
+    )
+    mongodb_database: str = "counterparties"
+    mongodb_collection: str = "counterparty_cards"
 
 
 @lru_cache

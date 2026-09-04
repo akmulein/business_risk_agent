@@ -3,15 +3,15 @@
 MVP для хакатона AI Talent Hub: FastAPI-сервис получает ИНН, извлекает одну
 карточку контрагента, запускает шесть MCP-анализаторов и формирует итоговое
 summary. Уточняющие ответы строятся только по снимку этой карточки.
-C
+
 ## Архитектура
 
 - `counterparty_verification.api` — HTTP API;
 - `counterparty_verification.mcp_server` — отдельный FastMCP-сервис;
 - Pydantic AI + OpenRouter — специалисты, итоговый evaluator и Q&A;
-- JSON-репозиторий — временная замена PostgreSQL;
-- SQLAlchemy-репозиторий для нормализованных таблиц уже определён и включается
-  через настройку.
+- MongoDB: `reports` хранит исходные отчёты, `counterparty_cards` — готовые
+  карточки пайплайна;
+- JSON и PostgreSQL остаются доступными как альтернативные репозитории.
 
 MCP-инструменты отвечают за общую информацию, структуру, юридические и
 репутационные риски, финансы и госзакупки. Все разделы запускаются параллельно.
@@ -20,15 +20,16 @@ MCP-инструменты отвечают за общую информацию
 
 ## Установка
 
+Для воспроизводимого запуска нужен только Docker. Создайте локальную
+конфигурацию и замените `MONGO_ROOT_PASSWORD=change_me`:
+
 ```bash
-source /Users/loginplease/anaconda3/etc/profile.d/conda.sh
-conda activate alpha_hackathon
-python -m pip install -e ".[dev]"
 cp .env.example .env
+nano .env
 ```
 
-Заполните `OPENROUTER_API_KEY` в `.env`. Модель меняется через
-`OPENROUTER_MODEL`.
+`OPENROUTER_API_KEY` можно оставить пустым: тогда анализ будет
+детерминированным, без LLM.
 
 ## Локальный запуск
 
@@ -48,16 +49,29 @@ uvicorn counterparty_verification.api:app --reload
 
 Swagger UI: <http://localhost:8000/docs>.
 
+Для локального запуска без Docker установите проект через
+`python -m pip install -e ".[dev]"` и используйте:
+
+```env
+REPOSITORY_BACKEND=mongo
+MONGODB_URL=mongodb://contractors_admin:<password>@localhost:27017/counterparties?authSource=admin
+MONGODB_DATABASE=counterparties
+MONGODB_COLLECTION=counterparty_cards
+```
+
 ## Запуск в Docker
 
 ```bash
 docker compose up --build
 ```
 
-Будущий PostgreSQL запускается отдельно:
+Команда поднимает MongoDB, создаёт `reports` и `counterparty_cards`, затем
+запускает MCP и API. Swagger UI: <http://localhost:8000/docs>.
+
+Остановить сервисы без удаления данных:
 
 ```bash
-docker compose --profile database up -d postgres
+docker compose down
 ```
 
 ## API
