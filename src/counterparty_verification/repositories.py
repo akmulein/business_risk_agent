@@ -25,6 +25,9 @@ from .domain import CounterpartyCard
 
 class CounterpartyRepository(Protocol):
     async def get_by_inn(self, inn: str) -> CounterpartyCard | None: ...
+    async def get_many_by_inns(
+        self, inns: list[str]
+    ) -> list[CounterpartyCard]: ...
 
 
 class JsonCounterpartyRepository:
@@ -39,6 +42,20 @@ class JsonCounterpartyRepository:
             if card.company_reports.inn == inn:
                 return card
         return None
+
+    async def get_many_by_inns(self, inns: list[str]) -> list[CounterpartyCard]:
+        wanted = set(inns)
+        found: dict[str, CounterpartyCard] = {}
+        with self.path.open(encoding="utf-8") as source:
+            records = json.load(source)
+        for record in records:
+            card = CounterpartyCard.model_validate(record)
+            inn = card.company_reports.inn
+            if inn in wanted and inn not in found:
+                found[inn] = card
+                if len(found) == len(wanted):
+                    break
+        return [found[inn] for inn in inns if inn in found]
 
 
 class MongoCounterpartyRepository:
@@ -67,6 +84,27 @@ class MongoCounterpartyRepository:
         if document is None:
             return None
         return CounterpartyCard.model_validate(document)
+
+    async def get_many_by_inns(self, inns: list[str]) -> list[CounterpartyCard]:
+        cursor = self.collection.find(
+            {"company_reports.inn": {"$in": inns}},
+            projection={"_id": False},
+        ).sort(
+            [
+                ("company_reports.inn", 1),
+                ("company_reports.report_date", -1),
+            ]
+        )
+        documents = await cursor.to_list(length=None)
+        latest: dict[str, dict[str, Any]] = {}
+        for document in documents:
+            inn = document["company_reports"]["inn"]
+            latest.setdefault(inn, document)
+        return [
+            CounterpartyCard.model_validate(latest[inn])
+            for inn in inns
+            if inn in latest
+        ]
 
     async def close(self) -> None:
         result = self.client.close()
@@ -293,3 +331,11 @@ class PostgresCounterpartyRepository:
                 **children,
             }
         )
+
+    async def get_many_by_inns(self, inns: list[str]) -> list[CounterpartyCard]:
+        cards: list[CounterpartyCard] = []
+        for inn in inns:
+            card = await self.get_by_inn(inn)
+            if card is not None:
+                cards.append(card)
+        return cards

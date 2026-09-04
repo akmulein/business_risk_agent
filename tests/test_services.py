@@ -3,7 +3,11 @@ import asyncio
 import pytest
 
 from counterparty_verification.agents import EvaluatorAgent, SpecialistAgent
-from counterparty_verification.domain import CounterpartyCard, RiskLevel
+from counterparty_verification.domain import (
+    BatchAnalysisStatus,
+    CounterpartyCard,
+    RiskLevel,
+)
 from counterparty_verification.mcp_client import LocalAnalysisToolClient
 from counterparty_verification.services import (
     AnalysisService,
@@ -17,6 +21,7 @@ class StubRepository:
     def __init__(self, card: CounterpartyCard | None) -> None:
         self.card = card
         self.requested: list[str] = []
+        self.requested_many: list[list[str]] = []
 
     async def get_by_inn(self, inn: str) -> CounterpartyCard | None:
         self.requested.append(inn)
@@ -25,6 +30,16 @@ class StubRepository:
             if self.card and self.card.company_reports.inn == inn
             else None
         )
+
+    async def get_many_by_inns(
+        self, inns: list[str]
+    ) -> list[CounterpartyCard]:
+        self.requested_many.append(inns)
+        if self.card is None:
+            return []
+        if self.card.company_reports.inn not in inns:
+            return []
+        return [self.card]
 
 
 class PartiallyFailingClient(LocalAnalysisToolClient):
@@ -81,3 +96,23 @@ async def test_missing_counterparty_raises() -> None:
 
     with pytest.raises(CounterpartyNotFoundError):
         await service.analyze("7707083893")
+
+
+@pytest.mark.asyncio
+async def test_batch_analysis_keeps_input_order_and_missing_items(
+    card: CounterpartyCard,
+) -> None:
+    repository = StubRepository(card)
+    service = build_service(repository, LocalAnalysisToolClient())
+    inns = [card.company_reports.inn, "772377037026"]
+
+    response = await service.analyze_many(inns)
+
+    assert repository.requested_many == [inns]
+    assert [item.inn for item in response.results] == inns
+    assert response.results[0].status == BatchAnalysisStatus.SUCCESS
+    assert response.results[0].analysis is not None
+    assert len(response.results[0].analysis.chapters) == 6
+    assert response.results[1].status == BatchAnalysisStatus.NOT_FOUND
+    assert response.results[1].analysis is None
+    assert response.results[1].error

@@ -7,7 +7,7 @@ from fastapi import Depends, FastAPI, HTTPException, Request, status
 from .agents import EvaluatorAgent, QuestionAnswerAgent, SpecialistAgent
 from .domain import (
     AnalysisRequest,
-    AnalysisResponse,
+    BatchAnalysisResponse,
     QuestionRequest,
     QuestionResponse,
 )
@@ -20,7 +20,6 @@ from .repositories import (
 from .services import (
     AnalysisService,
     AnalysisSessionNotFoundError,
-    CounterpartyNotFoundError,
     InMemorySessionStore,
     QuestionService,
     UpstreamServiceError,
@@ -98,27 +97,14 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     @app.post(
         "/api/v1/analyses",
-        response_model=AnalysisResponse,
+        response_model=BatchAnalysisResponse,
         status_code=status.HTTP_201_CREATED,
         tags=["analysis"],
     )
     async def create_analysis(
         payload: AnalysisRequest, service: AnalysisDep
-    ) -> AnalysisResponse:
-        try:
-            return await service.analyze(payload.inn)
-        except CounterpartyNotFoundError as error:
-            raise HTTPException(
-                status_code=404, detail="Контрагент с таким ИНН не найден"
-            ) from error
-        except TimeoutError as error:
-            raise HTTPException(
-                status_code=503, detail="Превышено время анализа"
-            ) from error
-        except UpstreamServiceError as error:
-            raise HTTPException(
-                status_code=502, detail="Ошибка сервиса языковой модели"
-            ) from error
+    ) -> BatchAnalysisResponse:
+        return await service.analyze_many(payload.inns)
 
     @app.post(
         "/api/v1/analyses/{analysis_id}/questions",

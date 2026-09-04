@@ -7,6 +7,9 @@ from uuid import uuid4
 
 from .agents import EvaluatorAgent, QuestionAnswerAgent, SpecialistAgent
 from .domain import (
+    BatchAnalysisItem,
+    BatchAnalysisResponse,
+    BatchAnalysisStatus,
     AnalysisResponse,
     ChapterResult,
     CounterpartyCard,
@@ -24,6 +27,7 @@ TOOL_NAMES = (
     "analyze_finance",
     "analyze_procurement",
 )
+BATCH_ANALYSIS_CONCURRENCY = 3
 
 
 class CounterpartyNotFoundError(LookupError):
@@ -93,6 +97,48 @@ class AnalysisService:
         card = await self.repository.get_by_inn(inn)
         if card is None:
             raise CounterpartyNotFoundError(inn)
+        return await self._analyze_card(inn, card)
+
+    async def analyze_many(self, inns: list[str]) -> BatchAnalysisResponse:
+        cards = await self.repository.get_many_by_inns(inns)
+        cards_by_inn = {card.company_reports.inn: card for card in cards}
+        semaphore = asyncio.Semaphore(BATCH_ANALYSIS_CONCURRENCY)
+
+        async def analyze_one(inn: str) -> BatchAnalysisItem:
+            card = cards_by_inn.get(inn)
+            if card is None:
+                return BatchAnalysisItem(
+                    inn=inn,
+                    status=BatchAnalysisStatus.NOT_FOUND,
+                    error="Контрагент с таким ИНН не найден",
+                )
+            async with semaphore:
+                try:
+                    analysis = await self._analyze_card(inn, card)
+                except TimeoutError:
+                    return BatchAnalysisItem(
+                        inn=inn,
+                        status=BatchAnalysisStatus.ERROR,
+                        error="Превышено время анализа",
+                    )
+                except UpstreamServiceError:
+                    return BatchAnalysisItem(
+                        inn=inn,
+                        status=BatchAnalysisStatus.ERROR,
+                        error="Ошибка сервиса языковой модели",
+                    )
+            return BatchAnalysisItem(
+                inn=inn,
+                status=BatchAnalysisStatus.SUCCESS,
+                analysis=analysis,
+            )
+
+        results = await asyncio.gather(*(analyze_one(inn) for inn in inns))
+        return BatchAnalysisResponse(results=list(results))
+
+    async def _analyze_card(
+        self, inn: str, card: CounterpartyCard
+    ) -> AnalysisResponse:
         async with asyncio.timeout(self.timeout_seconds):
             chapters = await asyncio.gather(
                 *(self._run_chapter(name, card) for name in TOOL_NAMES)
