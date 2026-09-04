@@ -1,6 +1,7 @@
 import json
+from inspect import isawaitable
 from pathlib import Path
-from typing import Protocol
+from typing import Any, Protocol
 
 from sqlalchemy import (
     JSON,
@@ -38,6 +39,39 @@ class JsonCounterpartyRepository:
             if card.company_reports.inn == inn:
                 return card
         return None
+
+
+class MongoCounterpartyRepository:
+    """Loads an application-ready card; raw source reports stay untouched."""
+
+    def __init__(
+        self,
+        mongodb_url: str,
+        database: str,
+        collection: str,
+        client: Any | None = None,
+    ) -> None:
+        if client is None:
+            from pymongo import AsyncMongoClient
+
+            client = AsyncMongoClient(mongodb_url)
+        self.client = client
+        self.collection = client[database][collection]
+
+    async def get_by_inn(self, inn: str) -> CounterpartyCard | None:
+        document = await self.collection.find_one(
+            {"company_reports.inn": inn},
+            projection={"_id": False},
+            sort=[("company_reports.report_date", -1)],
+        )
+        if document is None:
+            return None
+        return CounterpartyCard.model_validate(document)
+
+    async def close(self) -> None:
+        result = self.client.close()
+        if isawaitable(result):
+            await result
 
 
 metadata = MetaData()

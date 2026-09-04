@@ -1,4 +1,59 @@
+name: counterparty-verification
+
 services:
+  mongo:
+    image: mongo:${MONGO_IMAGE_TAG:-7.0}
+    container_name: contractor-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:-contractors_admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:?Set MONGO_ROOT_PASSWORD in .env}
+      MONGO_INITDB_DATABASE: ${MONGO_DATABASE:-counterparties}
+    ports:
+      - "${MONGO_PORT:-27017}:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          mongosh --quiet --username "$${MONGO_INITDB_ROOT_USERNAME}"
+          --password "$${MONGO_INITDB_ROOT_PASSWORD}"
+          --authenticationDatabase admin
+          --eval "db.adminCommand('ping').ok" | grep 1
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  mongo-seed:
+    image: mongo:${MONGO_IMAGE_TAG:-7.0}
+    restart: "no"
+    depends_on:
+      mongo:
+        condition: service_healthy
+    environment:
+      MONGO_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:-contractors_admin}
+      MONGO_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:?Set MONGO_ROOT_PASSWORD in .env}
+      MONGO_DATABASE: ${MONGO_DATABASE:-counterparties}
+      MONGO_COLLECTION: ${MONGO_COLLECTION:-reports}
+      MONGO_READ_COLLECTION: ${MONGO_READ_COLLECTION:-counterparty_cards}
+      MONGO_HOST: mongo
+      MONGO_INTERNAL_PORT: "27017"
+      MONGO_SEED_FILE: /seed/contractors_audit.snapshot.json
+    volumes:
+      - ./data/raw/contractors_audit.snapshot.json:/seed/contractors_audit.snapshot.json:ro
+      - ./mongo_setup/scripts:/seed/scripts:ro
+    entrypoint: ["/bin/sh", "/seed/scripts/seed.sh"]
+
+  mcp:
+    build: .
+    command: ["python", "-m", "counterparty_verification.mcp_server"]
+    environment:
+      MCP_HOST: 0.0.0.0
+      MCP_PORT: "8001"
+    ports:
+      - "8001:8001"
+
   api:
     build: .
     command:
@@ -12,21 +67,19 @@ services:
       - path: .env
         required: false
     environment:
+      REPOSITORY_BACKEND: ${REPOSITORY_BACKEND:-mongo}
       MCP_URL: http://mcp:8001/mcp
       MOCK_DATA_PATH: /app/data/counterparties.json
+      MONGODB_URL: mongodb://${MONGO_ROOT_USERNAME:-contractors_admin}:${MONGO_ROOT_PASSWORD:?Set MONGO_ROOT_PASSWORD in .env}@mongo:27017/${MONGO_DATABASE:-counterparties}?authSource=admin
+      MONGODB_DATABASE: ${MONGO_DATABASE:-counterparties}
+      MONGODB_COLLECTION: ${MONGO_READ_COLLECTION:-counterparty_cards}
     ports:
       - "8000:8000"
     depends_on:
-      - mcp
-
-  mcp:
-    build: .
-    command: ["python", "-m", "counterparty_verification.mcp_server"]
-    environment:
-      MCP_HOST: 0.0.0.0
-      MCP_PORT: "8001"
-    ports:
-      - "8001:8001"
+      mcp:
+        condition: service_started
+      mongo-seed:
+        condition: service_completed_successfully
 
   postgres:
     image: postgres:17-alpine
@@ -41,4 +94,6 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
 volumes:
+  mongo_data:
+    name: counterparty-mongo_mongo_data
   postgres_data:
