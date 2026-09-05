@@ -5,10 +5,11 @@ from fastmcp import FastMCP
 
 from .analyzers import ANALYZERS
 from .domain import CounterpartyCard
+from .prompt_constants import MCP_SERVER_INSTRUCTIONS
 
 mcp = FastMCP(
     "counterparty-analysis",
-    instructions="Analyze only the counterparty card supplied to each tool.",
+    instructions=MCP_SERVER_INSTRUCTIONS,
 )
 
 

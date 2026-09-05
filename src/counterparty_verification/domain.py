@@ -193,11 +193,21 @@ class RiskFactor(BaseModel):
     evidence: list[Evidence] = Field(default_factory=list)
 
 
+class Observation(BaseModel):
+    """A point worth attention, stated without any risk verdict."""
+
+    code: str
+    title: str
+    detail: str
+    evidence: list[Evidence] = Field(default_factory=list)
+
+
 class ChapterResult(BaseModel):
     chapter: str
     risk_level: RiskLevel = RiskLevel.UNKNOWN
     conclusion: str
     factors: list[RiskFactor] = Field(default_factory=list)
+    observations: list[Observation] = Field(default_factory=list)
     evidence: list[Evidence] = Field(default_factory=list)
     data_sufficient: bool = True
     error: str | None = None

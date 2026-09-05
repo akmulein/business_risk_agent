@@ -9,9 +9,12 @@ from pydantic_ai.models.openrouter import OpenRouterModel
 from pydantic_ai.providers.openrouter import OpenRouterProvider
 
 from .domain import AnalysisSummary, ChapterResult, CounterpartyCard, RiskLevel
-from .llm_config import MODEL_SYSTEM_PROMPT
-from .settings import Settings
 
+from .prompt_constants import (
+    EVALUATOR_INSTRUCTIONS,
+    QUESTION_ANSWER_INSTRUCTIONS,
+    SPECIALIST_INSTRUCTIONS,
+)
 
 class GroundedText(BaseModel):
     text: str = Field(
@@ -42,6 +45,8 @@ def _chapter_fields(chapter: ChapterResult) -> set[str]:
     fields = {item.field for item in chapter.evidence}
     for factor in chapter.factors:
         fields.update(item.field for item in factor.evidence)
+    for observation in chapter.observations:
+        fields.update(item.field for item in observation.evidence)
     return fields
 
 
@@ -67,7 +72,9 @@ class SpecialistAgent:
             Agent(
                 _model(settings),
                 output_type=GroundedText,
-                instructions=MODEL_SYSTEM_PROMPT,
+
+                instructions=SPECIALIST_INSTRUCTIONS,
+
             )
             if self.enabled
             else None
@@ -98,7 +105,9 @@ class EvaluatorAgent:
             Agent(
                 _model(settings),
                 output_type=EvaluatorOutput,
-                instructions=MODEL_SYSTEM_PROMPT,
+
+                instructions=EVALUATOR_INSTRUCTIONS,
+
             )
             if self.enabled
             else None
@@ -148,6 +157,11 @@ class EvaluatorAgent:
         factors = [
             factor.title for chapter in chapters for factor in chapter.factors
         ]
+        factors += [
+            observation.title
+            for chapter in chapters
+            for observation in chapter.observations
+        ]
         return AnalysisSummary(
             risk_level=risk,
             summary=f"Итоговый уровень риска: {risk.value}. {conclusions}",
@@ -162,7 +176,9 @@ class QuestionAnswerAgent:
             Agent(
                 _model(settings),
                 output_type=GroundedText,
-                instructions=MODEL_SYSTEM_PROMPT,
+
+                instructions=QUESTION_ANSWER_INSTRUCTIONS,
+
             )
             if self.enabled
             else None

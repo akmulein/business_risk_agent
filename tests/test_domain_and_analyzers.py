@@ -48,6 +48,9 @@ def test_every_chapter_returns_grounded_result(
     for factor in result.factors:
         assert factor.evidence
         assert all(evidence.field for evidence in factor.evidence)
+    for observation in result.observations:
+        assert observation.evidence
+        assert all(evidence.field for evidence in observation.evidence)
 
 
 def test_legal_analyzer_detects_active_enforcement(
@@ -67,5 +70,5 @@ def test_legal_analyzer_detects_active_enforcement(
 
     result = ANALYZERS["analyze_legal"](card)
 
-    assert result.risk_level == RiskLevel.HIGH
-    assert any("исполнительные" in item.title.lower() for item in result.factors)
+    assert result.risk_level == RiskLevel.UNKNOWN
+    assert any(item.code == "enforcement_load" for item in result.observations)
