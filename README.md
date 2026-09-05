@@ -41,7 +41,7 @@ nano .env
 
 ```env
 OPENROUTER_API_KEY=<ваш ключ>
-OPENROUTER_MODEL=qwen/qwen3-30b-a3b-instruct-2507
+OPENROUTER_MODEL=~deepseek/deepseek-v4-flash-latest
 ```
 
 ## Локальный запуск
@@ -81,6 +81,7 @@ docker compose up --build
 Команда поднимает MongoDB, создаёт `reports` и `counterparty_cards`, затем
 запускает MCP, API и frontend. Коллекция `chat_sessions` и TTL-индекс для
 автоматического удаления истёкших сессий создаются при запуске API.
+Python-зависимости Docker-образов зафиксированы в `requirements.lock.txt`.
 
 Frontend: <http://localhost:3000>. Swagger UI: <http://localhost:8000/docs>.
 

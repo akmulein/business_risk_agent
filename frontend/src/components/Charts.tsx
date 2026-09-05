@@ -11,8 +11,7 @@ import {
   YAxis,
 } from 'recharts';
 
-import type { ChapterResult, VisualizationData } from '../types';
-import { RiskBadge } from './RiskBadge';
+import type { VisualizationData } from '../types';
 
 const compactNumber = new Intl.NumberFormat('ru-RU', {
   notation: 'compact',
@@ -36,120 +35,75 @@ function ChartCard({ title, children }: { title: string; children: React.ReactNo
   );
 }
 
-export function ReportCharts({
-  data,
-  chapters,
-}: {
-  data: VisualizationData;
-  chapters: ChapterResult[];
-}) {
+export function ReportCharts({ data }: { data: VisualizationData }) {
   return (
-    <div className="space-y-4">
-      <div className="grid gap-4 xl:grid-cols-2">
-        <ChartCard title="Выручка и прибыль">
-          {data.financials.length ? (
-            <div className="h-64 w-full">
-              <ResponsiveContainer>
-                <LineChart data={data.financials}>
-                  <CartesianGrid stroke="#ececec" strokeDasharray="4 4" />
-                  <XAxis dataKey="year" tick={{ fill: '#777', fontSize: 12 }} />
-                  <YAxis
-                    tickFormatter={(value) => compactNumber.format(value)}
-                    tick={{ fill: '#777', fontSize: 12 }}
-                    width={54}
-                  />
-                  <Tooltip
-                    formatter={(value) =>
-                      typeof value === 'number' ? `${compactNumber.format(value)} ₽` : String(value ?? '')
-                    }
-                  />
-                  <Legend />
-                  <Line type="monotone" dataKey="revenue" name="Выручка" stroke="#ef3124" strokeWidth={3} />
-                  <Line type="monotone" dataKey="profit" name="Прибыль" stroke="#111111" strokeWidth={3} />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          ) : (
-            <EmptyChart>В отчёте нет финансовых данных для графика</EmptyChart>
-          )}
-        </ChartCard>
-
-        <ChartCard title="Активы и обязательства">
-          {data.financials.length ? (
-            <div className="h-64 w-full">
-              <ResponsiveContainer>
-                <BarChart data={data.financials}>
-                  <CartesianGrid stroke="#ececec" strokeDasharray="4 4" />
-                  <XAxis dataKey="year" tick={{ fill: '#777', fontSize: 12 }} />
-                  <YAxis
-                    tickFormatter={(value) => compactNumber.format(value)}
-                    tick={{ fill: '#777', fontSize: 12 }}
-                    width={54}
-                  />
-                  <Tooltip
-                    formatter={(value) =>
-                      typeof value === 'number' ? `${compactNumber.format(value)} ₽` : String(value ?? '')
-                    }
-                  />
-                  <Legend />
-                  <Bar dataKey="assets" name="Активы" fill="#252525" radius={[5, 5, 0, 0]} />
-                  <Bar dataKey="liabilities" name="Обязательства" fill="#a8a8a8" radius={[5, 5, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          ) : (
-            <EmptyChart>В отчёте нет данных баланса</EmptyChart>
-          )}
-        </ChartCard>
-      </div>
-
-      <div className="grid gap-4 xl:grid-cols-2">
-        <ChartCard title="Государственные закупки">
-          {data.procurements.length ? (
-            <div className="h-64 w-full">
-              <ResponsiveContainer>
-                <BarChart data={data.procurements}>
-                  <CartesianGrid stroke="#ececec" strokeDasharray="4 4" />
-                  <XAxis dataKey="year" tick={{ fill: '#777', fontSize: 12 }} />
-                  <YAxis tick={{ fill: '#777', fontSize: 12 }} width={36} />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="admitted" name="Заявки" fill="#c8c8c8" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="winners" name="Победы" fill="#ef3124" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="contracts" name="Контракты" fill="#252525" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          ) : (
-            <EmptyChart>Компания не участвовала в закупках или данные отсутствуют</EmptyChart>
-          )}
-        </ChartCard>
-
-        <ChartCard title="Оценка по разделам">
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-            {chapters.map((chapter) => (
-              <div
-                key={chapter.chapter}
-                className="flex items-center justify-between gap-3 rounded-xl bg-[#f6f6f6] px-3 py-3"
-              >
-                <span className="text-sm font-medium text-[#333]">
-                  {CHAPTER_TITLES[chapter.chapter] ?? chapter.chapter}
-                </span>
-                <RiskBadge level={chapter.risk_level} />
-              </div>
-            ))}
+    <div className="grid gap-4 xl:grid-cols-2">
+      <ChartCard title="Выручка и прибыль">
+        {data.financials.length ? (
+          <div className="h-64 w-full">
+            <ResponsiveContainer>
+              <LineChart data={data.financials}>
+                <CartesianGrid stroke="#ececec" strokeDasharray="4 4" />
+                <XAxis dataKey="year" tick={{ fill: '#777', fontSize: 12 }} />
+                <YAxis
+                  tickFormatter={(value) => compactNumber.format(value)}
+                  tick={{ fill: '#777', fontSize: 12 }}
+                  width={54}
+                />
+                <Tooltip
+                  formatter={(value) =>
+                    typeof value === 'number'
+                      ? `${compactNumber.format(value)} ₽`
+                      : String(value ?? '')
+                  }
+                />
+                <Legend />
+                <Line type="monotone" dataKey="revenue" name="Выручка" stroke="#ef3124" strokeWidth={3} />
+                <Line type="monotone" dataKey="profit" name="Прибыль" stroke="#111111" strokeWidth={3} />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
-        </ChartCard>
-      </div>
+        ) : (
+          <EmptyChart>В отчёте нет финансовых данных для графика</EmptyChart>
+        )}
+      </ChartCard>
+
+      <ChartCard title="Активы">
+        {data.financials.length ? (
+          <div className="h-64 w-full">
+            <ResponsiveContainer>
+              <BarChart data={data.financials}>
+                <CartesianGrid stroke="#ececec" strokeDasharray="4 4" />
+                <XAxis dataKey="year" tick={{ fill: '#777', fontSize: 12 }} />
+                <YAxis
+                  tickFormatter={(value) => compactNumber.format(value)}
+                  tick={{ fill: '#777', fontSize: 12 }}
+                  width={54}
+                />
+                <Tooltip
+                  formatter={(value) =>
+                    typeof value === 'number'
+                      ? `${compactNumber.format(value)} ₽`
+                      : String(value ?? '')
+                  }
+                />
+                <Bar dataKey="assets" name="Активы" fill="#252525" radius={[5, 5, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        ) : (
+          <EmptyChart>В отчёте нет данных об активах</EmptyChart>
+        )}
+      </ChartCard>
     </div>
   );
 }
 
 export const CHAPTER_TITLES: Record<string, string> = {
-  general: 'Общая информация',
-  structure: 'Структура компании',
-  legal: 'Юридические риски',
-  reputation: 'Репутация',
-  finance: 'Финансы',
+  general: 'Статус компании',
+  reputation: 'Критические красные флаги и налоги',
+  legal: 'Судебные риски',
+  finance: 'Финансовое состояние',
+  structure: 'Возраст, руководство и связанные лица',
   procurement: 'Госзакупки',
 };

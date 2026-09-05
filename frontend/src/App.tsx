@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Button } from '@alfalab/core-components/button';
-import { Bot, Building2, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { Building2 } from 'lucide-react';
 
 import { analyzeCounterparties } from './api';
 import { ChatSidebar } from './components/ChatSidebar';
@@ -70,58 +69,13 @@ export default function App() {
       <div className="grid h-full min-h-0 lg:grid-cols-[minmax(0,3fr)_minmax(320px,1fr)]">
         <section className="min-h-0 overflow-y-auto">
           <div className="mx-auto w-full max-w-[1440px] space-y-5 p-4 md:p-6 lg:p-8">
-            <header className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#ef3124] font-bold text-white shadow-sm">
-                  A
-                </span>
-                <div>
-                  <p className="font-semibold text-[#111]">Контрагент AI</p>
-                  <p className="text-xs text-[#777]">Проверка на основе банковского отчёта</p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsMobileChatOpen(true)}
-                className="flex items-center gap-2 rounded-full bg-[#111] px-4 py-2 text-sm font-medium text-white lg:hidden"
-              >
-                <Bot size={17} />
-                Чат
-              </button>
-            </header>
-
             <CompanySearch
               selectedInns={selected.map((item) => item.inn)}
               disabled={isAnalyzing}
               onAdd={addCompany}
+              onRunAnalysis={() => void runAnalysis()}
+              onOpenMobileChat={() => setIsMobileChatOpen(true)}
             />
-
-            {selected.length > 0 && (
-              <section className="flex flex-col gap-4 rounded-3xl bg-[#111] p-5 text-white shadow-lg sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 size={18} className="text-[#ef3124]" />
-                    <p className="font-semibold">Выбрано компаний: {selected.length}</p>
-                  </div>
-                  <p className="mt-1 text-sm text-white/60">
-                    Отчёты сформируются одним запросом и попадут в общий чат.
-                  </p>
-                </div>
-                <Button
-                  view="primary"
-                  size={48}
-                  disabled={isAnalyzing}
-                  onClick={() => void runAnalysis()}
-                >
-                  {isAnalyzing
-                    ? 'Формируем полный отчёт…'
-                    : 'Проверить ' +
-                      selected.length +
-                      ' ' +
-                      (selected.length === 1 ? 'компанию' : 'компании')}
-                </Button>
-              </section>
-            )}
 
             {analysisError && (
               <div className="rounded-2xl border border-[#f1b9b5] bg-[#fff0ef] p-4 text-sm text-[#a71b13]">
@@ -148,16 +102,12 @@ export default function App() {
                     preview={company}
                     result={resultsByInn.get(company.inn)}
                     analyzing={isAnalyzing}
+                    companyCount={selected.length}
                     onRemove={() => removeCompany(company.inn)}
                   />
                 ))}
               </section>
             )}
-
-            <footer className="flex items-center gap-2 pb-4 text-xs text-[#888]">
-              <ShieldCheck size={14} />
-              Решение не пересчитывает банковский уровень риска
-            </footer>
           </div>
         </section>
 
