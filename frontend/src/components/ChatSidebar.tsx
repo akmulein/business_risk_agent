@@ -1,15 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { Textarea } from '@alfalab/core-components/textarea';
-import { Bot, RotateCcw, Send, Sparkles, X } from 'lucide-react';
+import { Bot, ChevronDown, RotateCcw, Send, Sparkles, X } from 'lucide-react';
 
 import { clearChat, sendChatMessage } from '../api';
 import type { ChatMessage } from '../types';
 
 const PRESETS = [
-  'С кем судилась компания в 2024?',
-  'Есть ли налоговые задолженности?',
-  'Динамика выручки за 3 года',
-  'Кто конечный бенефициар?',
+  'Что может помешать сотрудничеству?',
+  'Проблемы с долгами, налогами и обязательствами?',
+  'Массовый адрес или недостоверные данные?',
 ];
 
 interface ChatSidebarProps {
@@ -22,6 +21,7 @@ export function ChatSidebar({ chatId, companyCount, onClose }: ChatSidebarProps)
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [value, setValue] = useState('');
   const [isSending, setIsSending] = useState(false);
+  const [arePresetsOpen, setArePresetsOpen] = useState(true);
   const [error, setError] = useState('');
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -83,15 +83,15 @@ export function ChatSidebar({ chatId, companyCount, onClose }: ChatSidebarProps)
   };
 
   return (
-    <aside className="flex h-full min-h-0 flex-col bg-white">
+    <aside className="flex h-full min-h-0 flex-col bg-white text-sm">
       <header className="flex items-center justify-between gap-3 border-b border-[#e8e8e8] px-4 py-4 lg:px-5">
         <div className="flex min-w-0 items-center gap-3">
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#111] text-white">
             <Bot size={20} />
           </span>
           <div className="min-w-0">
-            <h2 className="font-semibold text-[#111]">AI-Ассистент</h2>
-            <p className="truncate text-xs text-[#7a7a7a]">
+            <h2 className="text-sm font-semibold text-[#111]">AI-Ассистент</h2>
+            <p className="truncate text-sm text-[#7a7a7a]">
               {chatId ? 'Отчётов в контексте: ' + companyCount : 'Сначала запустите проверку'}
             </p>
           </div>
@@ -154,22 +154,6 @@ export function ChatSidebar({ chatId, companyCount, onClose }: ChatSidebarProps)
                 ].join(' ')}
               >
                 <p className="whitespace-pre-line">{message.content}</p>
-                {message.sources && message.sources.length > 0 && (
-                  <details className="mt-2 border-t border-black/10 pt-2 text-xs">
-                    <summary className="cursor-pointer text-[#666]">
-                      Показать исходные данные
-                    </summary>
-                    <div className="mt-2 space-y-2">
-                      {message.sources.map((source, index) => (
-                        <div key={source.field + '-' + index} className="break-words">
-                          <span className="font-medium">ИНН {source.inn}</span>
-                          <br />
-                          <span className="text-[#777]">{source.field}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </details>
-                )}
               </div>
             </div>
           ))}
@@ -187,22 +171,38 @@ export function ChatSidebar({ chatId, companyCount, onClose }: ChatSidebarProps)
       </div>
 
       <footer className="border-t border-[#e8e8e8] p-4">
-        {error && <p className="mb-2 text-xs text-[#c21a10]">{error}</p>}
-        <div className="mb-3 flex gap-2 overflow-x-auto pb-1 lg:flex-wrap">
-          {PRESETS.map((preset) => (
-            <button
-              key={preset}
-              type="button"
-              disabled={!chatId || isSending}
-              onClick={() => void submit(preset)}
-              className="shrink-0 rounded-full border border-[#d9d9d9] bg-white px-3 py-2 text-left text-xs text-[#444] transition hover:border-[#999] hover:bg-[#f7f7f7] disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              {preset}
-            </button>
-          ))}
+        {error && <p className="mb-2 text-sm text-[#c21a10]">{error}</p>}
+        <div className="mb-2">
+          <button
+            type="button"
+            aria-expanded={arePresetsOpen}
+            onClick={() => setArePresetsOpen((current) => !current)}
+            className="mb-1 flex items-center gap-1 text-sm font-medium text-[#777] transition hover:text-[#222]"
+          >
+            Быстрые вопросы
+            <ChevronDown
+              size={14}
+              className={`transition-transform ${arePresetsOpen ? 'rotate-180' : ''}`}
+            />
+          </button>
+          {arePresetsOpen && (
+            <div className="flex gap-1.5 overflow-x-auto pb-1 lg:flex-wrap">
+              {PRESETS.map((preset) => (
+                <button
+                  key={preset}
+                  type="button"
+                  disabled={!chatId || isSending}
+                  onClick={() => void submit(preset)}
+                  className="shrink-0 rounded-full bg-[#f1f1f1] px-2.5 py-1 text-left text-sm leading-5 text-[#555] transition hover:bg-[#e7e7e7] disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  {preset}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
         <div className="flex items-end gap-2">
-          <div className="min-w-0 flex-1">
+          <div className="min-w-0 flex-1 [&_textarea]:!text-sm">
             <Textarea
               block
               minRows={1}

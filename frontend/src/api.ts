@@ -1,8 +1,9 @@
-import { MOCK_ANALYSIS, MOCK_PREVIEW, mockChatAnswer } from './mockData';
+import { MOCK_ANALYSIS, MOCK_PREVIEW, MOCK_SOURCE_REPORT, mockChatAnswer } from './mockData';
 import type {
   BatchAnalysisResponse,
   ChatMessageResponse,
   CounterpartyPreview,
+  SourceReportResponse,
 } from './types';
 
 const useMocks = import.meta.env.VITE_USE_MOCKS === 'true';
@@ -71,6 +72,16 @@ export async function analyzeCounterparties(
     method: 'POST',
     body: JSON.stringify({ inns }),
   });
+}
+
+export async function getSourceReport(inn: string): Promise<SourceReportResponse> {
+  if (useMocks) {
+    await new Promise((resolve) => window.setTimeout(resolve, 350));
+    return { inn, report: structuredClone(MOCK_SOURCE_REPORT) };
+  }
+  return request<SourceReportResponse>(
+    `/api/v1/counterparties/${encodeURIComponent(inn)}/report`,
+  );
 }
 
 export async function sendChatMessage(

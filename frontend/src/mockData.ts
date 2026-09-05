@@ -12,6 +12,34 @@ export const MOCK_PREVIEW: CounterpartyPreview = {
   kpp: '732501001',
 };
 
+export const MOCK_SOURCE_REPORT: Record<string, unknown> = {
+  reportDate: '2025-12-31',
+  baseInfo: {
+    inn: '7325145393',
+    kpp: '732501001',
+    ogrn: '1167325059000',
+    shortName: 'ООО «ЗЕБРЕЙНС»',
+    fullName: 'ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ «ЗЕБРЕЙНС»',
+    address: 'г. Ульяновск',
+    riskLevel: 'MEDIUM',
+    registrationInfo: {
+      registrationDate: '2016-05-10',
+      yearsFromRegistration: 9,
+    },
+  },
+  status: { status: 'CURRENT' },
+  foundersInfo: {
+    shareCapital: 10000,
+    authPerson: {
+      name: 'ЗАЙНЕЕВ РАМИЛЬ РИНАТОВИЧ',
+      positionName: 'ГЕНЕРАЛЬНЫЙ ДИРЕКТОР',
+    },
+  },
+  finReports: [
+    { common: { year: 2025, proceeds: 278000000, profit: 16100000 } },
+  ],
+};
+
 export const MOCK_ANALYSIS: BatchAnalysisResponse = {
   chat_id: 'mock-chat',
   results: [
@@ -25,6 +53,32 @@ export const MOCK_ANALYSIS: BatchAnalysisResponse = {
         risk_level: 'MEDIUM',
         summary:
           'Компания ведёт деятельность более восьми лет и сохраняет действующий статус. Финансовые показатели демонстрируют рост выручки, однако в последнем периоде увеличилась долговая нагрузка. Существенных юридических ограничений в доступных данных не обнаружено.',
+        factor_summary: [
+          {
+            chapter: 'reputation',
+            label: 'Критические флаги',
+            status: 'LOW',
+            details: ['Критических факторов в отчёте не указано.'],
+          },
+          {
+            chapter: 'legal',
+            label: 'Суды и взыскания',
+            status: 'LOW',
+            details: ['Существенных юридических ограничений не обнаружено.'],
+          },
+          {
+            chapter: 'finance',
+            label: 'Финансы',
+            status: 'MEDIUM',
+            details: ['В последнем периоде увеличилась долговая нагрузка.'],
+          },
+          {
+            chapter: 'structure',
+            label: 'Руководство',
+            status: 'LOW',
+            details: ['Руководитель и состав учредителей определены.'],
+          },
+        ],
         company_profile: {
           inn: '7325145393',
           kpp: '732501001',
@@ -45,14 +99,14 @@ export const MOCK_ANALYSIS: BatchAnalysisResponse = {
         },
         visualization_data: {
           financials: [
-            { year: 2023, revenue: 184000000, profit: 14200000, assets: 96000000, liabilities: 51000000 },
-            { year: 2024, revenue: 231000000, profit: 18800000, assets: 121000000, liabilities: 68000000 },
-            { year: 2025, revenue: 278000000, profit: 16100000, assets: 149000000, liabilities: 97000000 },
+            { year: 2023, revenue: 184000000, profit: 14200000, assets: 96000000, obligations: 51000000 },
+            { year: 2024, revenue: 231000000, profit: 18800000, assets: 121000000, obligations: 68000000 },
+            { year: 2025, revenue: 278000000, profit: 16100000, assets: 149000000, obligations: 97000000 },
           ],
-          procurements: [
-            { year: 2023, admitted: 18, winners: 9, contracts: 8, amount: 21400000 },
-            { year: 2024, admitted: 24, winners: 13, contracts: 12, amount: 38700000 },
-            { year: 2025, admitted: 21, winners: 10, contracts: 10, amount: 44200000 },
+          legal_dynamics: [
+            { year: 2023, courts: 2, enforcements: 1 },
+            { year: 2024, courts: 4, enforcements: 2 },
+            { year: 2025, courts: 3, enforcements: 5 },
           ],
         },
         chapters: [

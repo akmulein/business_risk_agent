@@ -3,6 +3,7 @@ import inspect
 import pytest
 from pydantic import ValidationError
 
+import counterparty_verification.analyzers as analyzers_module
 from counterparty_verification.analyzers import ANALYZERS
 from counterparty_verification.domain import (
     AnalysisRequest,
@@ -40,8 +41,19 @@ def test_batch_accepts_at_most_ten_inns() -> None:
 
 @pytest.mark.parametrize("tool_name", ANALYZERS)
 async def test_every_chapter_returns_grounded_result(
-    tool_name: str, card: CounterpartyCard
+    tool_name: str,
+    card: CounterpartyCard,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    class StubReputationAgent:
+        async def aggregate(self, view):
+            return []
+
+    monkeypatch.setattr(
+        analyzers_module,
+        "get_reputation_agent",
+        lambda: StubReputationAgent(),
+    )
     result = ANALYZERS[tool_name](card)
     if inspect.isawaitable(result):
         result = await result

@@ -28,6 +28,7 @@ class CounterpartyRepository(Protocol):
     async def get_many_by_inns(
         self, inns: list[str]
     ) -> list[CounterpartyCard]: ...
+    async def get_source_report_by_inn(self, inn: str) -> dict[str, Any] | None: ...
 
 
 class JsonCounterpartyRepository:
@@ -57,6 +58,20 @@ class JsonCounterpartyRepository:
                     break
         return [found[inn] for inn in inns if inn in found]
 
+    async def get_source_report_by_inn(self, inn: str) -> dict[str, Any] | None:
+        with self.path.open(encoding="utf-8") as source:
+            records = json.load(source)
+        for record in records:
+            if "report" in record:
+                report = record.get("report") or {}
+                if str((report.get("baseInfo") or {}).get("inn") or "") == inn:
+                    return report
+                continue
+            card = CounterpartyCard.model_validate(record)
+            if card.company_reports.inn == inn:
+                return card.company_reports.raw_report_json
+        return None
+
 
 class MongoCounterpartyRepository:
     """Loads an application-ready card; raw source reports stay untouched."""
@@ -66,6 +81,7 @@ class MongoCounterpartyRepository:
         mongodb_url: str,
         database: str,
         collection: str,
+        source_collection: str = "reports",
         client: Any | None = None,
     ) -> None:
         if client is None:
@@ -73,7 +89,9 @@ class MongoCounterpartyRepository:
 
             client = AsyncMongoClient(mongodb_url)
         self.client = client
-        self.collection = client[database][collection]
+        self.database = client[database]
+        self.collection = self.database[collection]
+        self.source_collection_name = source_collection
 
     async def get_by_inn(self, inn: str) -> CounterpartyCard | None:
         document = await self.collection.find_one(
@@ -105,6 +123,17 @@ class MongoCounterpartyRepository:
             for inn in inns
             if inn in latest
         ]
+
+    async def get_source_report_by_inn(self, inn: str) -> dict[str, Any] | None:
+        document = await self.database[self.source_collection_name].find_one(
+            {"report.baseInfo.inn": inn},
+            projection={"_id": False, "report": True},
+            sort=[("report.reportDate", -1)],
+        )
+        if document is None:
+            return None
+        report = document.get("report")
+        return report if isinstance(report, dict) else None
 
     async def close(self) -> None:
         result = self.client.close()
@@ -339,3 +368,20 @@ class PostgresCounterpartyRepository:
             if card is not None:
                 cards.append(card)
         return cards
+
+    async def get_source_report_by_inn(self, inn: str) -> dict[str, Any] | None:
+        async with self.engine.connect() as connection:
+            raw_report = (
+                await connection.execute(
+                    select(company_reports.c.raw_report_json)
+                    .where(company_reports.c.inn == inn)
+                    .order_by(
+                        company_reports.c.report_date.desc().nullslast(),
+                        company_reports.c.report_id.desc(),
+                    )
+                    .limit(1)
+                )
+            ).scalar_one_or_none()
+        if isinstance(raw_report, str):
+            raw_report = json.loads(raw_report)
+        return raw_report if isinstance(raw_report, dict) else None

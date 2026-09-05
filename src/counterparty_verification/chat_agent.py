@@ -5,7 +5,7 @@ import logging
 from typing import Any
 
 from pydantic import BaseModel, Field
-from pydantic_ai import Agent
+from pydantic_ai import Agent, ModelSettings
 from pydantic_ai.models.openrouter import OpenRouterModel
 from pydantic_ai.providers.openrouter import OpenRouterProvider
 
@@ -82,6 +82,7 @@ class ReportChatAgent:
                 _openrouter_model(settings),
                 output_type=ChatModelOutput,
                 instructions=MODEL_SYSTEM_PROMPT,
+                model_settings=ModelSettings(max_tokens=settings.chat_max_tokens),
             )
         else:
             self.agent = None

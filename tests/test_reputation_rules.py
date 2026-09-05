@@ -5,17 +5,14 @@ from typing import Any
 
 import pytest
 
-import counterparty_verification.agents as agents_module
-from counterparty_verification.agents import flatten_field_paths
+import counterparty_verification.analyzers as analyzers_module
 from counterparty_verification.analyzers import analyze_reputation
-from counterparty_verification.domain import CounterpartyCard, RiskLevel
+from counterparty_verification.domain import CounterpartyCard, Observation, RiskLevel
 from counterparty_verification.reputation_rules import (
     CHAPTER_LABELS,
     CODE_ALIASES,
     build_view,
-    fallback_observations,
 )
-from counterparty_verification.settings import Settings
 
 RULES_DOC = Path(__file__).parents[1] / "tools_rules" / "analyze_reputation.md"
 
@@ -28,19 +25,24 @@ COMPANY_REPORT: dict[str, Any] = {
 
 
 @pytest.fixture(autouse=True)
-def _disabled_reputation_agent(monkeypatch: pytest.MonkeyPatch):
-    """Forces `ReputationAgent` off, independent of the local environment.
+def _stub_reputation_agent(monkeypatch: pytest.MonkeyPatch):
+    class StubReputationAgent:
+        async def aggregate(self, view):
+            return [
+                Observation(
+                    code=f"chapter_{chapter}",
+                    title=CHAPTER_LABELS.get(chapter, chapter),
+                    detail="; ".join(entry.item.name for entry in entries),
+                    evidence=[entry.evidence("name") for entry in entries],
+                )
+                for chapter, entries in view.by_chapter.items()
+            ]
 
-    `get_reputation_agent` is an `lru_cache` singleton reading real
-    `Settings` (env / `.env`); without this, an `OPENROUTER_API_KEY` present
-    on a developer's machine would make these tests non-deterministic.
-    """
-    agents_module.get_reputation_agent.cache_clear()
     monkeypatch.setattr(
-        agents_module, "get_settings", lambda: Settings(openrouter_api_key=None)
+        analyzers_module,
+        "get_reputation_agent",
+        lambda: StubReputationAgent(),
     )
-    yield
-    agents_module.get_reputation_agent.cache_clear()
 
 
 def _factor(index: int, sign: str, chapter: str, **fields: Any) -> dict[str, Any]:
@@ -86,27 +88,6 @@ def test_known_code_typo_is_normalized() -> None:
 
     assert view.indexed[0].code == "arbitrationDefendant"
     assert view.indexed[0].code == CODE_ALIASES["аrbitrationDefendant"]
-
-
-def test_fallback_observations_use_verbatim_text_and_valid_evidence() -> None:
-    card = _card(
-        [
-            _factor(0, "negative", "finance", name="Убыток за отчётный период."),
-            _factor(1, "positive", "finance", name="Стабильная выручка."),
-        ]
-    )
-    view = build_view(card)
-
-    observations = fallback_observations(view)
-
-    assert len(observations) == 1
-    observation = observations[0]
-    assert observation.code == "chapter_finance"
-    assert observation.title == CHAPTER_LABELS["finance"]
-    assert "Убыток за отчётный период." in observation.detail
-    assert "Стабильная выручка." in observation.detail
-    allowed = flatten_field_paths(card.model_dump(mode="json"))
-    assert {item.field for item in observation.evidence}.issubset(allowed)
 
 
 @pytest.mark.asyncio

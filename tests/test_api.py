@@ -4,7 +4,6 @@ import pytest
 from httpx import ASGITransport, AsyncClient
 
 from counterparty_verification.agents import (
-    EvaluatorAgent,
     QuestionAnswerAgent,
     SpecialistAgent,
 )
@@ -17,6 +16,7 @@ from counterparty_verification.chat_service import (
     ChatService,
     InMemoryChatSessionStore,
 )
+from counterparty_verification.domain import AnalysisSummary
 from counterparty_verification.mcp_client import LocalAnalysisToolClient
 from counterparty_verification.repositories import JsonCounterpartyRepository
 from counterparty_verification.services import (
@@ -42,6 +42,14 @@ class StubChatAgent:
         )
 
 
+class StubEvaluator:
+    async def summarize(self, company_name, risk_level, factors):
+        return AnalysisSummary(
+            risk_level=risk_level,
+            summary=f"{company_name}: тестовое LLM-саммари",
+        )
+
+
 @pytest.fixture
 def app():
     root = Path(__file__).parents[1]
@@ -57,7 +65,7 @@ def app():
         repository=repository,
         tools=LocalAnalysisToolClient(),
         specialist=SpecialistAgent(settings),
-        evaluator=EvaluatorAgent(settings),
+        evaluator=StubEvaluator(),
         sessions=sessions,
         timeout_seconds=5,
     )
@@ -87,6 +95,7 @@ async def test_analysis_and_question_endpoints(app) -> None:
         body = analysis_body["results"][0]["analysis"]
         assert body is not None
         assert body["summary"]
+        assert body["factor_summary"]
         assert len(body["chapters"]) == 6
         assert body["company_profile"]["inn"] == "7707083893"
         assert "financials" in body["visualization_data"]
