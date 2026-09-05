@@ -5,6 +5,19 @@ from typing import Annotated
 from fastapi import Depends, FastAPI, HTTPException, Request, status
 
 from .agents import EvaluatorAgent, QuestionAnswerAgent, SpecialistAgent
+from .chat_agent import ChatModelNotConfiguredError, ReportChatAgent
+from .chat_models import (
+    ChatHistoryResponse,
+    ChatMessageRequest,
+    ChatMessageResponse,
+)
+from .chat_service import (
+    ChatService,
+    ChatSessionNotFoundError,
+    ChatUpstreamServiceError,
+    InMemoryChatSessionStore,
+    MongoChatSessionStore,
+)
 from .domain import (
     AnalysisRequest,
     BatchAnalysisResponse,
@@ -41,12 +54,18 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     elif config.repository_backend == "mock":
         repository = JsonCounterpartyRepository(config.mock_data_path)
     else:
-        raise ValueError(
-            "REPOSITORY_BACKEND must be one of: mock, postgres, mongo"
+        raise ValueError("REPOSITORY_BACKEND must be one of: mock, postgres, mongo")
+    if isinstance(repository, MongoCounterpartyRepository):
+        chat_store = MongoChatSessionStore(
+            repository.client[config.mongodb_database][config.mongodb_chat_collection],
+            config.session_ttl_seconds,
         )
+    else:
+        chat_store = InMemoryChatSessionStore(config.session_ttl_seconds)
 
     @asynccontextmanager
     async def lifespan(_: FastAPI):
+        await chat_store.ensure_indexes()
         yield
         close = getattr(repository, "close", None)
         if close is not None:
@@ -74,9 +93,17 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         QuestionAnswerAgent(config),
         timeout_seconds=config.analysis_timeout_seconds,
     )
+    chat_service = ChatService(
+        repository=repository,
+        store=chat_store,
+        agent=ReportChatAgent(config),
+        timeout_seconds=config.chat_timeout_seconds,
+        history_limit=config.chat_history_limit,
+    )
     app.state.analysis_service = analysis_service
     app.state.question_service = question_service
     app.state.settings = config
+    app.state.chat_service = chat_service
 
     def get_analysis_service(request: Request) -> AnalysisService:
         return request.app.state.analysis_service
@@ -84,8 +111,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     def get_question_service(request: Request) -> QuestionService:
         return request.app.state.question_service
 
+    def get_chat_service(request: Request) -> ChatService:
+        return request.app.state.chat_service
+
     AnalysisDep = Annotated[AnalysisService, Depends(get_analysis_service)]
     QuestionDep = Annotated[QuestionService, Depends(get_question_service)]
+
+    ChatDep = Annotated[ChatService, Depends(get_chat_service)]
 
     @app.get("/health", tags=["system"])
     async def health() -> dict[str, str]:
@@ -102,9 +134,63 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         tags=["analysis"],
     )
     async def create_analysis(
-        payload: AnalysisRequest, service: AnalysisDep
+        payload: AnalysisRequest,
+        service: AnalysisDep,
+        chat: ChatDep,
     ) -> BatchAnalysisResponse:
-        return await service.analyze_many(payload.inns)
+        response = await service.analyze_many(payload.inns)
+        response.chat_id = await chat.create_for_analysis(response)
+        return response
+
+    @app.post(
+        "/api/v1/chats/{chat_id}/messages",
+        response_model=ChatMessageResponse,
+        tags=["chat"],
+    )
+    async def send_chat_message(
+        chat_id: str,
+        payload: ChatMessageRequest,
+        service: ChatDep,
+    ) -> ChatMessageResponse:
+        try:
+            return await service.answer(chat_id, payload.message)
+        except ChatSessionNotFoundError as error:
+            raise HTTPException(
+                status_code=404,
+                detail="Чат не найден или срок сессии истёк",
+            ) from error
+        except ChatModelNotConfiguredError as error:
+            raise HTTPException(
+                status_code=503,
+                detail="OPENROUTER_API_KEY не настроен",
+            ) from error
+        except asyncio.TimeoutError as error:
+            raise HTTPException(
+                status_code=503,
+                detail="Превышено время ответа",
+            ) from error
+        except ChatUpstreamServiceError as error:
+            raise HTTPException(
+                status_code=502,
+                detail="Ошибка сервиса языковой модели",
+            ) from error
+
+    @app.get(
+        "/api/v1/chats/{chat_id}/messages",
+        response_model=ChatHistoryResponse,
+        tags=["chat"],
+    )
+    async def get_chat_messages(
+        chat_id: str,
+        service: ChatDep,
+    ) -> ChatHistoryResponse:
+        try:
+            return await service.history(chat_id)
+        except ChatSessionNotFoundError as error:
+            raise HTTPException(
+                status_code=404,
+                detail="Чат не найден или срок сессии истёк",
+            ) from error
 
     @app.post(
         "/api/v1/analyses/{analysis_id}/questions",

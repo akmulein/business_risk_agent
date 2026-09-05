@@ -28,14 +28,19 @@ from .settings import Settings, get_settings
 
 
 class GroundedText(BaseModel):
-    text: str
-    evidence_fields: list[str] = Field(default_factory=list)
+    text: str = Field(
+        max_length=500,
+        description="Краткий текст без названий полей, JSON и описания процесса проверки",
+    )
+    evidence_fields: list[str] = Field(
+        default_factory=list,
+        description="Точные пути полей для машинной проверки; не включать их в text",
+    )
 
 
 class EvaluatorOutput(BaseModel):
-    risk_level: RiskLevel
-    statements: list[GroundedText]
-    key_factors: list[str] = Field(default_factory=list)
+    statements: list[GroundedText] = Field(min_length=1, max_length=5)
+    key_factors: list[str] = Field(default_factory=list, max_length=5)
 
 
 def _model(settings: Settings) -> OpenRouterModel:
@@ -78,7 +83,9 @@ class SpecialistAgent:
             Agent(
                 _model(settings),
                 output_type=GroundedText,
+
                 instructions=SPECIALIST_INSTRUCTIONS,
+
             )
             if self.enabled
             else None
@@ -87,9 +94,13 @@ class SpecialistAgent:
     async def enrich(self, chapter: ChapterResult) -> ChapterResult:
         if not self.agent:
             return chapter
-        result = await self.agent.run(
-            json.dumps(chapter.model_dump(mode="json"), ensure_ascii=False)
-        )
+        payload = {
+            "task": (
+                "Кратко переформулируй готовое заключение, не меняя его смысл."
+            ),
+            "chapter": chapter.model_dump(mode="json"),
+        }
+        result = await self.agent.run(json.dumps(payload, ensure_ascii=False))
         allowed = _chapter_fields(chapter)
         if result.output.evidence_fields and set(
             result.output.evidence_fields
@@ -105,30 +116,37 @@ class EvaluatorAgent:
             Agent(
                 _model(settings),
                 output_type=EvaluatorOutput,
+
                 instructions=EVALUATOR_INSTRUCTIONS,
+
             )
             if self.enabled
             else None
         )
 
     async def summarize(self, chapters: list[ChapterResult]) -> AnalysisSummary:
+        deterministic = self._deterministic_summary(chapters)
         if not self.agent:
-            return self._deterministic_summary(chapters)
-        result = await self.agent.run(
-            json.dumps(
-                [chapter.model_dump(mode="json") for chapter in chapters],
-                ensure_ascii=False,
-            )
-        )
+            return deterministic
+        payload = {
+            "task": (
+                "Составь краткое итоговое саммари. Не перечисляй все проверки и "
+                "не добавляй новые факторы риска. Светофор уже рассчитан и не "
+                "требует переоценки."
+            ),
+            "risk_level": deterministic.risk_level,
+            "chapters": [chapter.model_dump(mode="json") for chapter in chapters],
+        }
+        result = await self.agent.run(json.dumps(payload, ensure_ascii=False))
         allowed = set().union(*(_chapter_fields(item) for item in chapters))
         if not result.output.statements or any(
             not statement.evidence_fields
             or not set(statement.evidence_fields).issubset(allowed)
             for statement in result.output.statements
         ):
-            return self._deterministic_summary(chapters)
+            return deterministic
         return AnalysisSummary(
-            risk_level=result.output.risk_level,
+            risk_level=deterministic.risk_level,
             summary=" ".join(item.text for item in result.output.statements),
             key_factors=result.output.key_factors,
         )
@@ -169,7 +187,9 @@ class QuestionAnswerAgent:
             Agent(
                 _model(settings),
                 output_type=GroundedText,
+
                 instructions=QUESTION_ANSWER_INSTRUCTIONS,
+
             )
             if self.enabled
             else None
@@ -187,6 +207,7 @@ class QuestionAnswerAgent:
                 "Исходный анализ сформирован детерминированно."
             )
         payload = {
+            "task": "Ответь на вопрос по данным отчёта.",
             "question": question,
             "card": card.model_dump(mode="json"),
             "analysis": [item.model_dump(mode="json") for item in chapters],

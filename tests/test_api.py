@@ -9,6 +9,14 @@ from counterparty_verification.agents import (
     SpecialistAgent,
 )
 from counterparty_verification.api import create_app
+from counterparty_verification.chat_models import (
+    ChatAgentResult,
+    ChatSource,
+)
+from counterparty_verification.chat_service import (
+    ChatService,
+    InMemoryChatSessionStore,
+)
 from counterparty_verification.mcp_client import LocalAnalysisToolClient
 from counterparty_verification.repositories import JsonCounterpartyRepository
 from counterparty_verification.services import (
@@ -19,17 +27,34 @@ from counterparty_verification.services import (
 from counterparty_verification.settings import Settings
 
 
+class StubChatAgent:
+    async def answer(self, question, cards, analyses, history):
+        inn = cards[0].company_reports.inn
+        return ChatAgentResult(
+            answer=f"Ответ по {len(cards)} контрагентам",
+            sources=[
+                ChatSource(
+                    inn=inn,
+                    field="company_reports.inn",
+                    value=inn,
+                )
+            ],
+        )
+
+
 @pytest.fixture
 def app():
     root = Path(__file__).parents[1]
     settings = Settings(
         openrouter_api_key=None,
+        repository_backend="mock",
         mock_data_path=root / "data" / "counterparties.json",
     )
+    repository = JsonCounterpartyRepository(settings.mock_data_path)
     application = create_app(settings)
     sessions = InMemorySessionStore(60)
     application.state.analysis_service = AnalysisService(
-        repository=JsonCounterpartyRepository(settings.mock_data_path),
+        repository=repository,
         tools=LocalAnalysisToolClient(),
         specialist=SpecialistAgent(settings),
         evaluator=EvaluatorAgent(settings),
@@ -39,6 +64,13 @@ def app():
     application.state.question_service = QuestionService(
         sessions, QuestionAnswerAgent(settings)
     )
+    application.state.chat_service = ChatService(
+        repository=repository,
+        store=InMemoryChatSessionStore(60),
+        agent=StubChatAgent(),
+        timeout_seconds=5,
+        history_limit=12,
+    )
     return application
 
 
@@ -47,14 +79,26 @@ async def test_analysis_and_question_endpoints(app) -> None:
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://test"
     ) as client:
-        analysis = await client.post(
-            "/api/v1/analyses", json={"inns": ["7707083893"]}
-        )
+        analysis = await client.post("/api/v1/analyses", json={"inns": ["7707083893"]})
         assert analysis.status_code == 201
-        body = analysis.json()["results"][0]["analysis"]
+        analysis_body = analysis.json()
+        chat_id = analysis_body["chat_id"]
+        assert chat_id
+        body = analysis_body["results"][0]["analysis"]
         assert body is not None
         assert body["summary"]
         assert len(body["chapters"]) == 6
+        chat_answer = await client.post(
+            f"/api/v1/chats/{chat_id}/messages",
+            json={"message": "Какой ИНН указан в отчёте?"},
+        )
+        assert chat_answer.status_code == 200
+        assert chat_answer.json()["answer"] == "Ответ по 1 контрагентам"
+        assert chat_answer.json()["sources"][0]["value"] == "7707083893"
+
+        history = await client.get(f"/api/v1/chats/{chat_id}/messages")
+        assert history.status_code == 200
+        assert len(history.json()["messages"]) == 2
 
         answer = await client.post(
             f"/api/v1/analyses/{body['analysis_id']}/questions",
@@ -69,15 +113,19 @@ async def test_analysis_and_question_endpoints(app) -> None:
         )
         assert isolated.status_code == 404
 
+        missing_chat = await client.post(
+            "/api/v1/chats/not-this-chat/messages",
+            json={"message": "Вопрос"},
+        )
+        assert missing_chat.status_code == 404
+
 
 @pytest.mark.asyncio
 async def test_validation_and_not_found(app) -> None:
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://test"
     ) as client:
-        invalid = await client.post(
-            "/api/v1/analyses", json={"inns": ["123"]}
-        )
+        invalid = await client.post("/api/v1/analyses", json={"inns": ["123"]})
         missing = await client.post(
             "/api/v1/analyses",
             json={"inns": ["1234567894", "772377037026"]},
@@ -95,6 +143,8 @@ async def test_validation_and_not_found(app) -> None:
     ]
     assert too_many.status_code == 422
 
+    assert missing.json()["chat_id"] is None
+
 
 @pytest.mark.asyncio
 async def test_multiple_inns_return_independent_results(app) -> None:
@@ -108,6 +158,7 @@ async def test_multiple_inns_return_independent_results(app) -> None:
 
     assert response.status_code == 201
     body = response.json()
+    assert body["chat_id"]
     assert [item["inn"] for item in body["results"]] == [
         "7707083893",
         "772377037026",

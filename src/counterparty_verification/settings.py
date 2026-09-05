@@ -20,6 +20,8 @@ class Settings(BaseSettings):
     mcp_timeout_seconds: float = Field(default=30, gt=0)
     analysis_timeout_seconds: float = Field(default=90, gt=0)
     session_ttl_seconds: int = Field(default=3600, gt=0)
+    chat_timeout_seconds: float = Field(default=60, gt=0)
+    chat_history_limit: int = Field(default=12, ge=0, le=50)
 
     repository_backend: str = "mock"
     mock_data_path: Path = Path("data/counterparties.json")
@@ -32,6 +34,7 @@ class Settings(BaseSettings):
     )
     mongodb_database: str = "counterparties"
     mongodb_collection: str = "counterparty_cards"
+    mongodb_chat_collection: str = "chat_sessions"
 
 
 @lru_cache
