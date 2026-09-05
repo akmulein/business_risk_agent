@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 from functools import lru_cache
 from typing import Any
 
@@ -25,6 +26,8 @@ from .prompt_constants import (
 )
 from .reputation_rules import ReputationView, fallback_observations
 from .settings import Settings, get_settings
+
+logger = logging.getLogger(__name__)
 
 
 class GroundedText(BaseModel):
@@ -93,6 +96,7 @@ class SpecialistAgent:
 
     async def enrich(self, chapter: ChapterResult) -> ChapterResult:
         if not self.agent:
+            logger.info("LLM call skipped (SpecialistAgent.enrich): agent disabled")
             return chapter
         payload = {
             "task": (
@@ -100,7 +104,9 @@ class SpecialistAgent:
             ),
             "chapter": chapter.model_dump(mode="json"),
         }
+        logger.info("LLM call -> SpecialistAgent.enrich chapter=%s", chapter.name)
         result = await self.agent.run(json.dumps(payload, ensure_ascii=False))
+        logger.info("LLM call <- SpecialistAgent.enrich chapter=%s", chapter.name)
         allowed = _chapter_fields(chapter)
         if result.output.evidence_fields and set(
             result.output.evidence_fields
@@ -127,6 +133,7 @@ class EvaluatorAgent:
     async def summarize(self, chapters: list[ChapterResult]) -> AnalysisSummary:
         deterministic = self._deterministic_summary(chapters)
         if not self.agent:
+            logger.info("LLM call skipped (EvaluatorAgent.summarize): agent disabled")
             return deterministic
         payload = {
             "task": (
@@ -137,7 +144,9 @@ class EvaluatorAgent:
             "risk_level": deterministic.risk_level,
             "chapters": [chapter.model_dump(mode="json") for chapter in chapters],
         }
+        logger.info("LLM call -> EvaluatorAgent.summarize chapters=%d", len(chapters))
         result = await self.agent.run(json.dumps(payload, ensure_ascii=False))
+        logger.info("LLM call <- EvaluatorAgent.summarize")
         allowed = set().union(*(_chapter_fields(item) for item in chapters))
         if not result.output.statements or any(
             not statement.evidence_fields
@@ -202,6 +211,9 @@ class QuestionAnswerAgent:
         chapters: list[ChapterResult],
     ) -> str:
         if not self.agent:
+            logger.info(
+                "LLM call skipped (QuestionAnswerAgent.answer): agent disabled"
+            )
             return (
                 "OpenRouter не настроен, поэтому диалоговый ответ недоступен. "
                 "Исходный анализ сформирован детерминированно."
@@ -212,7 +224,9 @@ class QuestionAnswerAgent:
             "card": card.model_dump(mode="json"),
             "analysis": [item.model_dump(mode="json") for item in chapters],
         }
+        logger.info("LLM call -> QuestionAnswerAgent.answer")
         result = await self.agent.run(json.dumps(payload, ensure_ascii=False))
+        logger.info("LLM call <- QuestionAnswerAgent.answer")
         allowed = flatten_field_paths(payload["card"])
         citations = set(result.output.evidence_fields)
         if citations and not citations.issubset(allowed):
@@ -258,6 +272,9 @@ class ReputationAgent:
 
     async def aggregate(self, view: ReputationView) -> list[Observation]:
         if not self.agent or not view.chapters:
+            logger.info(
+                "LLM call skipped (ReputationAgent.aggregate): agent disabled or no data"
+            )
             return fallback_observations(view)
         payload = {
             chapter: [
@@ -271,7 +288,11 @@ class ReputationAgent:
             ]
             for chapter, entries in view.by_chapter.items()
         }
+        logger.info(
+            "LLM call -> ReputationAgent.aggregate chapters=%d", len(view.chapters)
+        )
         result = await self.agent.run(json.dumps(payload, ensure_ascii=False))
+        logger.info("LLM call <- ReputationAgent.aggregate")
         allowed = {entry.field("name") for entry in view.indexed}
         values = {entry.field("name"): entry.item.name for entry in view.indexed}
         highlights = result.output.highlights

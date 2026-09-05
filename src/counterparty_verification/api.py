@@ -1,8 +1,13 @@
 import asyncio
+import logging
 from contextlib import asynccontextmanager
 from typing import Annotated
 
 from fastapi import Depends, FastAPI, HTTPException, Request, status
+
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s"
+)
 
 from .agents import EvaluatorAgent, QuestionAnswerAgent, SpecialistAgent
 from .chat_agent import ChatModelNotConfiguredError, ReportChatAgent
