@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 from typing import Any
 
 from pydantic import BaseModel, Field
@@ -12,6 +13,8 @@ from .chat_models import ChatAgentResult, ChatMessage, ChatSource
 from .domain import AnalysisResponse, CounterpartyCard
 from .llm_config import MODEL_SYSTEM_PROMPT
 from .settings import Settings
+
+logger = logging.getLogger(__name__)
 
 
 class ChatModelNotConfiguredError(RuntimeError):
@@ -91,6 +94,7 @@ class ReportChatAgent:
         history: list[ChatMessage],
     ) -> ChatAgentResult:
         if self.agent is None:
+            logger.info("LLM call skipped (ReportChatAgent.answer): agent disabled")
             raise ChatModelNotConfiguredError("OPENROUTER_API_KEY is not configured")
 
         evidence_by_inn: dict[str, dict[str, Any]] = {}
@@ -127,9 +131,11 @@ class ReportChatAgent:
                 for message in history
             ],
         }
+        logger.info("LLM call -> ReportChatAgent.answer")
         result = await self.agent.run(
             json.dumps(payload, ensure_ascii=False, default=str)
         )
+        logger.info("LLM call <- ReportChatAgent.answer")
         output = ChatModelOutput.model_validate(result.output)
         if output.insufficient_data:
             return ChatAgentResult(
