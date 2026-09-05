@@ -8,6 +8,11 @@ export interface CounterpartyPreview {
   kpp: string | null;
 }
 
+export interface SourceReportResponse {
+  inn: string;
+  report: Record<string, unknown>;
+}
+
 export interface Evidence {
   field: string;
   value: unknown;
@@ -38,6 +43,13 @@ export interface ChapterResult {
   error: string | null;
 }
 
+export interface FactorSummaryItem {
+  chapter: string;
+  label: string;
+  status: RiskLevel;
+  details: string[];
+}
+
 export interface CompanyProfile {
   inn: string;
   kpp: string | null;
@@ -62,20 +74,18 @@ export interface FinancialChartPoint {
   revenue: number | null;
   profit: number | null;
   assets: number | null;
-  liabilities: number | null;
+  obligations: number | null;
 }
 
-export interface ProcurementChartPoint {
+export interface LegalChartPoint {
   year: number;
-  admitted: number;
-  winners: number;
-  contracts: number;
-  amount: number;
+  courts: number;
+  enforcements: number;
 }
 
 export interface VisualizationData {
   financials: FinancialChartPoint[];
-  procurements: ProcurementChartPoint[];
+  legal_dynamics: LegalChartPoint[];
 }
 
 export interface Analysis {
@@ -84,6 +94,7 @@ export interface Analysis {
   summary: string;
   risk_level: RiskLevel;
   chapters: ChapterResult[];
+  factor_summary: FactorSummaryItem[];
   company_profile: CompanyProfile | null;
   visualization_data: VisualizationData;
 }

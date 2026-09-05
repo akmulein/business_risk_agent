@@ -17,7 +17,11 @@ from .domain import (
     RiskLevel,
 )
 from .mcp_client import AnalysisToolClient
-from .presentation import build_company_profile, build_visualization_data
+from .presentation import (
+    build_company_profile,
+    build_factor_summary,
+    build_visualization_data,
+)
 from .repositories import CounterpartyRepository
 
 TOOL_NAMES = (
@@ -144,8 +148,20 @@ class AnalysisService:
             chapters = await asyncio.gather(
                 *(self._run_chapter(name, card) for name in TOOL_NAMES)
             )
+            factor_summary = build_factor_summary(card, chapters)
+            summary_factors = build_factor_summary(card, chapters, compact=False)
+            bank_risk_level = card.company_reports.risk_level or RiskLevel.UNKNOWN
+            company_name = (
+                card.company_reports.short_name
+                or card.company_reports.full_name
+                or inn
+            )
             try:
-                summary = await self.evaluator.summarize(chapters)
+                summary = await self.evaluator.summarize(
+                    company_name,
+                    bank_risk_level,
+                    summary_factors,
+                )
             except Exception as error:
                 raise UpstreamServiceError("Evaluator failed") from error
         response = AnalysisResponse(
@@ -154,6 +170,7 @@ class AnalysisService:
             summary=summary.summary,
             risk_level=summary.risk_level,
             chapters=chapters,
+            factor_summary=factor_summary,
             company_profile=build_company_profile(card),
             visualization_data=build_visualization_data(card),
         )

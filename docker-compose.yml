@@ -49,6 +49,9 @@ services:
     build: .
     restart: unless-stopped
     command: ["python", "-m", "counterparty_verification.mcp_server"]
+    env_file:
+      - path: .env
+        required: false
     environment:
       MCP_HOST: 0.0.0.0
       MCP_PORT: "8001"
@@ -75,6 +78,7 @@ services:
       MONGODB_URL: mongodb://${MONGO_ROOT_USERNAME:-contractors_admin}:${MONGO_ROOT_PASSWORD:?Set MONGO_ROOT_PASSWORD in .env}@mongo:27017/${MONGO_DATABASE:-counterparties}?authSource=admin
       MONGODB_DATABASE: ${MONGO_DATABASE:-counterparties}
       MONGODB_COLLECTION: ${MONGO_READ_COLLECTION:-counterparty_cards}
+      MONGODB_SOURCE_COLLECTION: ${MONGO_COLLECTION:-reports}
     ports:
       - "8000:8000"
     depends_on:

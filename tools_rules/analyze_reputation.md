@@ -5,7 +5,7 @@
 LLM-вызов.
 
 Код: [`reputation_rules.py`](../src/counterparty_verification/reputation_rules.py)
-(группировка и детерминированный fallback), [`ReputationAgent`](../src/counterparty_verification/agents.py)
+(индексация и группировка), [`ReputationAgent`](../src/counterparty_verification/agents.py)
 (LLM-агрегация), вызов — `analyze_reputation` в
 [`analyzers.py`](../src/counterparty_verification/analyzers.py).
 
@@ -31,10 +31,8 @@ LLM-агентом («agent as tool»): `analyze_reputation` вызывает
 которого он взят, а в схеме ответа физически нет поля для уровня риска или
 вердикта — модели просто нечем его выставить. Если ключ OpenRouter не
 настроен, либо агент сослался на несуществующее поле, на факт вне карточки
-или на раздел, которого в карточке нет, — тул откатывается на
-`fallback_observations`: дословную группировку исходных текстов по разделам,
-без переписывания и без оценки. Тул никогда не падает и не сочиняет данные
-сверх того, что было в отчёте.
+или на раздел, которого в карточке нет, результат агента не принимается и
+раздел возвращается как временно недоступный. Текстового fallback нет.
 
 `risk_level` главы всегда `UNKNOWN`, а находки лежат в `observations`, не в
 `factors` — как и у «Структуры» и «Юридических рисков». Раньше

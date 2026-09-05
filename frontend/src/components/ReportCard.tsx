@@ -1,22 +1,20 @@
 import { useState } from 'react';
 import { Button } from '@alfalab/core-components/button';
 import {
-  AlertTriangle,
-  ChevronDown,
   Sparkles,
   Trash2,
 } from 'lucide-react';
 
 import type {
-  Analysis,
   BatchAnalysisItem,
   CounterpartyPreview,
-  Evidence,
   RiskLevel,
 } from '../types';
-import { CHAPTER_TITLES, ReportCharts } from './Charts';
+import { getSourceReport } from '../api';
+import { ReportCharts } from './Charts';
 import { FactorSummary } from './FactorSummary';
 import { RISK_STYLES, RiskBadge } from './RiskBadge';
+import { SourceReport } from './SourceReport';
 
 interface ReportCardProps {
   preview: CounterpartyPreview;
@@ -76,131 +74,6 @@ function extractRegion(address: string | null | undefined) {
   return region || 'Регион не указан';
 }
 
-function EvidenceList({ evidence }: { evidence: Evidence[] }) {
-  if (!evidence.length) {
-    return <p className="text-sm text-[#777]">Дополнительные поля не указаны.</p>;
-  }
-  return (
-    <dl className="space-y-2">
-      {evidence.map((item, index) => (
-        <div
-          key={`${item.field}-${index}`}
-          className="grid gap-1 rounded-xl bg-white px-3 py-2 text-xs sm:grid-cols-[minmax(160px,0.8fr)_1.2fr]"
-        >
-          <dt className="break-all text-[#777]">{item.field}</dt>
-          <dd className="break-words font-medium text-[#222]">
-            {typeof item.value === 'object'
-              ? JSON.stringify(item.value, null, 2)
-              : String(item.value ?? '—')}
-          </dd>
-        </div>
-      ))}
-    </dl>
-  );
-}
-
-const REPORT_SECTION_ORDER = ['general', 'reputation', 'legal', 'finance', 'structure'];
-
-function FullReport({ analysis }: { analysis: Analysis }) {
-  const chapters = analysis.chapters
-    .filter((chapter) => chapter.chapter !== 'procurement')
-    .sort((left, right) => {
-      const leftIndex = REPORT_SECTION_ORDER.indexOf(left.chapter);
-      const rightIndex = REPORT_SECTION_ORDER.indexOf(right.chapter);
-      return (leftIndex < 0 ? Number.MAX_SAFE_INTEGER : leftIndex) -
-        (rightIndex < 0 ? Number.MAX_SAFE_INTEGER : rightIndex);
-    });
-
-  return (
-    <div className="space-y-5 border-t border-[#ededed] px-5 py-6 md:px-6">
-      <section>
-        <h3 className="mb-3 text-lg font-semibold text-[#111]">Подробности проверки</h3>
-        <div className="space-y-3">
-          {chapters.map((chapter) => (
-            <details
-              key={chapter.chapter}
-              className="group overflow-hidden rounded-2xl border border-[#e5e5e5] bg-white"
-            >
-              <summary className="flex cursor-pointer list-none items-center gap-4 px-4 py-4">
-                <div className="flex min-w-0 items-center gap-3">
-                  <ChevronDown
-                    size={18}
-                    className="shrink-0 transition-transform group-open:rotate-180"
-                  />
-                  <span className="font-semibold text-[#222]">
-                    {CHAPTER_TITLES[chapter.chapter] ?? chapter.chapter}
-                  </span>
-                </div>
-              </summary>
-
-              <div className="space-y-4 border-t border-[#ededed] bg-[#fafafa] px-4 py-4">
-                <p className="leading-6 text-[#333]">{chapter.conclusion}</p>
-
-                {chapter.factors.length > 0 && (
-                  <div className="space-y-2">
-                    <h4 className="text-sm font-semibold text-[#333]">Факторы риска</h4>
-                    {chapter.factors.map((factor, index) => (
-                      <div key={index} className="rounded-xl bg-[#fff0ef] p-3">
-                        <div className="flex items-center gap-2">
-                          <AlertTriangle size={16} className="text-[#d52319]" />
-                          <p className="text-sm font-semibold text-[#9d1811]">{factor.title}</p>
-                        </div>
-                        <p className="mt-1 text-sm leading-5 text-[#4a4a4a]">{factor.detail}</p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {chapter.observations.length > 0 && (
-                  <div className="space-y-2">
-                    <h4 className="text-sm font-semibold text-[#333]">
-                      {chapter.chapter === 'reputation'
-                        ? 'Факторы отчёта'
-                        : 'Требует внимания'}
-                    </h4>
-                    {chapter.observations.map((observation) => (
-                      <div
-                        key={observation.code}
-                        className={`rounded-xl p-3 ${
-                          chapter.chapter === 'reputation'
-                            ? 'bg-[#f3f3f3]'
-                            : 'bg-[#fff8df]'
-                        }`}
-                      >
-                        <p className="text-sm font-semibold text-[#6c5300]">
-                          {observation.title}
-                        </p>
-                        <p className="mt-1 text-sm leading-5 text-[#4a4a4a]">
-                          {observation.detail}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                <details className="rounded-xl border border-[#dedede] bg-[#f3f3f3]">
-                  <summary className="cursor-pointer px-3 py-2 text-sm font-medium text-[#444]">
-                    Показать исходные данные
-                  </summary>
-                  <div className="border-t border-[#dedede] p-3">
-                    <EvidenceList
-                      evidence={[
-                        ...chapter.evidence,
-                        ...chapter.factors.flatMap((item) => item.evidence),
-                        ...chapter.observations.flatMap((item) => item.evidence),
-                      ]}
-                    />
-                  </div>
-                </details>
-              </div>
-            </details>
-          ))}
-        </div>
-      </section>
-    </div>
-  );
-}
-
 export function ReportCard({
   preview,
   result,
@@ -209,6 +82,9 @@ export function ReportCard({
   onRemove,
 }: ReportCardProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [sourceReport, setSourceReport] = useState<Record<string, unknown> | null>(null);
+  const [reportLoading, setReportLoading] = useState(false);
+  const [reportError, setReportError] = useState<string | null>(null);
   const analysis = result?.analysis;
   const profile = analysis?.company_profile;
   const riskLevel: RiskLevel =
@@ -221,6 +97,25 @@ export function ReportCard({
   const region = extractRegion(profile?.address);
   const companyAge = formatCompanyAge(profile?.registration_date);
   const companyStatus = formatCompanyStatus(profile?.status ?? preview.status);
+
+  const toggleSourceReport = async () => {
+    if (isOpen) {
+      setIsOpen(false);
+      return;
+    }
+    setIsOpen(true);
+    if (sourceReport || reportLoading) return;
+    setReportLoading(true);
+    setReportError(null);
+    try {
+      const response = await getSourceReport(preview.inn);
+      setSourceReport(response.report);
+    } catch (error) {
+      setReportError(error instanceof Error ? error.message : 'Не удалось загрузить полный отчёт');
+    } finally {
+      setReportLoading(false);
+    }
+  };
 
   return (
     <article
@@ -284,8 +179,6 @@ export function ReportCard({
 
         {analysis && profile && (
           <>
-            <FactorSummary chapters={analysis.chapters} />
-
             <section className="mt-5 rounded-2xl bg-[#f2f5f9] p-5">
               <div className="flex items-center gap-2 text-[#333]">
                 <Sparkles size={19} className="text-[#ef3124]" />
@@ -298,14 +191,16 @@ export function ReportCard({
               </p>
             </section>
 
+            <FactorSummary items={analysis.factor_summary ?? []} />
+
             <div className="mt-5">
               <ReportCharts
-                data={analysis.visualization_data ?? { financials: [], procurements: [] }}
+                data={analysis.visualization_data ?? { financials: [], legal_dynamics: [] }}
               />
             </div>
 
             <div className="mt-5">
-              <Button view="primary" size={48} onClick={() => setIsOpen((value) => !value)}>
+              <Button view="primary" size={48} onClick={() => void toggleSourceReport()}>
                 {isOpen ? 'Свернуть полный отчёт' : 'Открыть полный отчёт'}
               </Button>
             </div>
@@ -314,7 +209,7 @@ export function ReportCard({
       </div>
 
       {analysis && profile && isOpen && (
-        <FullReport analysis={analysis} />
+        <SourceReport report={sourceReport} loading={reportLoading} error={reportError} />
       )}
     </article>
   );

@@ -14,6 +14,7 @@ from .domain import (
     ChapterResult,
     CounterpartyCard,
     Evidence,
+    FactorSummaryItem,
     Observation,
     RiskLevel,
 )
@@ -23,7 +24,7 @@ from .prompt_constants import (
     REPUTATION_AGGREGATOR_INSTRUCTIONS,
     SPECIALIST_INSTRUCTIONS,
 )
-from .reputation_rules import ReputationView, fallback_observations
+from .reputation_rules import ReputationView
 from .settings import Settings, get_settings
 
 
@@ -38,9 +39,19 @@ class GroundedText(BaseModel):
     )
 
 
+class EvaluatorStatement(BaseModel):
+    text: str = Field(
+        max_length=300,
+        description="Одно короткое утверждение о существенном факте без вводных фраз",
+    )
+    fact_ids: list[str] = Field(
+        min_length=1,
+        description="Идентификаторы фактов, подтверждающих утверждение",
+    )
+
+
 class EvaluatorOutput(BaseModel):
-    statements: list[GroundedText] = Field(min_length=1, max_length=5)
-    key_factors: list[str] = Field(default_factory=list, max_length=5)
+    statements: list[EvaluatorStatement] = Field(min_length=2, max_length=3)
 
 
 def _model(settings: Settings) -> OpenRouterModel:
@@ -124,59 +135,63 @@ class EvaluatorAgent:
             else None
         )
 
-    async def summarize(self, chapters: list[ChapterResult]) -> AnalysisSummary:
-        deterministic = self._deterministic_summary(chapters)
+    async def summarize(
+        self,
+        company_name: str,
+        risk_level: RiskLevel,
+        factors: list[FactorSummaryItem],
+    ) -> AnalysisSummary:
         if not self.agent:
-            return deterministic
+            raise RuntimeError("OPENROUTER_API_KEY is not configured")
+
+        risk_labels = {
+            RiskLevel.LOW: "Низкий риск",
+            RiskLevel.MEDIUM: "Средний риск",
+            RiskLevel.HIGH: "Высокий риск",
+            RiskLevel.UNKNOWN: "Уровень риска не определён",
+        }
+        facts = [
+            {
+                "id": f"{factor.chapter}.{index}",
+                "section": factor.label,
+                "status": factor.status.value,
+                "text": detail,
+            }
+            for factor in factors
+            for index, detail in enumerate(factor.details, start=1)
+        ]
+        if not facts:
+            raise RuntimeError("No report facts available for summary")
+
         payload = {
-            "task": (
-                "Составь краткое итоговое саммари. Не перечисляй все проверки и "
-                "не добавляй новые факторы риска. Светофор уже рассчитан и не "
-                "требует переоценки."
-            ),
-            "risk_level": deterministic.risk_level,
-            "chapters": [chapter.model_dump(mode="json") for chapter in chapters],
+            "task": "Составь ёмкое объяснение уровня риска для пользователя.",
+            "company": company_name,
+            "risk_label": risk_labels[risk_level],
+            "facts": facts,
         }
         result = await self.agent.run(json.dumps(payload, ensure_ascii=False))
-        allowed = set().union(*(_chapter_fields(item) for item in chapters))
-        if not result.output.statements or any(
-            not statement.evidence_fields
-            or not set(statement.evidence_fields).issubset(allowed)
+        allowed = {fact["id"] for fact in facts}
+        if any(
+            not set(statement.fact_ids).issubset(allowed)
             for statement in result.output.statements
         ):
-            return deterministic
-        return AnalysisSummary(
-            risk_level=deterministic.risk_level,
-            summary=" ".join(item.text for item in result.output.statements),
-            key_factors=result.output.key_factors,
-        )
+            raise RuntimeError("Summary contains unknown fact identifiers")
 
-    @staticmethod
-    def _deterministic_summary(chapters: list[ChapterResult]) -> AnalysisSummary:
-        rank = {
-            RiskLevel.UNKNOWN: 0,
-            RiskLevel.LOW: 1,
-            RiskLevel.MEDIUM: 2,
-            RiskLevel.HIGH: 3,
+        used_ids = {
+            fact_id
+            for statement in result.output.statements
+            for fact_id in statement.fact_ids
         }
-        risk = max(
-            (chapter.risk_level for chapter in chapters),
-            key=rank.get,
-            default=RiskLevel.UNKNOWN,
-        )
-        conclusions = " ".join(chapter.conclusion for chapter in chapters)
-        factors = [
-            factor.title for chapter in chapters for factor in chapter.factors
-        ]
-        factors += [
-            observation.title
-            for chapter in chapters
-            for observation in chapter.observations
-        ]
+        facts_by_id = {fact["id"]: fact["text"] for fact in facts}
+        summary_text = " ".join(item.text for item in result.output.statements)
         return AnalysisSummary(
-            risk_level=risk,
-            summary=f"Итоговый уровень риска: {risk.value}. {conclusions}",
-            key_factors=factors,
+            risk_level=risk_level,
+            summary=summary_text,
+            key_factors=[
+                facts_by_id[fact_id]
+                for fact_id in facts_by_id
+                if fact_id in used_ids
+            ][:5],
         )
 
 
@@ -240,8 +255,7 @@ class ReputationAgent:
     already-deterministic conclusion — it *is* the tool's aggregation logic
     for a chapter whose raw material is free-form text. Same grounding and
     evidence-validation discipline: no evidence, an unknown chapter, or a
-    reference outside the card and the answer is rejected in favour of the
-    deterministic `fallback_observations`.
+    reference outside the card and the answer is rejected.
     """
 
     def __init__(self, settings: Settings) -> None:
@@ -257,8 +271,10 @@ class ReputationAgent:
         )
 
     async def aggregate(self, view: ReputationView) -> list[Observation]:
-        if not self.agent or not view.chapters:
-            return fallback_observations(view)
+        if not view.chapters:
+            return []
+        if not self.agent:
+            raise RuntimeError("OPENROUTER_API_KEY is not configured")
         payload = {
             chapter: [
                 {
@@ -282,7 +298,7 @@ class ReputationAgent:
             for highlight in highlights
         )
         if not valid:
-            return fallback_observations(view)
+            raise RuntimeError("Reputation summary contains invalid evidence")
         return [
             Observation(
                 code=f"chapter_{highlight.chapter}",

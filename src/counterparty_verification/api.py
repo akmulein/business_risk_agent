@@ -24,10 +24,11 @@ from .domain import (
     CounterpartyPreview,
     QuestionRequest,
     QuestionResponse,
+    SourceReportResponse,
     validate_inn,
 )
 from .mcp_client import HttpMcpAnalysisClient
-from .presentation import build_counterparty_preview
+from .presentation import build_counterparty_preview, sanitize_source_report
 from .repositories import (
     JsonCounterpartyRepository,
     MongoCounterpartyRepository,
@@ -53,6 +54,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             config.mongodb_url,
             config.mongodb_database,
             config.mongodb_collection,
+            source_collection=config.mongodb_source_collection,
         )
     elif config.repository_backend == "mock":
         repository = JsonCounterpartyRepository(config.mock_data_path)
@@ -144,6 +146,24 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         if card is None:
             raise HTTPException(status_code=404, detail="Контрагент не найден")
         return build_counterparty_preview(card)
+
+    @app.get(
+        "/api/v1/counterparties/{inn}/report",
+        response_model=SourceReportResponse,
+        tags=["counterparties"],
+    )
+    async def source_report(inn: str) -> SourceReportResponse:
+        try:
+            normalized_inn = validate_inn(inn.strip())
+        except ValueError as error:
+            raise HTTPException(status_code=422, detail=str(error)) from error
+        report = await repository.get_source_report_by_inn(normalized_inn)
+        if report is None:
+            raise HTTPException(status_code=404, detail="Исходный отчёт не найден")
+        return SourceReportResponse(
+            inn=normalized_inn,
+            report=sanitize_source_report(report),
+        )
 
     @app.post(
         "/api/v1/analyses",

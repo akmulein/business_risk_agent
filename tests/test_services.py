@@ -2,8 +2,9 @@ import asyncio
 
 import pytest
 
-from counterparty_verification.agents import EvaluatorAgent, SpecialistAgent
+from counterparty_verification.agents import SpecialistAgent
 from counterparty_verification.domain import (
+    AnalysisSummary,
     BatchAnalysisStatus,
     CounterpartyCard,
     RiskLevel,
@@ -50,13 +51,21 @@ class PartiallyFailingClient(LocalAnalysisToolClient):
         return await super().call(tool_name, card)
 
 
+class StubEvaluator:
+    async def summarize(self, company_name, risk_level, factors):
+        return AnalysisSummary(
+            risk_level=risk_level,
+            summary=f"{company_name}: тестовое LLM-саммари",
+        )
+
+
 def build_service(repository, tools) -> AnalysisService:
     settings = Settings(openrouter_api_key=None)
     return AnalysisService(
         repository=repository,
         tools=tools,
         specialist=SpecialistAgent(settings),
-        evaluator=EvaluatorAgent(settings),
+        evaluator=StubEvaluator(),
         sessions=InMemorySessionStore(60),
         timeout_seconds=5,
     )
@@ -73,9 +82,10 @@ async def test_analysis_reads_one_card_and_runs_all_chapters(
 
     assert repository.requested == [card.company_reports.inn]
     assert len(response.chapters) == 6
-    # Every chapter reports its findings as observations, not a verdict, so
-    # `risk_level` stays UNKNOWN everywhere — see `tools_rules/*.md`.
-    assert response.risk_level == RiskLevel.UNKNOWN
+    assert response.risk_level == (
+        card.company_reports.risk_level or RiskLevel.UNKNOWN
+    )
+    assert response.factor_summary
     assert response.analysis_id
 
 

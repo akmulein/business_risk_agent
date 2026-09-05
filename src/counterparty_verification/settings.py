@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     session_ttl_seconds: int = Field(default=3600, gt=0)
     chat_timeout_seconds: float = Field(default=60, gt=0)
     chat_history_limit: int = Field(default=12, ge=0, le=50)
+    chat_max_tokens: int = Field(default=2048, ge=128, le=8192)
 
     repository_backend: str = "mock"
     mock_data_path: Path = Path("data/counterparties.json")
@@ -34,6 +35,7 @@ class Settings(BaseSettings):
     )
     mongodb_database: str = "counterparties"
     mongodb_collection: str = "counterparty_cards"
+    mongodb_source_collection: str = "reports"
     mongodb_chat_collection: str = "chat_sessions"
 
 

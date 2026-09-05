@@ -219,12 +219,24 @@ class AnalysisSummary(BaseModel):
     key_factors: list[str] = Field(default_factory=list)
 
 
+class FactorSummaryItem(BaseModel):
+    chapter: str
+    label: str
+    status: RiskLevel
+    details: list[str] = Field(default_factory=list)
+
+
 class CounterpartyPreview(BaseModel):
     inn: str
     name: str
     status: str | None = None
     risk_level: RiskLevel | None = None
     kpp: str | None = None
+
+
+class SourceReportResponse(BaseModel):
+    inn: str
+    report: dict[str, Any]
 
 
 class CompanyProfile(BaseModel):
@@ -251,7 +263,7 @@ class FinancialChartPoint(BaseModel):
     revenue: float | None = None
     profit: float | None = None
     assets: float | None = None
-    liabilities: float | None = None
+    obligations: float | None = None
 
 
 class ProcurementChartPoint(BaseModel):
@@ -262,9 +274,15 @@ class ProcurementChartPoint(BaseModel):
     amount: float = 0
 
 
+class LegalChartPoint(BaseModel):
+    year: int
+    courts: int = 0
+    enforcements: int = 0
+
+
 class VisualizationData(BaseModel):
     financials: list[FinancialChartPoint] = Field(default_factory=list)
-    procurements: list[ProcurementChartPoint] = Field(default_factory=list)
+    legal_dynamics: list[LegalChartPoint] = Field(default_factory=list)
 
 
 def validate_inn(value: str) -> str:
@@ -297,6 +315,7 @@ class AnalysisResponse(BaseModel):
     summary: str
     risk_level: RiskLevel
     chapters: list[ChapterResult]
+    factor_summary: list[FactorSummaryItem] = Field(default_factory=list)
     company_profile: CompanyProfile | None = None
     visualization_data: VisualizationData = Field(default_factory=VisualizationData)
 
