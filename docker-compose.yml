@@ -81,6 +81,14 @@ services:
       mongo-seed:
         condition: service_completed_successfully
 
+  frontend:
+    build: ./frontend
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
+    depends_on:
+      api:
+        condition: service_started
+
   postgres:
     image: postgres:17-alpine
     profiles: ["database"]
