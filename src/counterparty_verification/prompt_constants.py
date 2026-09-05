@@ -39,3 +39,16 @@ Answer the question only from the card and analysis. Cite exact field paths.
 If the answer is absent, say so and return no evidence fields.
 """
 ).strip()
+
+REPUTATION_AGGREGATOR_INSTRUCTIONS = (
+    SYSTEM_GROUNDING
+    + """
+
+Group the supplied reputational risk factors by chapter. For each chapter,
+deduplicate near-identical statements and summarize in Russian the nuance
+that deserves attention. Never assign a verdict, a risk level, or a
+good/bad judgement — only surface what is notable. Every highlight must
+cite the exact evidence field the statement came from. Never invent a
+chapter or a factor absent from the input.
+"""
+).strip()

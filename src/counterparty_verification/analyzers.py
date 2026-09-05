@@ -1,81 +1,46 @@
 from __future__ import annotations
 
-from collections.abc import Callable
-from typing import Any
+from collections.abc import Awaitable, Callable
 
-from .domain import (
-    ChapterResult,
-    CounterpartyCard,
-    Evidence,
-    Observation,
-    RiskFactor,
-    RiskLevel,
-)
+from .agents import get_reputation_agent
+from .domain import ChapterResult, CounterpartyCard, Evidence, Observation, RiskLevel
+from .finance_rules import FinanceView
+from .finance_rules import build_view as build_finance_view
+from .finance_rules import run_checks as run_finance_checks
+from .general_rules import GeneralView
+from .general_rules import build_view as build_general_view
+from .general_rules import run_checks as run_general_checks
 from .legal_rules import LegalView
 from .legal_rules import build_view as build_legal_view
 from .legal_rules import run_checks as run_legal_checks
+from .procurement_rules import ProcurementView
+from .procurement_rules import build_view as build_procurement_view
+from .procurement_rules import run_checks as run_procurement_checks
+from .reputation_rules import build_view as build_reputation_view
 from .structure_rules import LegalForm, StructureView, build_view, run_checks
 
 
-def _risk_max(*levels: RiskLevel) -> RiskLevel:
-    rank = {
-        RiskLevel.UNKNOWN: 0,
-        RiskLevel.LOW: 1,
-        RiskLevel.MEDIUM: 2,
-        RiskLevel.HIGH: 3,
-    }
-    return max(levels, key=rank.get, default=RiskLevel.UNKNOWN)
-
-
-def _factor(
-    title: str, detail: str, severity: RiskLevel, field: str, value: Any
-) -> RiskFactor:
-    return RiskFactor(
-        title=title,
-        detail=detail,
-        severity=severity,
-        evidence=[Evidence(field=field, value=value)],
-    )
+def _general_conclusion(view: GeneralView, observations: list[Observation]) -> str:
+    report = view.report
+    name = report.full_name or report.short_name or "Организация"
+    parts = [f"{name}: статус {report.status or 'не указан'}."]
+    if observations:
+        titles = "; ".join(item.title.lower() for item in observations)
+        parts.append(f"Стоит обратить внимание: {titles}.")
+    else:
+        parts.append("По общим сведениям вопросов, требующих внимания, не найдено.")
+    return " ".join(parts)
 
 
 def analyze_general(card: CounterpartyCard) -> ChapterResult:
-    factors: list[RiskFactor] = []
-    report = card.company_reports
-    if report.status in {"CLOSED", "закрытая"}:
-        factors.append(
-            _factor(
-                "Организация закрыта",
-                report.status_reason or "В отчёте указан статус закрытой организации",
-                RiskLevel.HIGH,
-                "company_reports.status",
-                report.status,
-            )
-        )
-    if report.zsk_risk_level in {"YELLOW", "RED"}:
-        factors.append(
-            _factor(
-                "Риск ЗСК",
-                f"Уровень «Знай своего клиента»: {report.zsk_risk_level}",
-                RiskLevel.HIGH
-                if report.zsk_risk_level == "RED"
-                else RiskLevel.MEDIUM,
-                "company_reports.zsk_risk_level",
-                report.zsk_risk_level,
-            )
-        )
-    declared = report.risk_level
-    if declared in {RiskLevel.MEDIUM, RiskLevel.HIGH}:
-        factors.append(
-            _factor(
-                "Риск из исходного отчёта",
-                f"Поставщик данных указал уровень {declared.value}",
-                declared,
-                "company_reports.risk_level",
-                declared.value,
-            )
-        )
-    risk = _risk_max(*(factor.severity for factor in factors), RiskLevel.LOW)
-    name = report.full_name or report.short_name or "Организация"
+    """Describes registration status and provider-assigned risk markers.
+
+    The chapter deliberately assigns no risk level: it lists observations with
+    the fields they came from, and the verdict is left to the analyst.
+    """
+    view = build_general_view(card)
+    observations = run_general_checks(view)
+    report = view.report
     evidence = [
         Evidence(field="company_reports.inn", value=report.inn),
         Evidence(field="company_reports.full_name", value=report.full_name),
@@ -83,12 +48,9 @@ def analyze_general(card: CounterpartyCard) -> ChapterResult:
     ]
     return ChapterResult(
         chapter="general",
-        risk_level=risk,
-        conclusion=(
-            f"{name}: статус {report.status or 'не указан'}, "
-            f"общий риск {risk.value}."
-        ),
-        factors=factors,
+        risk_level=RiskLevel.UNKNOWN,
+        conclusion=_general_conclusion(view, observations),
+        observations=observations,
         evidence=evidence,
     )
 
@@ -237,130 +199,155 @@ def _legal_evidence(view: LegalView) -> list[Evidence]:
     return evidence
 
 
-def analyze_reputation(card: CounterpartyCard) -> ChapterResult:
-    negative = [item for item in card.risk_factors if item.sign == "negative"]
-    positive = [item for item in card.risk_factors if item.sign == "positive"]
-    factors = [
-        _factor(
-            item.name,
-            f"Код: {item.code or 'не указан'}",
-            RiskLevel.HIGH,
-            "risk_factors",
-            item.model_dump(mode="json"),
-        )
-        for item in negative
-    ]
-    sufficient = bool(negative or positive)
+async def analyze_reputation(card: CounterpartyCard) -> ChapterResult:
+    """Aggregates and highlights positive and negative reputation factors.
+
+    Unlike the other five chapters, `risk_factors` already arrives as
+    free-form text pre-labelled by the data provider, so there is nothing
+    left to threshold-check — only to group and summarize. This is the one
+    chapter that runs an LLM agent inside the tool itself (agent-as-tool,
+    `agents.ReputationAgent`) to do that; it falls back to a verbatim,
+    deterministic grouping by chapter when the agent is disabled or its
+    answer fails evidence validation. Either way the chapter assigns no
+    verdict: `risk_level` is always `UNKNOWN` and findings live in
+    `observations`, not `factors`.
+    """
+    view = build_reputation_view(card)
+    sufficient = bool(view.indexed)
+    observations = await get_reputation_agent().aggregate(view) if sufficient else []
+    negative_chapters = {entry.chapter for entry in view.negative}
+    positive_chapters = {entry.chapter for entry in view.positive}
     return ChapterResult(
         chapter="reputation",
-        risk_level=RiskLevel.HIGH if negative else (
-            RiskLevel.LOW if sufficient else RiskLevel.UNKNOWN
-        ),
+        risk_level=RiskLevel.UNKNOWN,
         conclusion=(
-            f"Негативных факторов: {len(negative)}, позитивных: {len(positive)}."
+            f"Негативных факторов: {len(view.negative)} "
+            f"({len(negative_chapters)} раздел(ов)), позитивных: "
+            f"{len(view.positive)} ({len(positive_chapters)} раздел(ов))."
             if sufficient
             else "Репутационные факторы в отчёте отсутствуют."
         ),
-        factors=factors,
-        evidence=[
-            Evidence(
-                field="risk_factors",
-                value=[item.model_dump(mode="json") for item in card.risk_factors],
-            ),
-        ],
+        observations=observations,
+        evidence=[entry.evidence("name") for entry in view.indexed],
         data_sufficient=sufficient,
     )
 
 
-def analyze_finance(card: CounterpartyCard) -> ChapterResult:
-    reports = sorted(card.financial_reports, key=lambda item: item.year)
-    factors: list[RiskFactor] = []
-    if reports:
-        latest = reports[-1]
-        profit = float(latest.profit or 0)
-        if profit < 0:
-            factors.append(
-                _factor(
-                    "Убыток",
-                    f"Прибыль последнего отчётного года: {profit:g}.",
-                    RiskLevel.HIGH,
-                    "financial_reports.profit",
-                    profit,
-                )
-            )
-        if len(reports) > 1:
-            previous = float(reports[-2].proceeds or 0)
-            current = float(latest.proceeds or 0)
-            if previous > 0 and current < previous:
-                change = (current - previous) / previous * 100
-                factors.append(
-                    _factor(
-                        "Снижение выручки",
-                        f"Изменение к предыдущему периоду: {change:.1f}%.",
-                        RiskLevel.MEDIUM,
-                        "financial_reports.proceeds",
-                        [item.model_dump(mode="json") for item in reports],
-                    )
-                )
-    solvency = reports[-1].solvency if reports else None
-    if solvency is not None and float(solvency) < 1:
-        factors.append(
-            _factor(
-                "Низкий коэффициент платёжеспособности",
-                f"Значение в отчёте: {solvency}.",
-                RiskLevel.MEDIUM,
-                "financial_reports.solvency",
-                solvency,
-            )
+def _finance_conclusion(view: FinanceView, observations: list[Observation]) -> str:
+    latest = view.latest
+    parts = [
+        f"Отчётность за {len(view.reports)} год(лет), последний отчётный год — "
+        f"{latest.item.year}."
+    ]
+    if observations:
+        titles = "; ".join(item.title.lower() for item in observations)
+        parts.append(f"Стоит обратить внимание: {titles}.")
+    else:
+        parts.append(
+            "По финансовым показателям вопросов, требующих внимания, не найдено."
         )
-    sufficient = bool(reports)
-    risk = _risk_max(*(factor.severity for factor in factors), RiskLevel.LOW)
+    return " ".join(parts)
+
+
+def _finance_evidence(view: FinanceView) -> list[Evidence]:
+    latest = view.latest
+    if latest is None:
+        return []
+    return [
+        latest.evidence(name)
+        for name in (
+            "year",
+            "proceeds",
+            "profit",
+            "total_assets",
+            "total_liabilities",
+            "capitals",
+        )
+    ]
+
+
+def analyze_finance(card: CounterpartyCard) -> ChapterResult:
+    """Describes revenue, profit and balance-sheet indicators, and what to look at.
+
+    The chapter deliberately assigns no risk level: it lists observations with
+    the fields they came from, and the verdict is left to the analyst.
+    """
+    view = build_finance_view(card)
+    observations = run_finance_checks(view)
+    sufficient = bool(view.reports)
     return ChapterResult(
         chapter="finance",
-        risk_level=risk if sufficient else RiskLevel.UNKNOWN,
+        risk_level=RiskLevel.UNKNOWN,
         conclusion=(
-            f"Финансовых факторов риска найдено: {len(factors)}."
+            _finance_conclusion(view, observations)
             if sufficient
             else "Финансовые данные отсутствуют."
         ),
-        factors=factors,
-        evidence=[
-            Evidence(
-                field="financial_reports",
-                value=[item.model_dump(mode="json") for item in reports],
-            ),
-        ],
+        observations=observations,
+        evidence=_finance_evidence(view),
         data_sufficient=sufficient,
+    )
+
+
+def _procurement_conclusion(
+    view: ProcurementView, observations: list[Observation]
+) -> str:
+    signed_count = sum(agg.signed_count for agg in view.by_year.values())
+    signed_amount = sum(agg.signed_amount for agg in view.by_year.values())
+    parts = [
+        f"Госзакупки за {len(view.years)} год(лет), подписано контрактов: "
+        f"{signed_count} на сумму {signed_amount:g} ₽."
+    ]
+    if observations:
+        titles = "; ".join(item.title.lower() for item in observations)
+        parts.append(f"Стоит обратить внимание: {titles}.")
+    else:
+        parts.append(
+            "По истории госзакупок вопросов, требующих внимания, не найдено."
+        )
+    return " ".join(parts)
+
+
+def _procurement_evidence(view: ProcurementView) -> list[Evidence]:
+    latest = view.latest_year
+    if latest is None:
+        return []
+    return latest.evidence(
+        "year",
+        "federal_law_code",
+        "tender_admitted_count",
+        "tender_winner_count",
+        "contract_signed_count",
+        "contract_signed_amount",
     )
 
 
 def analyze_procurement(card: CounterpartyCard) -> ChapterResult:
-    signed_count = sum(
-        int(item.contract_signed_count or 0) for item in card.procurements
-    )
-    signed_amount = sum(
-        float(item.contract_signed_amount or 0) for item in card.procurements
-    )
+    """Describes public-procurement history and what to look at.
+
+    The chapter deliberately assigns no risk level: it lists observations with
+    the fields they came from, and the verdict is left to the analyst.
+    """
+    view = build_procurement_view(card)
+    observations = run_procurement_checks(view)
     sufficient = bool(card.procurements)
     return ChapterResult(
         chapter="procurement",
-        risk_level=RiskLevel.LOW if sufficient else RiskLevel.UNKNOWN,
+        risk_level=RiskLevel.UNKNOWN,
         conclusion=(
-            f"Подписано госконтрактов: {signed_count}, сумма: {signed_amount:g}."
+            _procurement_conclusion(view, observations)
             if sufficient
             else "Данные о госзакупках отсутствуют."
         ),
-        evidence=[
-            Evidence(
-                field="procurements",
-                value=[item.model_dump(mode="json") for item in card.procurements],
-            )
-        ],
+        observations=observations,
+        evidence=_procurement_evidence(view),
         data_sufficient=sufficient,
     )
 
 
-ANALYZERS: dict[str, Callable[[CounterpartyCard], ChapterResult]] = {
+ANALYZERS: dict[
+    str, Callable[[CounterpartyCard], ChapterResult | Awaitable[ChapterResult]]
+] = {
     "analyze_general": analyze_general,
     "analyze_structure": analyze_structure,
     "analyze_legal": analyze_legal,
