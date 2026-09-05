@@ -11,6 +11,8 @@ MCP-анализаторов и формирует отдельное итого
 
 - `counterparty_verification.api` — HTTP API;
 - `counterparty_verification.mcp_server` — отдельный FastMCP-сервис;
+- `frontend` — React-интерфейс на Core Components с отчётами, графиками и
+  общим AI-чатом;
 - Pydantic AI + OpenRouter — специалисты, итоговый evaluator и Q&A;
 - MongoDB: `reports` хранит исходные отчёты, `counterparty_cards` — готовые
   карточки пайплайна, `chat_sessions` — сессии и историю чатов;
@@ -77,9 +79,14 @@ docker compose up --build
 ```
 
 Команда поднимает MongoDB, создаёт `reports` и `counterparty_cards`, затем
-запускает MCP и API. Коллекция `chat_sessions` и TTL-индекс для автоматического
-удаления истёкших сессий создаются при запуске API. Swagger UI:
-<http://localhost:8000/docs>.
+запускает MCP, API и frontend. Коллекция `chat_sessions` и TTL-индекс для
+автоматического удаления истёкших сессий создаются при запуске API.
+
+Frontend: <http://localhost:3000>. Swagger UI: <http://localhost:8000/docs>.
+
+Интерфейс позволяет найти и последовательно добавить до 10 компаний, после
+чего запустить один общий анализ. Полные отчёты раскрываются внутри карточек,
+а чат использует общий `chat_id` результатов.
 
 Если ключ OpenRouter был добавлен после запуска, пересоздайте только API:
 

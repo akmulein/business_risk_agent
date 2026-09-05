@@ -47,6 +47,8 @@ class ChatSessionStore(Protocol):
         self, chat_id: str, messages: list[ChatMessage]
     ) -> None: ...
 
+    async def clear_messages(self, chat_id: str) -> None: ...
+
     async def ensure_indexes(self) -> None: ...
 
 
@@ -86,6 +88,14 @@ class InMemoryChatSessionStore:
                 self._sessions.pop(chat_id, None)
                 raise ChatSessionNotFoundError(chat_id)
             session.messages.extend(messages)
+
+    async def clear_messages(self, chat_id: str) -> None:
+        async with self._lock:
+            session = self._sessions.get(chat_id)
+            if session is None or session.expires_at <= datetime.now(UTC):
+                self._sessions.pop(chat_id, None)
+                raise ChatSessionNotFoundError(chat_id)
+            session.messages.clear()
 
     async def ensure_indexes(self) -> None:
         return None
@@ -148,6 +158,17 @@ class MongoChatSessionStore:
                     }
                 }
             },
+        )
+        if result.matched_count == 0:
+            raise ChatSessionNotFoundError(chat_id)
+
+    async def clear_messages(self, chat_id: str) -> None:
+        result = await self.collection.update_one(
+            {
+                "_id": chat_id,
+                "expires_at": {"$gt": datetime.now(UTC)},
+            },
+            {"$set": {"messages": []}},
         )
         if result.matched_count == 0:
             raise ChatSessionNotFoundError(chat_id)
@@ -236,3 +257,10 @@ class ChatService:
             inns=session.inns,
             messages=session.messages,
         )
+
+    async def clear_history(self, chat_id: str) -> ChatHistoryResponse:
+        session = await self.store.get(chat_id)
+        if session is None:
+            raise ChatSessionNotFoundError(chat_id)
+        await self.store.clear_messages(chat_id)
+        return ChatHistoryResponse(chat_id=chat_id, inns=session.inns)

@@ -21,10 +21,13 @@ from .chat_service import (
 from .domain import (
     AnalysisRequest,
     BatchAnalysisResponse,
+    CounterpartyPreview,
     QuestionRequest,
     QuestionResponse,
+    validate_inn,
 )
 from .mcp_client import HttpMcpAnalysisClient
+from .presentation import build_counterparty_preview
 from .repositories import (
     JsonCounterpartyRepository,
     MongoCounterpartyRepository,
@@ -127,6 +130,21 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     async def ready() -> dict[str, str]:
         return {"status": "ready"}
 
+    @app.get(
+        "/api/v1/counterparties/{inn}/preview",
+        response_model=CounterpartyPreview,
+        tags=["counterparties"],
+    )
+    async def counterparty_preview(inn: str) -> CounterpartyPreview:
+        try:
+            normalized_inn = validate_inn(inn.strip())
+        except ValueError as error:
+            raise HTTPException(status_code=422, detail=str(error)) from error
+        card = await repository.get_by_inn(normalized_inn)
+        if card is None:
+            raise HTTPException(status_code=404, detail="Контрагент не найден")
+        return build_counterparty_preview(card)
+
     @app.post(
         "/api/v1/analyses",
         response_model=BatchAnalysisResponse,
@@ -186,6 +204,23 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     ) -> ChatHistoryResponse:
         try:
             return await service.history(chat_id)
+        except ChatSessionNotFoundError as error:
+            raise HTTPException(
+                status_code=404,
+                detail="Чат не найден или срок сессии истёк",
+            ) from error
+
+    @app.delete(
+        "/api/v1/chats/{chat_id}/messages",
+        response_model=ChatHistoryResponse,
+        tags=["chat"],
+    )
+    async def clear_chat_messages(
+        chat_id: str,
+        service: ChatDep,
+    ) -> ChatHistoryResponse:
+        try:
+            return await service.clear_history(chat_id)
         except ChatSessionNotFoundError as error:
             raise HTTPException(
                 status_code=404,

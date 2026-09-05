@@ -219,6 +219,54 @@ class AnalysisSummary(BaseModel):
     key_factors: list[str] = Field(default_factory=list)
 
 
+class CounterpartyPreview(BaseModel):
+    inn: str
+    name: str
+    status: str | None = None
+    risk_level: RiskLevel | None = None
+    kpp: str | None = None
+
+
+class CompanyProfile(BaseModel):
+    inn: str
+    kpp: str | None = None
+    ogrn: str | None = None
+    short_name: str | None = None
+    full_name: str | None = None
+    status: str | None = None
+    bank_risk_level: RiskLevel | None = None
+    director_name: str | None = None
+    director_position: str | None = None
+    share_capital: float | None = None
+    staff: str | None = None
+    founders_count: int = 0
+    registration_date: date | str | None = None
+    address: str | None = None
+    company_size: str | None = None
+    account_blocking: str | None = None
+
+
+class FinancialChartPoint(BaseModel):
+    year: int
+    revenue: float | None = None
+    profit: float | None = None
+    assets: float | None = None
+    liabilities: float | None = None
+
+
+class ProcurementChartPoint(BaseModel):
+    year: int
+    admitted: int = 0
+    winners: int = 0
+    contracts: int = 0
+    amount: float = 0
+
+
+class VisualizationData(BaseModel):
+    financials: list[FinancialChartPoint] = Field(default_factory=list)
+    procurements: list[ProcurementChartPoint] = Field(default_factory=list)
+
+
 def validate_inn(value: str) -> str:
     if not value.isdigit() or len(value) not in (10, 12):
         raise ValueError("ИНН должен содержать 10 или 12 цифр")
@@ -249,6 +297,8 @@ class AnalysisResponse(BaseModel):
     summary: str
     risk_level: RiskLevel
     chapters: list[ChapterResult]
+    company_profile: CompanyProfile | None = None
+    visualization_data: VisualizationData = Field(default_factory=VisualizationData)
 
 
 class AnalysisRequest(BaseModel):

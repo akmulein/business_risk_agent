@@ -17,6 +17,7 @@ from .domain import (
     RiskLevel,
 )
 from .mcp_client import AnalysisToolClient
+from .presentation import build_company_profile, build_visualization_data
 from .repositories import CounterpartyRepository
 
 TOOL_NAMES = (
@@ -153,6 +154,8 @@ class AnalysisService:
             summary=summary.summary,
             risk_level=summary.risk_level,
             chapters=chapters,
+            company_profile=build_company_profile(card),
+            visualization_data=build_visualization_data(card),
         )
         await self.sessions.put(card, response)
         return response

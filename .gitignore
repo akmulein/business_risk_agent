@@ -214,6 +214,11 @@ tempCodeRunnerFile.py
 .env.*
 !.env.example
 
+# Frontend build artifacts
+node_modules/
+frontend/dist/
+frontend/*.tsbuildinfo
+
 # Marimo
 marimo/_static/
 marimo/_lsp/
