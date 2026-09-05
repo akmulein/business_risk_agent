@@ -73,7 +73,9 @@ async def test_analysis_reads_one_card_and_runs_all_chapters(
 
     assert repository.requested == [card.company_reports.inn]
     assert len(response.chapters) == 6
-    assert response.risk_level == RiskLevel.MEDIUM
+    # Every chapter reports its findings as observations, not a verdict, so
+    # `risk_level` stays UNKNOWN everywhere — see `tools_rules/*.md`.
+    assert response.risk_level == RiskLevel.UNKNOWN
     assert response.analysis_id
 
 

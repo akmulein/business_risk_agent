@@ -1,3 +1,5 @@
+import inspect
+
 import pytest
 from pydantic import ValidationError
 
@@ -37,10 +39,12 @@ def test_batch_accepts_at_most_ten_inns() -> None:
 
 
 @pytest.mark.parametrize("tool_name", ANALYZERS)
-def test_every_chapter_returns_grounded_result(
+async def test_every_chapter_returns_grounded_result(
     tool_name: str, card: CounterpartyCard
 ) -> None:
     result = ANALYZERS[tool_name](card)
+    if inspect.isawaitable(result):
+        result = await result
 
     assert result.chapter
     assert result.conclusion

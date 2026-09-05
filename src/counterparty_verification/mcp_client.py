@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import inspect
 import json
 from typing import Any, Protocol
 
@@ -42,4 +43,7 @@ class LocalAnalysisToolClient:
     """In-process adapter for tests and development without the MCP process."""
 
     async def call(self, tool_name: str, card: CounterpartyCard) -> ChapterResult:
-        return ANALYZERS[tool_name](card)
+        result = ANALYZERS[tool_name](card)
+        if inspect.isawaitable(result):
+            result = await result
+        return result
