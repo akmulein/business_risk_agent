@@ -258,6 +258,7 @@ class BatchAnalysisItem(BaseModel):
 
 
 class BatchAnalysisResponse(BaseModel):
+    chat_id: str | None = None
     results: list[BatchAnalysisItem]
 
 
