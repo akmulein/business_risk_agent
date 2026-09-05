@@ -14,7 +14,7 @@ class Settings(BaseSettings):
 
     app_name: str = "Counterparty Verification API"
     openrouter_api_key: str | None = None
-    openrouter_model: str = "qwen/qwen3-30b-a3b-instruct-2507"
+    openrouter_model: str = "~deepseek/deepseek-v4-flash-latest"
 
     mcp_url: str = "http://localhost:8001/mcp"
     mcp_timeout_seconds: float = Field(default=30, gt=0)

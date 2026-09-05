@@ -1,23 +1,28 @@
 import { useEffect, useState } from 'react';
 import { Button } from '@alfalab/core-components/button';
 import { Input } from '@alfalab/core-components/input';
-import { Plus, Search } from 'lucide-react';
+import { Bot, Plus, Search } from 'lucide-react';
 
 import { ApiError, findCounterparty } from '../api';
 import { isValidInn, normalizeInn } from '../inn';
 import type { CounterpartyPreview } from '../types';
+import { AlfaLogo } from './AlfaLogo';
 import { RiskBadge } from './RiskBadge';
 
 interface CompanySearchProps {
   selectedInns: string[];
   disabled?: boolean;
   onAdd: (company: CounterpartyPreview) => void;
+  onRunAnalysis: () => void;
+  onOpenMobileChat: () => void;
 }
 
 export function CompanySearch({
   selectedInns,
   disabled,
   onAdd,
+  onRunAnalysis,
+  onOpenMobileChat,
 }: CompanySearchProps) {
   const [value, setValue] = useState('');
   const [preview, setPreview] = useState<CounterpartyPreview | null>(null);
@@ -29,6 +34,11 @@ export function CompanySearch({
     setMessage('');
     if (!value) {
       setStatus('idle');
+      return;
+    }
+    if (selectedInns.length >= 10) {
+      setStatus('idle');
+      setMessage('Максимум 10 ИНН');
       return;
     }
     if (!isValidInn(value)) {
@@ -78,36 +88,65 @@ export function CompanySearch({
     setStatus('idle');
   };
 
+  const companyWord =
+    selectedInns.length === 1
+      ? 'компанию'
+      : selectedInns.length >= 2 && selectedInns.length <= 4
+        ? 'компании'
+        : 'компаний';
+
   return (
     <section className="rounded-3xl border border-[#e7e7e7] bg-white p-5 shadow-[0_12px_36px_rgba(0,0,0,0.06)] md:p-6">
-      <div className="mb-4">
-        <p className="text-sm font-medium text-[#6b6b6b]">Новая проверка</p>
-        <h1 className="mt-1 text-2xl font-semibold tracking-[-0.03em] text-[#111] md:text-3xl">
-          Проверка контрагентов
-        </h1>
-      </div>
-
-      <div className="relative">
-        <div className="pointer-events-none absolute top-1/2 left-4 z-10 -translate-y-1/2 text-[#777]">
-          <Search size={20} strokeWidth={2} />
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <AlfaLogo />
+          <h1 className="text-2xl font-semibold tracking-[-0.03em] text-[#111] md:text-3xl">
+            Проверка контрагентов
+          </h1>
         </div>
-        <Input
-          block
-          size={56}
-          value={value}
-          disabled={disabled || selectedInns.length >= 10}
-          placeholder="Введите ИНН компании или ИП"
-          onChange={(event) => setValue(normalizeInn(event.target.value))}
-          className="search-input"
-        />
+        <button
+          type="button"
+          onClick={onOpenMobileChat}
+          className="flex items-center gap-2 rounded-full bg-[#111] px-4 py-2 text-sm font-medium text-white lg:hidden"
+        >
+          <Bot size={17} />
+          Чат
+        </button>
       </div>
 
-      <div className="mt-2 flex min-h-6 items-center justify-between gap-3 px-1 text-sm">
-        <span className={status === 'error' ? 'text-[#c21a10]' : 'text-[#777]'}>
-          {status === 'searching'
-            ? 'Ищем компанию…'
-            : message || `Добавлено ${selectedInns.length} из 10 компаний`}
-        </span>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
+        <div className="min-w-0 flex-1">
+          <div className="relative">
+            <div className="pointer-events-none absolute top-1/2 left-4 z-10 -translate-y-1/2 text-[#777]">
+              <Search size={20} strokeWidth={2} />
+            </div>
+            <Input
+              block
+              size={56}
+              value={value}
+              disabled={disabled}
+              placeholder="Введите ИНН компании или ИП"
+              onChange={(event) => setValue(normalizeInn(event.target.value))}
+              className="search-input"
+            />
+          </div>
+
+          {(status === 'searching' || message) && (
+            <div className="mt-2 px-1 text-sm">
+              <span className={status === 'error' ? 'text-[#c21a10]' : 'text-[#777]'}>
+                {status === 'searching' ? 'Ищем компанию…' : message}
+              </span>
+            </div>
+          )}
+        </div>
+
+        {selectedInns.length > 0 && (
+          <Button view="primary" size={56} disabled={disabled} onClick={onRunAnalysis}>
+            {disabled
+              ? 'Анализ отчета...'
+              : `Проверить ${selectedInns.length} ${companyWord}`}
+          </Button>
+        )}
       </div>
 
       {preview && status === 'found' && (

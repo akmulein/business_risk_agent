@@ -1,19 +1,10 @@
-import { useState, type ReactNode } from 'react';
+import { useState } from 'react';
 import { Button } from '@alfalab/core-components/button';
 import {
   AlertTriangle,
-  Building2,
-  CalendarDays,
   ChevronDown,
-  CircleDollarSign,
-  FileText,
-  Landmark,
-  MapPin,
-  ShieldCheck,
   Sparkles,
   Trash2,
-  UserRound,
-  UsersRound,
 } from 'lucide-react';
 
 import type {
@@ -24,53 +15,65 @@ import type {
   RiskLevel,
 } from '../types';
 import { CHAPTER_TITLES, ReportCharts } from './Charts';
+import { FactorSummary } from './FactorSummary';
 import { RISK_STYLES, RiskBadge } from './RiskBadge';
 
 interface ReportCardProps {
   preview: CounterpartyPreview;
   result?: BatchAnalysisItem;
   analyzing: boolean;
+  companyCount: number;
   onRemove: () => void;
 }
 
-const money = new Intl.NumberFormat('ru-RU', {
-  style: 'currency',
-  currency: 'RUB',
-  maximumFractionDigits: 0,
-});
-
-function formatDate(value: string | null | undefined) {
-  if (!value) return 'Нет данных';
-  const date = new Date(value);
-  return Number.isNaN(date.getTime())
-    ? value
-    : new Intl.DateTimeFormat('ru-RU').format(date);
+function formatCompanyStatus(value: string | null | undefined) {
+  const status = value?.trim().toUpperCase();
+  if (!status) return 'Статус не указан';
+  if (['CURRENT', 'ACTIVE', 'ДЕЙСТВУЮЩАЯ', 'ДЕЙСТВУЮЩИЙ'].includes(status)) {
+    return 'Действующая';
+  }
+  if (status.includes('BANKRUPT') || status.includes('БАНКРОТ')) return 'Банкротство';
+  if (status.includes('REORGAN') || status.includes('РЕОРГАН')) return 'Реорганизация';
+  if (status.includes('LIQUID') || status.includes('ЛИКВИД')) return 'Ликвидация';
+  return value ?? 'Статус не указан';
 }
 
-function valueOrFallback(value: ReactNode) {
-  return value === null || value === undefined || value === '' ? 'Нет данных' : value;
+function yearWord(years: number) {
+  const lastTwo = years % 100;
+  const last = years % 10;
+  if (lastTwo >= 11 && lastTwo <= 14) return 'лет';
+  if (last === 1) return 'год';
+  if (last >= 2 && last <= 4) return 'года';
+  return 'лет';
 }
 
-function Fact({
-  icon,
-  label,
-  value,
-}: {
-  icon: ReactNode;
-  label: string;
-  value: ReactNode;
-}) {
-  return (
-    <div className="grid grid-cols-[24px_minmax(0,1fr)] gap-3 rounded-2xl bg-[#f7f7f7] p-4">
-      <div className="mt-0.5 text-[#777]">{icon}</div>
-      <div className="min-w-0">
-        <dt className="text-xs leading-4 text-[#858585]">{label}</dt>
-        <dd className="mt-1 break-words text-sm font-medium leading-5 text-[#222]">
-          {valueOrFallback(value)}
-        </dd>
-      </div>
-    </div>
-  );
+function formatCompanyAge(value: string | null | undefined) {
+  if (!value) return null;
+  const registrationDate = new Date(value);
+  if (Number.isNaN(registrationDate.getTime())) return null;
+  const now = new Date();
+  let years = now.getFullYear() - registrationDate.getFullYear();
+  const anniversaryPassed =
+    now.getMonth() > registrationDate.getMonth() ||
+    (now.getMonth() === registrationDate.getMonth() &&
+      now.getDate() >= registrationDate.getDate());
+  if (!anniversaryPassed) years -= 1;
+  return years > 0
+    ? `зарегистрирована ${years} ${yearWord(years)} назад`
+    : 'зарегистрирована менее года назад';
+}
+
+function extractRegion(address: string | null | undefined) {
+  if (!address) return 'Регион не указан';
+  const region = address
+    .split(',')
+    .map((part) => part.trim())
+    .find((part) =>
+      /(республика|область|край|автоном|москва|санкт-петербург|севастополь)/i.test(
+        part,
+      ),
+    );
+  return region || 'Регион не указан';
 }
 
 function EvidenceList({ evidence }: { evidence: Evidence[] }) {
@@ -96,23 +99,29 @@ function EvidenceList({ evidence }: { evidence: Evidence[] }) {
   );
 }
 
+const REPORT_SECTION_ORDER = ['general', 'reputation', 'legal', 'finance', 'structure'];
+
 function FullReport({ analysis }: { analysis: Analysis }) {
+  const chapters = analysis.chapters
+    .filter((chapter) => chapter.chapter !== 'procurement')
+    .sort((left, right) => {
+      const leftIndex = REPORT_SECTION_ORDER.indexOf(left.chapter);
+      const rightIndex = REPORT_SECTION_ORDER.indexOf(right.chapter);
+      return (leftIndex < 0 ? Number.MAX_SAFE_INTEGER : leftIndex) -
+        (rightIndex < 0 ? Number.MAX_SAFE_INTEGER : rightIndex);
+    });
+
   return (
     <div className="space-y-5 border-t border-[#ededed] px-5 py-6 md:px-6">
-      <ReportCharts
-        data={analysis.visualization_data ?? { financials: [], procurements: [] }}
-        chapters={analysis.chapters}
-      />
-
       <section>
-        <h3 className="mb-3 text-lg font-semibold text-[#111]">Разделы проверки</h3>
+        <h3 className="mb-3 text-lg font-semibold text-[#111]">Подробности проверки</h3>
         <div className="space-y-3">
-          {analysis.chapters.map((chapter) => (
+          {chapters.map((chapter) => (
             <details
               key={chapter.chapter}
               className="group overflow-hidden rounded-2xl border border-[#e5e5e5] bg-white"
             >
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-4 py-4">
+              <summary className="flex cursor-pointer list-none items-center gap-4 px-4 py-4">
                 <div className="flex min-w-0 items-center gap-3">
                   <ChevronDown
                     size={18}
@@ -122,7 +131,6 @@ function FullReport({ analysis }: { analysis: Analysis }) {
                     {CHAPTER_TITLES[chapter.chapter] ?? chapter.chapter}
                   </span>
                 </div>
-                <RiskBadge level={chapter.risk_level} />
               </summary>
 
               <div className="space-y-4 border-t border-[#ededed] bg-[#fafafa] px-4 py-4">
@@ -145,9 +153,20 @@ function FullReport({ analysis }: { analysis: Analysis }) {
 
                 {chapter.observations.length > 0 && (
                   <div className="space-y-2">
-                    <h4 className="text-sm font-semibold text-[#333]">Требует внимания</h4>
+                    <h4 className="text-sm font-semibold text-[#333]">
+                      {chapter.chapter === 'reputation'
+                        ? 'Факторы отчёта'
+                        : 'Требует внимания'}
+                    </h4>
                     {chapter.observations.map((observation) => (
-                      <div key={observation.code} className="rounded-xl bg-[#fff8df] p-3">
+                      <div
+                        key={observation.code}
+                        className={`rounded-xl p-3 ${
+                          chapter.chapter === 'reputation'
+                            ? 'bg-[#f3f3f3]'
+                            : 'bg-[#fff8df]'
+                        }`}
+                      >
                         <p className="text-sm font-semibold text-[#6c5300]">
                           {observation.title}
                         </p>
@@ -186,6 +205,7 @@ export function ReportCard({
   preview,
   result,
   analyzing,
+  companyCount,
   onRemove,
 }: ReportCardProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -198,6 +218,9 @@ export function ReportCard({
   const director = profile?.director_name
     ? [profile.director_position, profile.director_name].filter(Boolean).join(' ')
     : null;
+  const region = extractRegion(profile?.address);
+  const companyAge = formatCompanyAge(profile?.registration_date);
+  const companyStatus = formatCompanyStatus(profile?.status ?? preview.status);
 
   return (
     <article
@@ -206,33 +229,44 @@ export function ReportCard({
       <div className="p-5 md:p-6">
         <header className="flex items-start justify-between gap-4">
           <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2">
-              <h2 className="text-xl font-semibold tracking-[-0.02em] text-[#111]">
-                {profile?.short_name || preview.name}
-              </h2>
-              <RiskBadge level={riskLevel} />
-            </div>
-            <p className="mt-1 text-sm text-[#777]">
+            <h2 className="text-xl font-semibold uppercase tracking-[-0.02em] text-[#111]">
+              {profile?.short_name || preview.name}
+            </h2>
+            <p className="mt-1 text-xs uppercase leading-5 text-[#777] sm:text-sm">
               ИНН {preview.inn}
-              {profile?.kpp || preview.kpp ? ` · КПП ${profile?.kpp || preview.kpp}` : ''}
+              {profile
+                ? ` · ${region}`
+                : preview.kpp
+                  ? ` · КПП ${preview.kpp}`
+                  : ''}
+              {director ? ` · ${director}` : ''}
             </p>
+            {profile && (
+              <p className="mt-2 text-sm text-[#555]">
+                {companyStatus}
+                {companyAge ? ` · ${companyAge}` : ''}
+              </p>
+            )}
           </div>
-          <button
-            type="button"
-            disabled={analyzing}
-            onClick={onRemove}
-            aria-label="Удалить компанию из проверки"
-            className="rounded-full p-2 text-[#777] transition hover:bg-[#f2f2f2] hover:text-[#111] disabled:opacity-40"
-          >
-            <Trash2 size={18} />
-          </button>
+          <div className="flex shrink-0 items-center gap-2">
+            <RiskBadge level={riskLevel} />
+            <button
+              type="button"
+              disabled={analyzing}
+              onClick={onRemove}
+              aria-label="Удалить компанию из проверки"
+              className="rounded-full p-2 text-[#777] transition hover:bg-[#f2f2f2] hover:text-[#111] disabled:opacity-40"
+            >
+              <Trash2 size={18} />
+            </button>
+          </div>
         </header>
 
         {analyzing && !result && (
           <div className="mt-5 space-y-3">
             <div className="h-16 animate-pulse rounded-2xl bg-[#f1f1f1]" />
             <div className="h-28 animate-pulse rounded-2xl bg-[#f1f1f1]" />
-            <p className="text-sm text-[#777]">Агенты анализируют полный отчёт…</p>
+            <p className="text-sm text-[#777]">Анализ отчета...</p>
           </div>
         )}
 
@@ -250,68 +284,25 @@ export function ReportCard({
 
         {analysis && profile && (
           <>
-            <dl className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-              <Fact
-                icon={<Building2 size={18} />}
-                label="Полное юридическое наименование"
-                value={profile.full_name}
-              />
-              <Fact
-                icon={<UserRound size={18} />}
-                label="Руководитель"
-                value={director}
-              />
-              <Fact
-                icon={<FileText size={18} />}
-                label="ИНН / КПП"
-                value={[profile.inn, profile.kpp].filter(Boolean).join(' / ')}
-              />
-              <Fact
-                icon={<CircleDollarSign size={18} />}
-                label="Уставный капитал"
-                value={profile.share_capital === null ? null : money.format(profile.share_capital)}
-              />
-              <Fact
-                icon={<UsersRound size={18} />}
-                label="Численность персонала"
-                value={profile.staff}
-              />
-              <Fact
-                icon={<UsersRound size={18} />}
-                label="Количество учредителей"
-                value={profile.founders_count}
-              />
-              <Fact
-                icon={<CalendarDays size={18} />}
-                label="Дата регистрации"
-                value={formatDate(profile.registration_date)}
-              />
-              <Fact
-                icon={<ShieldCheck size={18} />}
-                label="Блокировка банковских счетов"
-                value={profile.account_blocking}
-              />
-              <Fact
-                icon={<Landmark size={18} />}
-                label="Реестр МСП"
-                value={profile.company_size}
-              />
-              <Fact
-                icon={<MapPin size={18} />}
-                label="Юридический адрес"
-                value={profile.address}
-              />
-            </dl>
+            <FactorSummary chapters={analysis.chapters} />
 
-            <section className="mt-5 rounded-2xl border border-[#e1e6ed] bg-[#f2f5f9] p-5">
+            <section className="mt-5 rounded-2xl bg-[#f2f5f9] p-5">
               <div className="flex items-center gap-2 text-[#333]">
                 <Sparkles size={19} className="text-[#ef3124]" />
-                <h3 className="font-semibold">AI-вердикт по контрагенту</h3>
+                <h3 className="font-semibold">
+                  {companyCount === 1 ? 'Анализ контрагента' : 'Анализ контрагентов'}
+                </h3>
               </div>
               <p className="mt-3 whitespace-pre-line leading-7 text-[#303030]">
                 {analysis.summary}
               </p>
             </section>
+
+            <div className="mt-5">
+              <ReportCharts
+                data={analysis.visualization_data ?? { financials: [], procurements: [] }}
+              />
+            </div>
 
             <div className="mt-5">
               <Button view="primary" size={48} onClick={() => setIsOpen((value) => !value)}>
@@ -322,7 +313,9 @@ export function ReportCard({
         )}
       </div>
 
-      {analysis && isOpen && <FullReport analysis={analysis} />}
+      {analysis && profile && isOpen && (
+        <FullReport analysis={analysis} />
+      )}
     </article>
   );
 }

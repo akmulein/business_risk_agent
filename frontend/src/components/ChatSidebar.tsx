@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import { Button } from '@alfalab/core-components/button';
 import { Textarea } from '@alfalab/core-components/textarea';
 import { Bot, RotateCcw, Send, Sparkles, X } from 'lucide-react';
 
@@ -203,30 +202,32 @@ export function ChatSidebar({ chatId, companyCount, onClose }: ChatSidebarProps)
           ))}
         </div>
         <div className="flex items-end gap-2">
-          <Textarea
-            block
-            minRows={1}
-            maxRows={5}
-            value={value}
-            disabled={!chatId || isSending}
-            placeholder="Задайте вопрос по отчётам"
-            onChange={(event) => setValue(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter' && !event.shiftKey) {
-                event.preventDefault();
-                void submit(value);
-              }
-            }}
-          />
-          <Button
-            view="primary"
-            size={48}
+          <div className="min-w-0 flex-1">
+            <Textarea
+              block
+              minRows={1}
+              maxRows={5}
+              value={value}
+              disabled={!chatId || isSending}
+              placeholder="Задайте вопрос по отчётам"
+              onChange={(event) => setValue(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' && !event.shiftKey) {
+                  event.preventDefault();
+                  void submit(value);
+                }
+              }}
+            />
+          </div>
+          <button
+            type="button"
             disabled={!chatId || !value.trim() || isSending}
             onClick={() => void submit(value)}
             aria-label="Отправить сообщение"
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#111] text-white transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-35"
           >
             <Send size={18} />
-          </Button>
+          </button>
         </div>
       </footer>
     </aside>
