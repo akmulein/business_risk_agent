@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 from functools import lru_cache
 from typing import Any
 
@@ -26,6 +27,8 @@ from .prompt_constants import (
 )
 from .reputation_rules import ReputationView
 from .settings import Settings, get_settings
+
+logger = logging.getLogger(__name__)
 
 
 class GroundedText(BaseModel):
@@ -104,6 +107,7 @@ class SpecialistAgent:
 
     async def enrich(self, chapter: ChapterResult) -> ChapterResult:
         if not self.agent:
+            logger.info("LLM call skipped (SpecialistAgent.enrich): agent disabled")
             return chapter
         payload = {
             "task": (
@@ -111,7 +115,9 @@ class SpecialistAgent:
             ),
             "chapter": chapter.model_dump(mode="json"),
         }
+        logger.info("LLM call -> SpecialistAgent.enrich chapter=%s", chapter.name)
         result = await self.agent.run(json.dumps(payload, ensure_ascii=False))
+        logger.info("LLM call <- SpecialistAgent.enrich chapter=%s", chapter.name)
         allowed = _chapter_fields(chapter)
         if result.output.evidence_fields and set(
             result.output.evidence_fields
@@ -142,37 +148,26 @@ class EvaluatorAgent:
         factors: list[FactorSummaryItem],
     ) -> AnalysisSummary:
         if not self.agent:
-            raise RuntimeError("OPENROUTER_API_KEY is not configured")
-
-        risk_labels = {
-            RiskLevel.LOW: "Низкий риск",
-            RiskLevel.MEDIUM: "Средний риск",
-            RiskLevel.HIGH: "Высокий риск",
-            RiskLevel.UNKNOWN: "Уровень риска не определён",
-        }
-        facts = [
-            {
-                "id": f"{factor.chapter}.{index}",
-                "section": factor.label,
-                "status": factor.status.value,
-                "text": detail,
-            }
-            for factor in factors
-            for index, detail in enumerate(factor.details, start=1)
-        ]
-        if not facts:
-            raise RuntimeError("No report facts available for summary")
-
+if not self.agent:
+    logger.info("LLM call skipped (EvaluatorAgent.summarize): agent disabled")
+    return deterministic
         payload = {
             "task": "Составь ёмкое объяснение уровня риска для пользователя.",
             "company": company_name,
             "risk_label": risk_labels[risk_level],
             "facts": facts,
         }
+        logger.info("LLM call -> EvaluatorAgent.summarize chapters=%d", len(chapters))
         result = await self.agent.run(json.dumps(payload, ensure_ascii=False))
-        allowed = {fact["id"] for fact in facts}
-        if any(
-            not set(statement.fact_ids).issubset(allowed)
+logger.info("LLM call <- EvaluatorAgent.summarize")
+
+allowed = {fact["id"] for fact in facts}
+
+if any(
+    not set(statement.fact_ids).issubset(allowed)
+    for statement in result.output.statements
+):
+    raise RuntimeError("Summary contains unknown fact identifiers")
             for statement in result.output.statements
         ):
             raise RuntimeError("Summary contains unknown fact identifiers")
@@ -217,6 +212,9 @@ class QuestionAnswerAgent:
         chapters: list[ChapterResult],
     ) -> str:
         if not self.agent:
+            logger.info(
+                "LLM call skipped (QuestionAnswerAgent.answer): agent disabled"
+            )
             return (
                 "OpenRouter не настроен, поэтому диалоговый ответ недоступен. "
                 "Исходный анализ сформирован детерминированно."
@@ -227,7 +225,9 @@ class QuestionAnswerAgent:
             "card": card.model_dump(mode="json"),
             "analysis": [item.model_dump(mode="json") for item in chapters],
         }
+        logger.info("LLM call -> QuestionAnswerAgent.answer")
         result = await self.agent.run(json.dumps(payload, ensure_ascii=False))
+        logger.info("LLM call <- QuestionAnswerAgent.answer")
         allowed = flatten_field_paths(payload["card"])
         citations = set(result.output.evidence_fields)
         if citations and not citations.issubset(allowed):
@@ -271,10 +271,11 @@ class ReputationAgent:
         )
 
     async def aggregate(self, view: ReputationView) -> list[Observation]:
-        if not view.chapters:
-            return []
-        if not self.agent:
-            raise RuntimeError("OPENROUTER_API_KEY is not configured")
+if not view.chapters:
+    return []
+
+if not self.agent:
+    raise RuntimeError("OPENROUTER_API_KEY is not configured")
         payload = {
             chapter: [
                 {
@@ -287,7 +288,11 @@ class ReputationAgent:
             ]
             for chapter, entries in view.by_chapter.items()
         }
+        logger.info(
+            "LLM call -> ReputationAgent.aggregate chapters=%d", len(view.chapters)
+        )
         result = await self.agent.run(json.dumps(payload, ensure_ascii=False))
+        logger.info("LLM call <- ReputationAgent.aggregate")
         allowed = {entry.field("name") for entry in view.indexed}
         values = {entry.field("name"): entry.item.name for entry in view.indexed}
         highlights = result.output.highlights

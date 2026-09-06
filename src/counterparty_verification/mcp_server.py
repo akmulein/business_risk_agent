@@ -1,4 +1,5 @@
 import inspect
+import logging
 import os
 from typing import Any
 
@@ -7,6 +8,10 @@ from fastmcp import FastMCP
 from .analyzers import ANALYZERS
 from .domain import CounterpartyCard
 from .prompt_constants import MCP_SERVER_INSTRUCTIONS
+
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s"
+)
 
 mcp = FastMCP(
     "counterparty-analysis",
