@@ -180,13 +180,11 @@ class ChatService:
         repository: CounterpartyRepository,
         store: ChatSessionStore,
         agent: ChatResponder,
-        timeout_seconds: float,
         history_limit: int,
     ) -> None:
         self.repository = repository
         self.store = store
         self.agent = agent
-        self.timeout_seconds = timeout_seconds
         self.history_limit = history_limit
 
     async def create_for_analysis(self, response: BatchAnalysisResponse) -> str | None:
@@ -211,16 +209,13 @@ class ChatService:
             raise ChatSessionNotFoundError(chat_id)
         history = session.messages[-self.history_limit :] if self.history_limit else []
         try:
-            async with asyncio.timeout(self.timeout_seconds):
-                result = await self.agent.answer(
-                    question,
-                    cards,
-                    session.analyses,
-                    history,
-                )
+            result = await self.agent.answer(
+                question,
+                cards,
+                session.analyses,
+                history,
+            )
         except ChatModelNotConfiguredError:
-            raise
-        except TimeoutError:
             raise
         except Exception as error:
             raise ChatUpstreamServiceError("Chat agent failed") from error

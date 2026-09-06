@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import re
 from collections import defaultdict
 from typing import Any
@@ -8,10 +9,12 @@ from typing import Any
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent
 from pydantic_ai.models.openrouter import OpenRouterModel
-from pydantic_ai.providers.openrouter import OpenRouterProvider
 
 from .domain import ComparisonCompany, RiskLevel, VerificationStatus
+from .llm_provider import openrouter_provider
 from .settings import Settings
+
+logger = logging.getLogger(__name__)
 
 
 class ComparisonStatement(BaseModel):
@@ -98,14 +101,14 @@ def _enforcement_text(count: int) -> str:
         return f"{count} действующих исполнительных производств"
     if last == 1:
         return f"{count} действующее исполнительное производство"
-    return f"{count} действующих исполнительных производста"
+    return f"{count} действующих исполнительных производства"
 
 
 def _defendant_case_text(count: int) -> str:
     last_two = count % 100
     last = count % 10
     if last_two in range(11, 15) or last == 0 or last >= 5:
-        return f"{count} текущих арбитражных дела в роли ответчика"
+        return f"{count} текущих арбитражных дел в роли ответчика"
     if last == 1:
         return f"{count} текущее арбитражное дело в роли ответчика"
     return f"{count} текущих арбитражных дела в роли ответчика"
@@ -317,12 +320,13 @@ class ComparisonAgent:
         if self.enabled:
             model = OpenRouterModel(
                 settings.openrouter_model,
-                provider=OpenRouterProvider(api_key=settings.openrouter_api_key),
+                provider=openrouter_provider(settings.openrouter_api_key),
             )
             self.agent = Agent(
                 model,
                 output_type=ComparisonSummaryOutput,
                 instructions=COMPARISON_INSTRUCTIONS,
+                model_settings={"temperature": 0},
             )
 
     async def summarize(self, companies: list[ComparisonCompany]) -> str:
@@ -350,10 +354,16 @@ class ComparisonAgent:
                     "не меняя остальное."
                 )
             try:
+                logger.info("Comparison LLM call attempt=%d", attempt)
                 result = await self.agent.run(prompt)
-                return self._build_summary(result.output, facts_by_id)
+                summary = self._build_summary(result.output, facts_by_id)
+                logger.info("Comparison LLM call succeeded attempt=%d", attempt)
+                return summary
             except Exception as error:  # noqa: BLE001 - retried, then re-raised
                 last_error = error
+                logger.warning(
+                    "Comparison LLM call attempt=%d failed: %s", attempt, error
+                )
                 if attempt == max_attempts:
                     raise RuntimeError(
                         f"Не удалось получить корректное сравнение за "
@@ -367,6 +377,27 @@ class ComparisonAgent:
         facts_by_id: dict[str, Any],
     ) -> str:
         ordered_statements = [output.leader_statement, *output.company_statements]
+        if set(output.leader_statement.fact_refs) != {"comparison.leaders"}:
+            raise RuntimeError("Первое утверждение не ссылается на лидеров")
         for statement in ordered_statements:
+            unknown_refs = set(statement.fact_refs) - facts_by_id.keys()
+            if unknown_refs:
+                raise RuntimeError(
+                    "Указаны неизвестные fact_refs: "
+                    + ", ".join(sorted(unknown_refs))
+                )
             _check_numbers(statement, facts_by_id)
-        return " ".join(statement.text.strip() for statement in ordered_statements)
+        for statement in output.company_statements:
+            expected_prefix = f"{statement.company_inn}."
+            if not all(
+                ref.startswith(expected_prefix) for ref in statement.fact_refs
+            ):
+                raise RuntimeError(
+                    "Утверждение компании ссылается на факты другого контрагента"
+                )
+        summary = " ".join(
+            statement.text.strip() for statement in ordered_statements
+        )
+        if len(summary) > 1200:
+            raise RuntimeError("Сравнительный анализ длиннее 1200 знаков")
+        return summary

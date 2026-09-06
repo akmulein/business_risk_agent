@@ -1,9 +1,6 @@
-name: counterparty-verification
-
 services:
   mongo:
     image: mongo:${MONGO_IMAGE_TAG:-7.0}
-    container_name: contractor-mongo
     restart: unless-stopped
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:-contractors_admin}
@@ -57,6 +54,18 @@ services:
       MCP_PORT: "8001"
     ports:
       - "8001:8001"
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - >-
+          import socket;
+          connection = socket.create_connection(('127.0.0.1', 8001), 2);
+          connection.close()
+      interval: 3s
+      timeout: 3s
+      retries: 20
 
   api:
     build: .
@@ -81,9 +90,20 @@ services:
       MONGODB_SOURCE_COLLECTION: ${MONGO_COLLECTION:-reports}
     ports:
       - "8000:8000"
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - >-
+          import urllib.request;
+          urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=2)
+      interval: 3s
+      timeout: 3s
+      retries: 20
     depends_on:
       mcp:
-        condition: service_started
+        condition: service_healthy
       mongo-seed:
         condition: service_completed_successfully
 
@@ -94,7 +114,7 @@ services:
       - "${FRONTEND_PORT:-3000}:80"
     depends_on:
       api:
-        condition: service_started
+        condition: service_healthy
 
   postgres:
     image: postgres:17-alpine
@@ -110,5 +130,4 @@ services:
 
 volumes:
   mongo_data:
-    name: counterparty-mongo_mongo_data
   postgres_data:

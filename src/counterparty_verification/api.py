@@ -1,4 +1,3 @@
-import asyncio
 import logging
 from contextlib import asynccontextmanager
 from typing import Annotated
@@ -91,25 +90,20 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     sessions = InMemorySessionStore(config.session_ttl_seconds)
     analysis_service = AnalysisService(
         repository=repository,
-        tools=HttpMcpAnalysisClient(
-            config.mcp_url, timeout_seconds=config.mcp_timeout_seconds
-        ),
+        tools=HttpMcpAnalysisClient(config.mcp_url),
         specialist=SpecialistAgent(config),
         evaluator=EvaluatorAgent(config),
         sessions=sessions,
-        timeout_seconds=config.analysis_timeout_seconds,
         comparison_agent=ComparisonAgent(config),
     )
     question_service = QuestionService(
         sessions,
         QuestionAnswerAgent(config),
-        timeout_seconds=config.analysis_timeout_seconds,
     )
     chat_service = ChatService(
         repository=repository,
         store=chat_store,
         agent=ReportChatAgent(config),
-        timeout_seconds=config.chat_timeout_seconds,
         history_limit=config.chat_history_limit,
     )
     app.state.analysis_service = analysis_service
@@ -209,11 +203,6 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 status_code=503,
                 detail="OPENROUTER_API_KEY не настроен",
             ) from error
-        except asyncio.TimeoutError as error:
-            raise HTTPException(
-                status_code=503,
-                detail="Превышено время ответа",
-            ) from error
         except ChatUpstreamServiceError as error:
             raise HTTPException(
                 status_code=502,
@@ -268,10 +257,6 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             raise HTTPException(
                 status_code=404,
                 detail="Анализ не найден или срок сессии истёк",
-            ) from error
-        except asyncio.TimeoutError as error:
-            raise HTTPException(
-                status_code=503, detail="Превышено время ответа"
             ) from error
         except UpstreamServiceError as error:
             raise HTTPException(

@@ -7,10 +7,10 @@ from typing import Any
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent, ModelSettings
 from pydantic_ai.models.openrouter import OpenRouterModel
-from pydantic_ai.providers.openrouter import OpenRouterProvider
 
 from .chat_models import ChatAgentResult, ChatMessage, ChatSource
 from .domain import AnalysisResponse, CounterpartyCard
+from .llm_provider import openrouter_provider
 from .llm_config import MODEL_SYSTEM_PROMPT
 from .settings import Settings
 
@@ -69,7 +69,7 @@ def _openrouter_model(settings: Settings) -> OpenRouterModel:
         raise ChatModelNotConfiguredError("OPENROUTER_API_KEY is not configured")
     return OpenRouterModel(
         settings.openrouter_model,
-        provider=OpenRouterProvider(api_key=settings.openrouter_api_key),
+        provider=openrouter_provider(settings.openrouter_api_key),
     )
 
 
@@ -82,7 +82,10 @@ class ReportChatAgent:
                 _openrouter_model(settings),
                 output_type=ChatModelOutput,
                 instructions=MODEL_SYSTEM_PROMPT,
-                model_settings=ModelSettings(max_tokens=settings.chat_max_tokens),
+                model_settings=ModelSettings(
+                    max_tokens=settings.chat_max_tokens,
+                    temperature=0,
+                ),
             )
         else:
             self.agent = None
