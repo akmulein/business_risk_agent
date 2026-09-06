@@ -4,6 +4,7 @@ import { Building2 } from 'lucide-react';
 import { analyzeCounterparties } from './api';
 import { ChatSidebar } from './components/ChatSidebar';
 import { CompanySearch } from './components/CompanySearch';
+import { ComparisonDashboard } from './components/ComparisonDashboard';
 import { ReportCard } from './components/ReportCard';
 import type {
   BatchAnalysisItem,
@@ -25,6 +26,18 @@ export default function App() {
       ),
     [response],
   );
+
+  const displayedCompanies = useMemo(() => {
+    if (!response?.comparison) return selected;
+    const ranks = new Map(
+      response.comparison.companies.map((company) => [company.inn, company.rank]),
+    );
+    return [...selected].sort(
+      (left, right) =>
+        (ranks.get(left.inn) ?? Number.POSITIVE_INFINITY) -
+        (ranks.get(right.inn) ?? Number.POSITIVE_INFINITY),
+    );
+  }, [response?.comparison, selected]);
 
   const invalidateAnalysis = () => {
     setResponse(null);
@@ -96,13 +109,21 @@ export default function App() {
               </section>
             ) : (
               <section className="space-y-5 pb-8">
-                {selected.map((company) => (
+                {response?.comparison && (
+                  <ComparisonDashboard comparison={response.comparison} />
+                )}
+                {response?.comparison && (
+                  <h2 className="pt-2 text-lg font-semibold text-[#222]">
+                    Отчёты по компаниям
+                  </h2>
+                )}
+                {displayedCompanies.map((company) => (
                   <ReportCard
                     key={company.inn}
                     preview={company}
                     result={resultsByInn.get(company.inn)}
                     analyzing={isAnalyzing}
-                    companyCount={selected.length}
+                    collapsedByDefault={Boolean(response?.comparison)}
                     onRemove={() => removeCompany(company.inn)}
                   />
                 ))}

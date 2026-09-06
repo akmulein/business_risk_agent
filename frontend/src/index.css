@@ -31,6 +31,59 @@ input {
   font: inherit;
 }
 
+.surface-shadow {
+  box-shadow: 0 12px 36px rgb(0 0 0 / 6%);
+}
+
+.analysis-button-loading {
+  position: relative;
+  background: linear-gradient(110deg, #111 15%, #3d3d3d 42%, #ef3124 55%, #282828 70%, #111 88%);
+  background-size: 240% 100%;
+  animation: analysis-flow 1.7s linear infinite;
+}
+
+.analysis-progress-track {
+  position: relative;
+  display: block;
+  width: min(128px, 36%);
+  height: 3px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e3e3e3;
+}
+
+.analysis-progress-value {
+  position: absolute;
+  inset-block: 0;
+  left: -42%;
+  width: 42%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #ef3124, #ff756c);
+  animation: report-progress 1.35s ease-in-out infinite;
+}
+
+@keyframes analysis-flow {
+  to {
+    background-position: -240% 0;
+  }
+}
+
+@keyframes report-progress {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(340%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .analysis-button-loading,
+  .analysis-progress-value {
+    animation-duration: 3.5s;
+  }
+}
+
 .search-input input {
   padding-left: 46px;
 }

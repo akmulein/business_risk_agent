@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@alfalab/core-components/button';
 import {
   Sparkles,
+  ChevronDown,
+  ChevronUp,
   Trash2,
 } from 'lucide-react';
 
@@ -20,7 +22,7 @@ interface ReportCardProps {
   preview: CounterpartyPreview;
   result?: BatchAnalysisItem;
   analyzing: boolean;
-  companyCount: number;
+  collapsedByDefault: boolean;
   onRemove: () => void;
 }
 
@@ -78,9 +80,10 @@ export function ReportCard({
   preview,
   result,
   analyzing,
-  companyCount,
+  collapsedByDefault,
   onRemove,
 }: ReportCardProps) {
+  const [isDetailsOpen, setIsDetailsOpen] = useState(!collapsedByDefault);
   const [isOpen, setIsOpen] = useState(false);
   const [sourceReport, setSourceReport] = useState<Record<string, unknown> | null>(null);
   const [reportLoading, setReportLoading] = useState(false);
@@ -90,6 +93,10 @@ export function ReportCard({
   const riskLevel: RiskLevel =
     profile?.bank_risk_level ?? preview.risk_level ?? 'UNKNOWN';
   const style = RISK_STYLES[riskLevel];
+
+  useEffect(() => {
+    setIsDetailsOpen(!collapsedByDefault);
+  }, [collapsedByDefault, analysis?.analysis_id]);
 
   const director = profile?.director_name
     ? [profile.director_position, profile.director_name].filter(Boolean).join(' ')
@@ -119,7 +126,7 @@ export function ReportCard({
 
   return (
     <article
-      className={`overflow-hidden rounded-3xl border border-[#e6e6e6] border-l-4 bg-white shadow-[0_12px_36px_rgba(0,0,0,0.06)] ${style.border}`}
+      className={`surface-shadow overflow-hidden rounded-3xl border border-[#e6e6e6] border-l-4 bg-white ${style.border}`}
     >
       <div className="p-5 md:p-6">
         <header className="flex items-start justify-between gap-4">
@@ -145,6 +152,17 @@ export function ReportCard({
           </div>
           <div className="flex shrink-0 items-center gap-2">
             <RiskBadge level={riskLevel} />
+            {analysis && profile && collapsedByDefault && (
+              <button
+                type="button"
+                onClick={() => setIsDetailsOpen((current) => !current)}
+                aria-expanded={isDetailsOpen}
+                className="inline-flex items-center gap-1 rounded-full px-3 py-2 text-xs font-medium text-[#555] transition hover:bg-[#f2f2f2] hover:text-[#111]"
+              >
+                {isDetailsOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                {isDetailsOpen ? 'Свернуть' : 'Развернуть отчёт'}
+              </button>
+            )}
             <button
               type="button"
               disabled={analyzing}
@@ -157,34 +175,33 @@ export function ReportCard({
           </div>
         </header>
 
-        {analyzing && !result && (
-          <div className="mt-5 space-y-3">
-            <div className="h-16 animate-pulse rounded-2xl bg-[#f1f1f1]" />
-            <div className="h-28 animate-pulse rounded-2xl bg-[#f1f1f1]" />
-            <p className="text-sm text-[#777]">Анализ отчета...</p>
+        {isDetailsOpen && analyzing && !result && (
+          <div className="mt-5 flex items-center gap-3 text-sm text-[#777]">
+            <span className="shrink-0">Анализ отчета...</span>
+            <span className="analysis-progress-track" aria-hidden="true">
+              <span className="analysis-progress-value" />
+            </span>
           </div>
         )}
 
-        {!analyzing && !result && (
+        {isDetailsOpen && !analyzing && !result && (
           <div className="mt-5 rounded-2xl border border-dashed border-[#d7d7d7] bg-[#fafafa] px-4 py-5 text-sm text-[#666]">
             Компания добавлена. Запустите общую проверку выбранных контрагентов.
           </div>
         )}
 
-        {result && result.status !== 'success' && (
+        {isDetailsOpen && result && result.status !== 'success' && (
           <div className="mt-5 rounded-2xl bg-[#fff0ef] p-4 text-sm text-[#9d1811]">
             {result.error || 'Не удалось сформировать отчёт'}
           </div>
         )}
 
-        {analysis && profile && (
+        {isDetailsOpen && analysis && profile && (
           <>
             <section className="mt-5 rounded-2xl bg-[#f2f5f9] p-5">
               <div className="flex items-center gap-2 text-[#333]">
                 <Sparkles size={19} className="text-[#ef3124]" />
-                <h3 className="font-semibold">
-                  {companyCount === 1 ? 'Анализ контрагента' : 'Анализ контрагентов'}
-                </h3>
+                <h3 className="font-semibold">Анализ контрагента</h3>
               </div>
               <p className="mt-3 whitespace-pre-line leading-7 text-[#303030]">
                 {analysis.summary}

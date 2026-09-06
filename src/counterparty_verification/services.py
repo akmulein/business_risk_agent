@@ -6,6 +6,8 @@ from datetime import UTC, datetime, timedelta
 from uuid import uuid4
 
 from .agents import EvaluatorAgent, QuestionAnswerAgent, SpecialistAgent
+from .comparison import build_comparison
+from .comparison_agent import ComparisonAgent
 from .domain import (
     BatchAnalysisItem,
     BatchAnalysisResponse,
@@ -90,6 +92,7 @@ class AnalysisService:
         evaluator: EvaluatorAgent,
         sessions: InMemorySessionStore,
         timeout_seconds: float,
+        comparison_agent: ComparisonAgent | None = None,
     ) -> None:
         self.repository = repository
         self.tools = tools
@@ -97,6 +100,7 @@ class AnalysisService:
         self.evaluator = evaluator
         self.sessions = sessions
         self.timeout_seconds = timeout_seconds
+        self.comparison_agent = comparison_agent
 
     async def analyze(self, inn: str) -> AnalysisResponse:
         card = await self.repository.get_by_inn(inn)
@@ -120,12 +124,6 @@ class AnalysisService:
             async with semaphore:
                 try:
                     analysis = await self._analyze_card(inn, card)
-                except TimeoutError:
-                    return BatchAnalysisItem(
-                        inn=inn,
-                        status=BatchAnalysisStatus.ERROR,
-                        error="Превышено время анализа",
-                    )
                 except UpstreamServiceError:
                     return BatchAnalysisItem(
                         inn=inn,
@@ -138,32 +136,50 @@ class AnalysisService:
                 analysis=analysis,
             )
 
-        results = await asyncio.gather(*(analyze_one(inn) for inn in inns))
-        return BatchAnalysisResponse(results=list(results))
+        results = list(await asyncio.gather(*(analyze_one(inn) for inn in inns)))
+        successful_cards = [
+            cards_by_inn[item.inn]
+            for item in results
+            if item.status == BatchAnalysisStatus.SUCCESS
+            and item.analysis is not None
+        ]
+        comparison = None
+        if len(successful_cards) >= 2:
+            comparison = build_comparison(successful_cards)
+            try:
+                if self.comparison_agent is None:
+                    raise RuntimeError("Comparison agent is not configured")
+                comparison.summary = await self.comparison_agent.summarize(
+                    comparison.companies
+                )
+            except Exception:
+                comparison.summary_error = (
+                    "Не удалось сформировать сравнительный анализ"
+                )
+        return BatchAnalysisResponse(results=results, comparison=comparison)
 
     async def _analyze_card(
         self, inn: str, card: CounterpartyCard
     ) -> AnalysisResponse:
-        async with asyncio.timeout(self.timeout_seconds):
-            chapters = await asyncio.gather(
-                *(self._run_chapter(name, card) for name in TOOL_NAMES)
+        chapters = await asyncio.gather(
+            *(self._run_chapter(name, card) for name in TOOL_NAMES)
+        )
+        factor_summary = build_factor_summary(card, chapters)
+        summary_factors = build_factor_summary(card, chapters, compact=False)
+        bank_risk_level = card.company_reports.risk_level or RiskLevel.UNKNOWN
+        company_name = (
+            card.company_reports.short_name
+            or card.company_reports.full_name
+            or inn
+        )
+        try:
+            summary = await self.evaluator.summarize(
+                company_name,
+                bank_risk_level,
+                summary_factors,
             )
-            factor_summary = build_factor_summary(card, chapters)
-            summary_factors = build_factor_summary(card, chapters, compact=False)
-            bank_risk_level = card.company_reports.risk_level or RiskLevel.UNKNOWN
-            company_name = (
-                card.company_reports.short_name
-                or card.company_reports.full_name
-                or inn
-            )
-            try:
-                summary = await self.evaluator.summarize(
-                    company_name,
-                    bank_risk_level,
-                    summary_factors,
-                )
-            except Exception as error:
-                raise UpstreamServiceError("Evaluator failed") from error
+        except Exception as error:
+            raise UpstreamServiceError("Evaluator failed") from error
         response = AnalysisResponse(
             analysis_id=str(uuid4()),
             inn=inn,
