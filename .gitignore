@@ -148,7 +148,6 @@ activemq-data/
 *.sage.py
 
 # Environments
-.env
 .envrc
 .venv
 env/
@@ -209,8 +208,7 @@ tempCodeRunnerFile.py
 # PyPI configuration file
 .pypirc
 
-# Local application secrets
-.env
+# Local application configuration variants
 .env.*
 !.env.example
 
