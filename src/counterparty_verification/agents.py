@@ -148,26 +148,39 @@ class EvaluatorAgent:
         factors: list[FactorSummaryItem],
     ) -> AnalysisSummary:
         if not self.agent:
-if not self.agent:
-    logger.info("LLM call skipped (EvaluatorAgent.summarize): agent disabled")
-    return deterministic
+            raise RuntimeError("OPENROUTER_API_KEY is not configured")
+
+        risk_labels = {
+            RiskLevel.LOW: "Низкий риск",
+            RiskLevel.MEDIUM: "Средний риск",
+            RiskLevel.HIGH: "Высокий риск",
+            RiskLevel.UNKNOWN: "Уровень риска не определён",
+        }
+        facts = [
+            {
+                "id": f"{factor.chapter}.{index}",
+                "section": factor.label,
+                "status": factor.status.value,
+                "text": detail,
+            }
+            for factor in factors
+            for index, detail in enumerate(factor.details, start=1)
+        ]
+        if not facts:
+            raise RuntimeError("No report facts available for summary")
+
         payload = {
             "task": "Составь ёмкое объяснение уровня риска для пользователя.",
             "company": company_name,
             "risk_label": risk_labels[risk_level],
             "facts": facts,
         }
-        logger.info("LLM call -> EvaluatorAgent.summarize chapters=%d", len(chapters))
+        logger.info("LLM call -> EvaluatorAgent.summarize facts=%d", len(facts))
         result = await self.agent.run(json.dumps(payload, ensure_ascii=False))
-logger.info("LLM call <- EvaluatorAgent.summarize")
-
-allowed = {fact["id"] for fact in facts}
-
-if any(
-    not set(statement.fact_ids).issubset(allowed)
-    for statement in result.output.statements
-):
-    raise RuntimeError("Summary contains unknown fact identifiers")
+        logger.info("LLM call <- EvaluatorAgent.summarize")
+        allowed = {fact["id"] for fact in facts}
+        if any(
+            not set(statement.fact_ids).issubset(allowed)
             for statement in result.output.statements
         ):
             raise RuntimeError("Summary contains unknown fact identifiers")
@@ -271,11 +284,11 @@ class ReputationAgent:
         )
 
     async def aggregate(self, view: ReputationView) -> list[Observation]:
-if not view.chapters:
-    return []
+        if not view.chapters:
+            return []
 
-if not self.agent:
-    raise RuntimeError("OPENROUTER_API_KEY is not configured")
+        if not self.agent:
+            raise RuntimeError("OPENROUTER_API_KEY is not configured")
         payload = {
             chapter: [
                 {
