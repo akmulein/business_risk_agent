@@ -37,7 +37,7 @@ input {
 
 .analysis-button-loading {
   position: relative;
-  background: linear-gradient(110deg, #111 15%, #3d3d3d 42%, #ef3124 55%, #282828 70%, #111 88%);
+  background: linear-gradient(110deg, #111 15%, #3d3d3d 42%, #777 55%, #282828 70%, #111 88%);
   background-size: 240% 100%;
   animation: analysis-flow 1.7s linear infinite;
 }

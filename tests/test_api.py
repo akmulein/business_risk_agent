@@ -67,7 +67,6 @@ def app():
         specialist=SpecialistAgent(settings),
         evaluator=StubEvaluator(),
         sessions=sessions,
-        timeout_seconds=5,
     )
     application.state.question_service = QuestionService(
         sessions, QuestionAnswerAgent(settings)
@@ -76,7 +75,6 @@ def app():
         repository=repository,
         store=InMemoryChatSessionStore(60),
         agent=StubChatAgent(),
-        timeout_seconds=5,
         history_limit=12,
     )
     return application

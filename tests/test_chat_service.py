@@ -93,7 +93,6 @@ async def test_chat_supports_multiple_companies_and_history(
         repository=repository,
         store=store,
         agent=agent,
-        timeout_seconds=5,
         history_limit=12,
     )
 
@@ -139,7 +138,6 @@ async def test_chat_is_not_created_when_no_reports_are_found(
         repository=StubRepository([card]),
         store=InMemoryChatSessionStore(ttl_seconds=60),
         agent=StubChatAgent(),
-        timeout_seconds=5,
         history_limit=12,
     )
     response = BatchAnalysisResponse(
