@@ -42,6 +42,7 @@ export const MOCK_SOURCE_REPORT: Record<string, unknown> = {
 
 export const MOCK_ANALYSIS: BatchAnalysisResponse = {
   chat_id: 'mock-chat',
+  comparison: null,
   results: [
     {
       inn: '7325145393',

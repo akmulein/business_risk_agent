@@ -336,9 +336,40 @@ class BatchAnalysisItem(BaseModel):
     error: str | None = None
 
 
+class VerificationStatus(StrEnum):
+    OK = "OK"
+    ISSUE = "ISSUE"
+    NO_DATA = "NO_DATA"
+
+
+class ComparisonCompany(BaseModel):
+    rank: int
+    inn: str
+    name: str
+    risk_level: RiskLevel
+    financial_year: int | None = None
+    revenue: float | None = None
+    profit: float | None = None
+    assets: float | None = None
+    capital: float | None = None
+    short_term_liabilities: float | None = None
+    revenue_change_percent: float | None = None
+    defendant_cases: int | None = None
+    active_enforcements: int | None = None
+    fns_status: VerificationStatus = VerificationStatus.NO_DATA
+    bankruptcy_status: VerificationStatus = VerificationStatus.NO_DATA
+
+
+class BatchComparison(BaseModel):
+    summary: str | None = None
+    summary_error: str | None = None
+    companies: list[ComparisonCompany]
+
+
 class BatchAnalysisResponse(BaseModel):
     chat_id: str | None = None
     results: list[BatchAnalysisItem]
+    comparison: BatchComparison | None = None
 
 
 class QuestionRequest(BaseModel):

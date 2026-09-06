@@ -96,7 +96,7 @@ export function CompanySearch({
         : 'компаний';
 
   return (
-    <section className="rounded-3xl border border-[#e7e7e7] bg-white p-5 shadow-[0_12px_36px_rgba(0,0,0,0.06)] md:p-6">
+    <section className="surface-shadow rounded-3xl border border-[#e7e7e7] bg-white p-5 md:p-6">
       <div className="mb-4 flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <AlfaLogo />
@@ -141,11 +141,19 @@ export function CompanySearch({
         </div>
 
         {selectedInns.length > 0 && (
-          <Button view="primary" size={56} disabled={disabled} onClick={onRunAnalysis}>
-            {disabled
-              ? 'Анализ отчета...'
-              : `Проверить ${selectedInns.length} ${companyWord}`}
-          </Button>
+          <button
+            type="button"
+            disabled={disabled}
+            onClick={onRunAnalysis}
+            aria-label={disabled ? 'Анализ отчета...' : undefined}
+            className={`h-14 min-w-56 overflow-hidden rounded-xl px-6 text-sm font-semibold text-white transition ${
+              disabled
+                ? 'analysis-button-loading cursor-wait'
+                : 'bg-[#111] hover:bg-[#292929] active:scale-[0.99]'
+            }`}
+          >
+            {!disabled && `Проверить ${selectedInns.length} ${companyWord}`}
+          </button>
         )}
       </div>
 

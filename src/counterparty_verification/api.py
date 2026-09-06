@@ -18,6 +18,7 @@ from .chat_service import (
     InMemoryChatSessionStore,
     MongoChatSessionStore,
 )
+from .comparison_agent import ComparisonAgent
 from .domain import (
     AnalysisRequest,
     BatchAnalysisResponse,
@@ -92,6 +93,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         evaluator=EvaluatorAgent(config),
         sessions=sessions,
         timeout_seconds=config.analysis_timeout_seconds,
+        comparison_agent=ComparisonAgent(config),
     )
     question_service = QuestionService(
         sessions,

@@ -106,9 +106,36 @@ export interface BatchAnalysisItem {
   error: string | null;
 }
 
+export type VerificationStatus = 'OK' | 'ISSUE' | 'NO_DATA';
+
+export interface ComparisonCompany {
+  rank: number;
+  inn: string;
+  name: string;
+  risk_level: RiskLevel;
+  financial_year: number | null;
+  revenue: number | null;
+  profit: number | null;
+  assets: number | null;
+  capital: number | null;
+  short_term_liabilities: number | null;
+  revenue_change_percent: number | null;
+  defendant_cases: number | null;
+  active_enforcements: number | null;
+  fns_status: VerificationStatus;
+  bankruptcy_status: VerificationStatus;
+}
+
+export interface BatchComparison {
+  summary: string | null;
+  summary_error: string | null;
+  companies: ComparisonCompany[];
+}
+
 export interface BatchAnalysisResponse {
   chat_id: string | null;
   results: BatchAnalysisItem[];
+  comparison: BatchComparison | null;
 }
 
 export interface ChatSource {
