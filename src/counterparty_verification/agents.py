@@ -115,9 +115,9 @@ class SpecialistAgent:
             ),
             "chapter": chapter.model_dump(mode="json"),
         }
-        logger.info("LLM call -> SpecialistAgent.enrich chapter=%s", chapter.name)
+        logger.info("LLM call -> SpecialistAgent.enrich chapter=%s", chapter.chapter)
         result = await self.agent.run(json.dumps(payload, ensure_ascii=False))
-        logger.info("LLM call <- SpecialistAgent.enrich chapter=%s", chapter.name)
+        logger.info("LLM call <- SpecialistAgent.enrich chapter=%s", chapter.chapter)
         allowed = _chapter_fields(chapter)
         if result.output.evidence_fields and set(
             result.output.evidence_fields
@@ -308,15 +308,18 @@ class ReputationAgent:
         logger.info("LLM call <- ReputationAgent.aggregate")
         allowed = {entry.field("name") for entry in view.indexed}
         values = {entry.field("name"): entry.item.name for entry in view.indexed}
-        highlights = result.output.highlights
-        valid = bool(highlights) and all(
-            highlight.chapter in view.chapters
+        grounded_highlights = [
+            highlight
+            for highlight in result.output.highlights
+            if highlight.chapter in view.chapters
             and highlight.evidence_fields
             and set(highlight.evidence_fields).issubset(allowed)
-            for highlight in highlights
-        )
-        if not valid:
-            raise RuntimeError("Reputation summary contains invalid evidence")
+        ]
+        if len(grounded_highlights) < len(result.output.highlights):
+            logger.info(
+                "ReputationAgent.aggregate: dropped %d ungrounded highlight(s)",
+                len(result.output.highlights) - len(grounded_highlights),
+            )
         return [
             Observation(
                 code=f"chapter_{highlight.chapter}",
@@ -327,7 +330,7 @@ class ReputationAgent:
                     for field in highlight.evidence_fields
                 ],
             )
-            for highlight in highlights
+            for highlight in grounded_highlights
         ]
 
 
