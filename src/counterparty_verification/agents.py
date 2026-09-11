@@ -8,7 +8,6 @@ from typing import Any
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent
 from pydantic_ai.models.openrouter import OpenRouterModel
-from pydantic_ai.providers.openrouter import OpenRouterProvider
 
 from .domain import (
     AnalysisSummary,
@@ -19,6 +18,7 @@ from .domain import (
     Observation,
     RiskLevel,
 )
+from .llm_provider import openrouter_provider
 from .prompt_constants import (
     EVALUATOR_INSTRUCTIONS,
     QUESTION_ANSWER_INSTRUCTIONS,
@@ -62,7 +62,7 @@ def _model(settings: Settings) -> OpenRouterModel:
         raise RuntimeError("OPENROUTER_API_KEY is not configured")
     return OpenRouterModel(
         settings.openrouter_model,
-        provider=OpenRouterProvider(api_key=settings.openrouter_api_key),
+        provider=openrouter_provider(settings.openrouter_api_key),
     )
 
 
@@ -97,6 +97,7 @@ class SpecialistAgent:
             Agent(
                 _model(settings),
                 output_type=GroundedText,
+                model_settings={"temperature": 0},
 
                 instructions=SPECIALIST_INSTRUCTIONS,
 
@@ -115,9 +116,11 @@ class SpecialistAgent:
             ),
             "chapter": chapter.model_dump(mode="json"),
         }
+
         logger.info("LLM call -> SpecialistAgent.enrich chapter=%s", chapter.chapter)
         result = await self.agent.run(json.dumps(payload, ensure_ascii=False))
         logger.info("LLM call <- SpecialistAgent.enrich chapter=%s", chapter.chapter)
+
         allowed = _chapter_fields(chapter)
         if result.output.evidence_fields and set(
             result.output.evidence_fields
@@ -133,6 +136,7 @@ class EvaluatorAgent:
             Agent(
                 _model(settings),
                 output_type=EvaluatorOutput,
+                model_settings={"temperature": 0},
 
                 instructions=EVALUATOR_INSTRUCTIONS,
 
@@ -175,32 +179,58 @@ class EvaluatorAgent:
             "risk_label": risk_labels[risk_level],
             "facts": facts,
         }
-        logger.info("LLM call -> EvaluatorAgent.summarize facts=%d", len(facts))
-        result = await self.agent.run(json.dumps(payload, ensure_ascii=False))
-        logger.info("LLM call <- EvaluatorAgent.summarize")
         allowed = {fact["id"] for fact in facts}
-        if any(
-            not set(statement.fact_ids).issubset(allowed)
-            for statement in result.output.statements
-        ):
-            raise RuntimeError("Summary contains unknown fact identifiers")
-
-        used_ids = {
-            fact_id
-            for statement in result.output.statements
-            for fact_id in statement.fact_ids
-        }
         facts_by_id = {fact["id"]: fact["text"] for fact in facts}
-        summary_text = " ".join(item.text for item in result.output.statements)
-        return AnalysisSummary(
-            risk_level=risk_level,
-            summary=summary_text,
-            key_factors=[
-                facts_by_id[fact_id]
-                for fact_id in facts_by_id
-                if fact_id in used_ids
-            ][:5],
-        )
+        base_prompt = json.dumps(payload, ensure_ascii=False)
+        last_error: Exception | None = None
+        for attempt in range(1, 4):
+            prompt = base_prompt
+            if last_error is not None:
+                prompt += (
+                    "\n\nПредыдущий ответ не прошёл проверку. Используй только "
+                    "точные id из facts и верни 2–3 коротких предложения."
+                )
+            try:
+                logger.info(
+                    "LLM call -> EvaluatorAgent.summarize facts=%d attempt=%d",
+                    len(facts),
+                    attempt,
+                )
+                result = await self.agent.run(prompt)
+                if any(
+                    not set(statement.fact_ids).issubset(allowed)
+                    for statement in result.output.statements
+                ):
+                    raise RuntimeError(
+                        "Summary contains unknown fact identifiers"
+                    )
+                used_ids = {
+                    fact_id
+                    for statement in result.output.statements
+                    for fact_id in statement.fact_ids
+                }
+                logger.info(
+                    "LLM call <- EvaluatorAgent.summarize attempt=%d", attempt
+                )
+                return AnalysisSummary(
+                    risk_level=risk_level,
+                    summary=" ".join(
+                        item.text for item in result.output.statements
+                    ),
+                    key_factors=[
+                        facts_by_id[fact_id]
+                        for fact_id in facts_by_id
+                        if fact_id in used_ids
+                    ][:5],
+                )
+            except Exception as error:
+                last_error = error
+                logger.warning(
+                    "Evaluator summary attempt %d failed: %s", attempt, error
+                )
+        raise RuntimeError(
+            "Summary generation failed after 3 attempts"
+        ) from last_error
 
 
 class QuestionAnswerAgent:
@@ -210,6 +240,7 @@ class QuestionAnswerAgent:
             Agent(
                 _model(settings),
                 output_type=GroundedText,
+                model_settings={"temperature": 0},
 
                 instructions=QUESTION_ANSWER_INSTRUCTIONS,
 
@@ -278,6 +309,7 @@ class ReputationAgent:
                 _model(settings),
                 output_type=ReputationAggregateOutput,
                 instructions=REPUTATION_AGGREGATOR_INSTRUCTIONS,
+                model_settings={"temperature": 0},
             )
             if self.enabled
             else None
@@ -301,13 +333,9 @@ class ReputationAgent:
             ]
             for chapter, entries in view.by_chapter.items()
         }
-        logger.info(
-            "LLM call -> ReputationAgent.aggregate chapters=%d", len(view.chapters)
-        )
-        result = await self.agent.run(json.dumps(payload, ensure_ascii=False))
-        logger.info("LLM call <- ReputationAgent.aggregate")
         allowed = {entry.field("name") for entry in view.indexed}
         values = {entry.field("name"): entry.item.name for entry in view.indexed}
+
         grounded_highlights = [
             highlight
             for highlight in result.output.highlights
@@ -332,6 +360,7 @@ class ReputationAgent:
             )
             for highlight in grounded_highlights
         ]
+
 
 
 @lru_cache

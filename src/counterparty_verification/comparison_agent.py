@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import re
 from collections import defaultdict
 from typing import Any
@@ -8,10 +9,12 @@ from typing import Any
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent
 from pydantic_ai.models.openrouter import OpenRouterModel
-from pydantic_ai.providers.openrouter import OpenRouterProvider
 
 from .domain import ComparisonCompany, RiskLevel, VerificationStatus
+from .llm_provider import openrouter_provider
 from .settings import Settings
+
+logger = logging.getLogger(__name__)
 
 
 class ComparisonStatement(BaseModel):
@@ -50,29 +53,67 @@ class ComparisonSummaryOutput(BaseModel):
 
 
 COMPARISON_INSTRUCTIONS = """
-Составь ёмкий сравнительный анализ российских контрагентов: 3–6 коротких
-предложений, не более 1200 знаков суммарно. Он может быть в 1,5–2 раза
-подробнее анализа одной компании, но без повторов и общих рассуждений.
+#Роль
+Ты — банковский аналитик, который на основе уже готовых, не подлежащих
+пересчёту факторов риска составляет короткий сравнительный анализ
+контрагентов для решения банка. Все входные факты уже проверены и
+посчитаны заранее — ты только точно и без искажений формулируешь их на
+русском языке.
 
-leader_statement — первое предложение только о лидере или лидирующей группе
-по готовой банковской оценке. Используй строго fact comparison.leaders.
-company_statements — отдельные предложения о конкретных компаниях. В каждом
-элементе укажи точный company_inn, пиши только об этой компании и используй
-не более трёх наиболее важных фактов этой компании. Сначала объясни сильными
-сторонами и важными оговорками, почему лидер или лидирующая группа выглядит
-лучше, затем назови главные факторы внимания компаний с высоким и средним
-риском. Не повторяй в этих предложениях сам уровень риска — он уже назван и
-показан в таблице. Не объединяй факты разных компаний в одном предложении и не обобщай их
-словами «у них», «у обеих» или «в их отчётах». При одинаковом risk_level не
-утверждай, что одна компания надёжнее другой.
+#Входные данные
+Тебе передан JSON с массивом facts. Каждый факт имеет: id, kind
+(ranking | concern | strength), leader (bool), при наличии — company_inn
+и risk_level, и text — уже готовую формулировку факта. Факт с
+id="comparison.leaders" (kind=ranking) описывает лидера или лидирующую
+группу по банковской оценке риска и называет всех лидеров по имени.
 
+#Задача
+Составь ёмкий сравнительный анализ: 5-6 коротких предложений
+
+Ответ состоит из:
+- leader_statement — одно предложение о лидере или лидирующей группе;
+- company_statements — 2–4 отдельных предложения, по одному на компанию.
+
+#Правила для leader_statement
+Опирайся строго на fact comparison.leaders, fact_refs = ["comparison.leaders"].
+
+Перед тем как формулировать предложение, определи по company_inn и
+risk_level всех переданных facts, сколько всего разных компаний в батче
+и какой risk_level у каждой.
+- Если среди компаний батча есть хотя бы одна с risk_level, отличным от
+  лидирующего (лидирующая группа — часть компаний, а не все), сформулируй
+  явное превосходство лидера(ов) над остальными, например «Лучше
+  остальных по банковской оценке выглядят …».
+- Если ВСЕ компании батча входят в лидирующую группу (другого уровня
+  риска в данных нет — в том числе стандартный случай, когда сравниваются
+  ровно две компании с одинаковой оценкой), не используй сравнение с
+  «остальными» и формулировки превосходства («лучше остальных», «выглядят
+  лучше других» и т.п.) — остальных компаний нет. Вместо этого констатируй,
+  что все перечисленные компании получили одинаковую банковскую оценку
+  риска, назвав компании и сам уровень.
+
+Меняется только рамка сравнения — сам факт (уровень риска, состав
+лидеров) не меняй.
+
+#Правила для company_statements
+В каждом элементе укажи точный company_inn, пиши только об этой компании
+и используй не более трёх наиболее важных фактов этой компании. Сначала
+сильными сторонами и важными оговорками объясни, почему лидер или
+лидирующая группа выглядит лучше, затем назови главные факторы внимания
+компаний с высоким и средним риском. Не повторяй в этих предложениях сам
+уровень риска — он уже показан в таблице. Не объединяй факты разных
+компаний в одном предложении и не обобщай их словами «у них», «у обеих»
+или «в их отчётах». При одинаковом risk_level не утверждай, что одна
+компания надёжнее другой.
+
+#Общие ограничения
 Используй только входные facts и не меняй их смысл. Не добавляй причин,
 предположений, прогнозов или рекомендаций. Не называй отсутствие сведений
-отсутствием риска. Уровень риска уже определён банком — не пересчитывай его.
-Числа переноси точно в указанном формате. Не упоминай JSON, поля, источники и
-процесс проверки. Для каждого предложения укажи fact_refs на все факты,
-которые оно использует. Не упоминай ни одного показателя или числа, если его
-fact_ref не указан.
+отсутствием риска. Уровень риска уже определён банком — не пересчитывай
+его. Числа переноси точно в указанном формате. Не упоминай JSON, поля,
+источники и процесс проверки. Для каждого предложения укажи fact_refs на
+все факты, которые оно использует. Не упоминай ни одного показателя или
+числа, если его fact_ref не указан.
 """.strip()
 
 RISK_LABELS = {
@@ -98,14 +139,14 @@ def _enforcement_text(count: int) -> str:
         return f"{count} действующих исполнительных производств"
     if last == 1:
         return f"{count} действующее исполнительное производство"
-    return f"{count} действующих исполнительных производста"
+    return f"{count} действующих исполнительных производства"
 
 
 def _defendant_case_text(count: int) -> str:
     last_two = count % 100
     last = count % 10
     if last_two in range(11, 15) or last == 0 or last >= 5:
-        return f"{count} текущих арбитражных дела в роли ответчика"
+        return f"{count} текущих арбитражных дел в роли ответчика"
     if last == 1:
         return f"{count} текущее арбитражное дело в роли ответчика"
     return f"{count} текущих арбитражных дела в роли ответчика"
@@ -317,12 +358,13 @@ class ComparisonAgent:
         if self.enabled:
             model = OpenRouterModel(
                 settings.openrouter_model,
-                provider=OpenRouterProvider(api_key=settings.openrouter_api_key),
+                provider=openrouter_provider(settings.openrouter_api_key),
             )
             self.agent = Agent(
                 model,
                 output_type=ComparisonSummaryOutput,
                 instructions=COMPARISON_INSTRUCTIONS,
+                model_settings={"temperature": 0},
             )
 
     async def summarize(self, companies: list[ComparisonCompany]) -> str:
@@ -350,10 +392,16 @@ class ComparisonAgent:
                     "не меняя остальное."
                 )
             try:
+                logger.info("Comparison LLM call attempt=%d", attempt)
                 result = await self.agent.run(prompt)
-                return self._build_summary(result.output, facts_by_id)
+                summary = self._build_summary(result.output, facts_by_id)
+                logger.info("Comparison LLM call succeeded attempt=%d", attempt)
+                return summary
             except Exception as error:  # noqa: BLE001 - retried, then re-raised
                 last_error = error
+                logger.warning(
+                    "Comparison LLM call attempt=%d failed: %s", attempt, error
+                )
                 if attempt == max_attempts:
                     raise RuntimeError(
                         f"Не удалось получить корректное сравнение за "
@@ -367,6 +415,27 @@ class ComparisonAgent:
         facts_by_id: dict[str, Any],
     ) -> str:
         ordered_statements = [output.leader_statement, *output.company_statements]
+        if set(output.leader_statement.fact_refs) != {"comparison.leaders"}:
+            raise RuntimeError("Первое утверждение не ссылается на лидеров")
         for statement in ordered_statements:
+            unknown_refs = set(statement.fact_refs) - facts_by_id.keys()
+            if unknown_refs:
+                raise RuntimeError(
+                    "Указаны неизвестные fact_refs: "
+                    + ", ".join(sorted(unknown_refs))
+                )
             _check_numbers(statement, facts_by_id)
-        return " ".join(statement.text.strip() for statement in ordered_statements)
+        for statement in output.company_statements:
+            expected_prefix = f"{statement.company_inn}."
+            if not all(
+                ref.startswith(expected_prefix) for ref in statement.fact_refs
+            ):
+                raise RuntimeError(
+                    "Утверждение компании ссылается на факты другого контрагента"
+                )
+        summary = " ".join(
+            statement.text.strip() for statement in ordered_statements
+        )
+        if len(summary) > 1200:
+            raise RuntimeError("Сравнительный анализ длиннее 1200 знаков")
+        return summary

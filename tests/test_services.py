@@ -59,6 +59,11 @@ class StubEvaluator:
         )
 
 
+class FailingSpecialist:
+    async def enrich(self, chapter):
+        raise RuntimeError("LLM enrichment failed")
+
+
 def build_service(repository, tools) -> AnalysisService:
     settings = Settings(openrouter_api_key=None)
     return AnalysisService(
@@ -67,7 +72,6 @@ def build_service(repository, tools) -> AnalysisService:
         specialist=SpecialistAgent(settings),
         evaluator=StubEvaluator(),
         sessions=InMemorySessionStore(60),
-        timeout_seconds=5,
     )
 
 
@@ -100,6 +104,25 @@ async def test_analysis_returns_partial_report_when_one_tool_fails(
     failed = next(item for item in response.chapters if item.chapter == "reputation")
     assert failed.error == "ConnectionError"
     assert failed.risk_level == RiskLevel.UNKNOWN
+
+
+@pytest.mark.asyncio
+async def test_specialist_failure_does_not_discard_tool_result(
+    card: CounterpartyCard,
+) -> None:
+    service = AnalysisService(
+        repository=StubRepository(card),
+        tools=LocalAnalysisToolClient(),
+        specialist=FailingSpecialist(),
+        evaluator=StubEvaluator(),
+        sessions=InMemorySessionStore(60),
+    )
+
+    chapter = await service._run_chapter("analyze_general", card)
+
+    assert chapter.chapter == "general"
+    assert chapter.error is None
+    assert chapter.data_sufficient is True
 
 
 @pytest.mark.asyncio

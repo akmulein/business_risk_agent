@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from uuid import uuid4
@@ -35,6 +36,7 @@ TOOL_NAMES = (
     "analyze_procurement",
 )
 BATCH_ANALYSIS_CONCURRENCY = 3
+logger = logging.getLogger(__name__)
 
 
 class CounterpartyNotFoundError(LookupError):
@@ -91,7 +93,6 @@ class AnalysisService:
         specialist: SpecialistAgent,
         evaluator: EvaluatorAgent,
         sessions: InMemorySessionStore,
-        timeout_seconds: float,
         comparison_agent: ComparisonAgent | None = None,
     ) -> None:
         self.repository = repository
@@ -99,7 +100,6 @@ class AnalysisService:
         self.specialist = specialist
         self.evaluator = evaluator
         self.sessions = sessions
-        self.timeout_seconds = timeout_seconds
         self.comparison_agent = comparison_agent
 
     async def analyze(self, inn: str) -> AnalysisResponse:
@@ -153,6 +153,7 @@ class AnalysisService:
                     comparison.companies
                 )
             except Exception:
+                logger.exception("Comparison summary generation failed")
                 comparison.summary_error = (
                     "Не удалось сформировать сравнительный анализ"
                 )
@@ -199,8 +200,8 @@ class AnalysisService:
         chapter_name = tool_name.removeprefix("analyze_")
         try:
             chapter = await self.tools.call(tool_name, card)
-            return await self.specialist.enrich(chapter)
         except Exception as error:
+            logger.exception("MCP analysis chapter failed: %s", chapter_name)
             return ChapterResult(
                 chapter=chapter_name,
                 risk_level=RiskLevel.UNKNOWN,
@@ -208,6 +209,14 @@ class AnalysisService:
                 data_sufficient=False,
                 error=type(error).__name__,
             )
+        try:
+            return await self.specialist.enrich(chapter)
+        except Exception:
+            logger.exception(
+                "Specialist enrichment failed; preserving chapter: %s",
+                chapter_name,
+            )
+            return chapter
 
 
 class QuestionService:
@@ -215,21 +224,18 @@ class QuestionService:
         self,
         sessions: InMemorySessionStore,
         agent: QuestionAnswerAgent,
-        timeout_seconds: float = 30,
     ) -> None:
         self.sessions = sessions
         self.agent = agent
-        self.timeout_seconds = timeout_seconds
 
     async def answer(self, analysis_id: str, question: str) -> QuestionResponse:
         session = await self.sessions.get(analysis_id)
         if session is None:
             raise AnalysisSessionNotFoundError(analysis_id)
-        async with asyncio.timeout(self.timeout_seconds):
-            try:
-                answer = await self.agent.answer(
-                    question, session.card, session.response.chapters
-                )
-            except Exception as error:
-                raise UpstreamServiceError("Question agent failed") from error
+        try:
+            answer = await self.agent.answer(
+                question, session.card, session.response.chapters
+            )
+        except Exception as error:
+            raise UpstreamServiceError("Question agent failed") from error
         return QuestionResponse(analysis_id=analysis_id, answer=answer)
