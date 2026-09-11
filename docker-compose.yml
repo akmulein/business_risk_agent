@@ -38,14 +38,14 @@ services:
       MONGO_INTERNAL_PORT: "27017"
       MONGO_SEED_FILE: /seed/contractors_audit.snapshot.json
     volumes:
-      - ./data/raw/contractors_audit.snapshot.json:/seed/contractors_audit.snapshot.json:ro
-      - ./mongo_setup/scripts:/seed/scripts:ro
+      - ./data/seed/contractors_audit.snapshot.json:/seed/contractors_audit.snapshot.json:ro
+      - ./scripts/mongo:/seed/scripts:ro
     entrypoint: ["/bin/sh", "/seed/scripts/seed.sh"]
 
   mcp:
     build: .
     restart: unless-stopped
-    command: ["python", "-m", "counterparty_verification.mcp_server"]
+    command: ["python", "-m", "counterparty_verification.mcp.server"]
     env_file:
       - path: .env
         required: false
@@ -83,7 +83,6 @@ services:
     environment:
       REPOSITORY_BACKEND: ${REPOSITORY_BACKEND:-mongo}
       MCP_URL: http://mcp:8001/mcp
-      MOCK_DATA_PATH: /app/data/counterparties.json
       MONGODB_URL: mongodb://${MONGO_ROOT_USERNAME:-contractors_admin}:${MONGO_ROOT_PASSWORD:?Set MONGO_ROOT_PASSWORD in .env}@mongo:27017/${MONGO_DATABASE:-counterparties}?authSource=admin
       MONGODB_DATABASE: ${MONGO_DATABASE:-counterparties}
       MONGODB_COLLECTION: ${MONGO_READ_COLLECTION:-counterparty_cards}

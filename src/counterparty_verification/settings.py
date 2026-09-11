@@ -1,5 +1,4 @@
 from functools import lru_cache
-from pathlib import Path
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -21,8 +20,7 @@ class Settings(BaseSettings):
     chat_history_limit: int = Field(default=12, ge=0, le=50)
     chat_max_tokens: int = Field(default=2048, ge=128, le=8192)
 
-    repository_backend: str = "mock"
-    mock_data_path: Path = Path("data/counterparties.json")
+    repository_backend: str = "mongo"
     database_url: str = (
         "postgresql+asyncpg://postgres:postgres@localhost:5432/counterparties"
     )

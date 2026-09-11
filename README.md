@@ -10,20 +10,55 @@ MCP-анализаторов и формирует отдельное итого
 ## Архитектура
 
 - `counterparty_verification.api` — HTTP API;
-- `counterparty_verification.mcp_server` — отдельный FastMCP-сервис;
+- `counterparty_verification.mcp.server` — отдельный FastMCP-сервис;
 - `frontend` — React-интерфейс на Core Components с отчётами, графиками и
   общим AI-чатом;
-- Pydantic AI + OpenRouter — специалисты, итоговый evaluator и Q&A;
+- Pydantic AI + OpenRouter — репутационное обобщение, итоговое резюме и чат;
 - MongoDB: `reports` хранит исходные отчёты, `counterparty_cards` — готовые
   карточки пайплайна, `chat_sessions` — сессии и историю чатов;
-- JSON и PostgreSQL остаются доступными как альтернативные репозитории.
+- PostgreSQL пока сохранён как дополнительный адаптер в `storage/postgres.py`;
+  основной Docker-запуск использует MongoDB.
 
 MCP-инструменты отвечают за общую информацию, структуру, юридические и
-репутационные риски, финансы и госзакупки. Все разделы запускаются параллельно.
-Без ключа OpenRouter анализ остаётся работоспособным в детерминированном режиме,
-а диалоговый endpoint сообщает, что модель не настроена. Все LLM-агенты
-используют одну модель из `OPENROUTER_MODEL`. Цвета светофора рассчитываются
-детерминированно и не изменяются моделью.
+репутационные риски, финансы и госзакупки. Все шесть разделов, включая
+репутационный, полностью детерминированы и не вызывают LLM. Для итогового
+резюме по компании нужен действующий ключ OpenRouter; если ключ не задан или
+модель недоступна, резюме формируется детерминированно из тех же расчётов.
+Для чата по результатам ключ обязателен. Все LLM-агенты используют одну
+модель из `OPENROUTER_MODEL`. Цвета светофора рассчитываются детерминированно
+и не изменяются моделью.
+
+## Структура репозитория
+
+```text
+src/counterparty_verification/
+├── api.py                 # HTTP-приложение и сборка зависимостей
+├── settings.py            # настройки окружения
+├── domain.py              # общие модели данных
+├── analysis/              # выполнение анализа, сравнение и представление
+│   └── rules/             # бизнес-проверки шести разделов
+├── agents/                # LLM-агенты, промпты и провайдер
+├── chat/                  # сценарии и модели чата
+├── storage/               # контракты, адаптеры БД и хранилища сессий
+└── mcp/                   # публикация и вызов MCP-инструментов
+
+tests/                     # проверки analysis, agents, api, chat и storage
+docs/rules/                # описание бизнес-правил
+scripts/mongo/             # импорт, подготовка карточек и индексов
+data/seed/                 # исходный JSON для импорта в MongoDB
+frontend/                  # React-интерфейс
+.github/workflows/         # проверки pull request и main
+```
+
+MCP-сервер публикует инструменты из `mcp/server.py`. Их реализация находится
+в `analysis/analyzers.py`, конкретные проверки — в `analysis/rules/`.
+Описание правил: [docs/rules](docs/rules/).
+
+Тесты задают небольшие входные данные непосредственно в Python и используют
+подставные хранилища и модели. Отдельный JSON для тестов и файловый режим
+`mock` удалены. Прикладные данные загружаются из
+`data/seed/contractors_audit.snapshot.json`; seed по-прежнему выполняется при
+обычном запуске Compose. Данные БД сохраняются в томе `mongo_data`.
 
 ## Установка
 
@@ -35,41 +70,11 @@ cp .env.example .env
 nano .env
 ```
 
-`OPENROUTER_API_KEY` можно оставить пустым: тогда анализ будет
-детерминированным, без LLM, а чат будет недоступен. Для работы чата укажите
-ключ и модель:
+Для итогового резюме и чата укажите ключ и модель:
 
 ```env
 OPENROUTER_API_KEY=<ваш ключ>
 OPENROUTER_MODEL=~deepseek/deepseek-v4-flash-latest
-```
-
-## Локальный запуск
-
-В первом терминале:
-
-```bash
-conda activate alpha_hackathon
-python -m counterparty_verification.mcp_server
-```
-
-Во втором:
-
-```bash
-conda activate alpha_hackathon
-uvicorn counterparty_verification.api:app --reload
-```
-
-Swagger UI: <http://localhost:8000/docs>.
-
-Для локального запуска без Docker установите проект через
-`python -m pip install -e ".[dev]"` и используйте:
-
-```env
-REPOSITORY_BACKEND=mongo
-MONGODB_URL=mongodb://contractors_admin:<password>@localhost:27017/counterparties?authSource=admin
-MONGODB_DATABASE=counterparties
-MONGODB_COLLECTION=counterparty_cards
 ```
 
 ## Запуск в Docker
@@ -89,10 +94,10 @@ Frontend: <http://localhost:3000>. Swagger UI: <http://localhost:8000/docs>.
 чего запустить один общий анализ. Полные отчёты раскрываются внутри карточек,
 а чат использует общий `chat_id` результатов.
 
-Если ключ OpenRouter был добавлен после запуска, пересоздайте только API:
+Если ключ OpenRouter был добавлен после запуска, пересоздайте API и MCP:
 
 ```bash
-docker compose up -d --force-recreate --no-deps api
+docker compose up -d --force-recreate --no-deps api mcp
 ```
 
 Остановить сервисы без удаления данных:
@@ -165,18 +170,6 @@ curl -X POST http://localhost:8000/api/v1/analyses/ANALYSIS_ID/questions \
   -H 'Content-Type: application/json' \
   -d '{"question":"Как менялась прибыль?"}'
 ```
-
-Тестовая карточка в `data/counterparties.json` содержит синтетические значения и
-не является реальным отчётом об указанной организации.
-
-## Проверка
-
-```bash
-pytest
-```
-
-Тесты не обращаются к OpenRouter и не требуют API-ключа.
-
 
 ## Выполнение анализа и проверки
 
