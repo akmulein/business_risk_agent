@@ -116,13 +116,11 @@ class SpecialistAgent:
             ),
             "chapter": chapter.model_dump(mode="json"),
         }
-        logger.info(
-            "LLM call -> SpecialistAgent.enrich chapter=%s", chapter.chapter
-        )
+
+        logger.info("LLM call -> SpecialistAgent.enrich chapter=%s", chapter.chapter)
         result = await self.agent.run(json.dumps(payload, ensure_ascii=False))
-        logger.info(
-            "LLM call <- SpecialistAgent.enrich chapter=%s", chapter.chapter
-        )
+        logger.info("LLM call <- SpecialistAgent.enrich chapter=%s", chapter.chapter)
+
         allowed = _chapter_fields(chapter)
         if result.output.evidence_fields and set(
             result.output.evidence_fields
@@ -337,60 +335,32 @@ class ReputationAgent:
         }
         allowed = {entry.field("name") for entry in view.indexed}
         values = {entry.field("name"): entry.item.name for entry in view.indexed}
-        base_prompt = json.dumps(payload, ensure_ascii=False)
-        last_error: Exception | None = None
-        for attempt in range(1, 4):
-            prompt = base_prompt
-            if last_error is not None:
-                prompt += (
-                    "\n\nПредыдущий ответ не прошёл проверку ссылок на факты. "
-                    "Используй в evidence_fields только точные значения field "
-                    "из входных данных и обязательно укажи хотя бы одну ссылку "
-                    "для каждого утверждения."
-                )
-            try:
-                logger.info(
-                    "LLM call -> ReputationAgent.aggregate chapters=%d attempt=%d",
-                    len(view.chapters),
-                    attempt,
-                )
-                result = await self.agent.run(prompt)
-                highlights = result.output.highlights
-                valid = bool(highlights) and all(
-                    highlight.chapter in view.chapters
-                    and highlight.evidence_fields
-                    and set(highlight.evidence_fields).issubset(allowed)
-                    for highlight in highlights
-                )
-                if not valid:
-                    raise RuntimeError(
-                        "Reputation summary contains invalid evidence"
-                    )
-                logger.info(
-                    "LLM call <- ReputationAgent.aggregate attempt=%d", attempt
-                )
-                return [
-                    Observation(
-                        code=f"chapter_{highlight.chapter}",
-                        title=highlight.title,
-                        detail=highlight.text,
-                        evidence=[
-                            Evidence(field=field, value=values.get(field))
-                            for field in highlight.evidence_fields
-                        ],
-                    )
-                    for highlight in highlights
-                ]
-            except Exception as error:
-                last_error = error
-                logger.warning(
-                    "Reputation aggregation attempt %d failed: %s",
-                    attempt,
-                    error,
-                )
-        raise RuntimeError(
-            "Reputation summary contains invalid evidence after 3 attempts"
-        ) from last_error
+
+        grounded_highlights = [
+            highlight
+            for highlight in result.output.highlights
+            if highlight.chapter in view.chapters
+            and highlight.evidence_fields
+            and set(highlight.evidence_fields).issubset(allowed)
+        ]
+        if len(grounded_highlights) < len(result.output.highlights):
+            logger.info(
+                "ReputationAgent.aggregate: dropped %d ungrounded highlight(s)",
+                len(result.output.highlights) - len(grounded_highlights),
+            )
+        return [
+            Observation(
+                code=f"chapter_{highlight.chapter}",
+                title=highlight.title,
+                detail=highlight.text,
+                evidence=[
+                    Evidence(field=field, value=values.get(field))
+                    for field in highlight.evidence_fields
+                ],
+            )
+            for highlight in grounded_highlights
+        ]
+
 
 
 @lru_cache
