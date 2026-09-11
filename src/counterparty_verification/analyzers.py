@@ -208,7 +208,8 @@ async def analyze_reputation(card: CounterpartyCard) -> ChapterResult:
     chapter that runs an LLM agent inside the tool itself (agent-as-tool,
     `agents.ReputationAgent`) to do that; it falls back to a verbatim,
     deterministic grouping by chapter when the agent is disabled or its
-    answer fails evidence validation. Either way the chapter assigns no
+    answer fails evidence validation after three attempts, or the model
+    request fails. Either way the chapter assigns no
     verdict: `risk_level` is always `UNKNOWN` and findings live in
     `observations`, not `factors`.
     """

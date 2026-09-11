@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from uuid import uuid4
 
-from .agents import EvaluatorAgent, QuestionAnswerAgent, SpecialistAgent
+from .agents import EvaluatorAgent, QuestionAnswerAgent
 from .comparison import build_comparison
 from .comparison_agent import ComparisonAgent
 from .domain import (
@@ -90,14 +90,12 @@ class AnalysisService:
         self,
         repository: CounterpartyRepository,
         tools: AnalysisToolClient,
-        specialist: SpecialistAgent,
         evaluator: EvaluatorAgent,
         sessions: InMemorySessionStore,
         comparison_agent: ComparisonAgent | None = None,
     ) -> None:
         self.repository = repository
         self.tools = tools
-        self.specialist = specialist
         self.evaluator = evaluator
         self.sessions = sessions
         self.comparison_agent = comparison_agent
@@ -209,14 +207,7 @@ class AnalysisService:
                 data_sufficient=False,
                 error=type(error).__name__,
             )
-        try:
-            return await self.specialist.enrich(chapter)
-        except Exception:
-            logger.exception(
-                "Specialist enrichment failed; preserving chapter: %s",
-                chapter_name,
-            )
-            return chapter
+        return chapter
 
 
 class QuestionService:

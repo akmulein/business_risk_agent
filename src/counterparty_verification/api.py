@@ -8,7 +8,7 @@ logging.basicConfig(
     level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s"
 )
 
-from .agents import EvaluatorAgent, QuestionAnswerAgent, SpecialistAgent
+from .agents import EvaluatorAgent, QuestionAnswerAgent
 from .chat_agent import ChatModelNotConfiguredError, ReportChatAgent
 from .chat_models import (
     ChatHistoryResponse,
@@ -91,7 +91,6 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     analysis_service = AnalysisService(
         repository=repository,
         tools=HttpMcpAnalysisClient(config.mcp_url),
-        specialist=SpecialistAgent(config),
         evaluator=EvaluatorAgent(config),
         sessions=sessions,
         comparison_agent=ComparisonAgent(config),

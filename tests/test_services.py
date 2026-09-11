@@ -2,7 +2,6 @@ import asyncio
 
 import pytest
 
-from counterparty_verification.agents import SpecialistAgent
 from counterparty_verification.domain import (
     AnalysisSummary,
     BatchAnalysisStatus,
@@ -15,7 +14,6 @@ from counterparty_verification.services import (
     CounterpartyNotFoundError,
     InMemorySessionStore,
 )
-from counterparty_verification.settings import Settings
 
 
 class StubRepository:
@@ -59,17 +57,10 @@ class StubEvaluator:
         )
 
 
-class FailingSpecialist:
-    async def enrich(self, chapter):
-        raise RuntimeError("LLM enrichment failed")
-
-
 def build_service(repository, tools) -> AnalysisService:
-    settings = Settings(openrouter_api_key=None)
     return AnalysisService(
         repository=repository,
         tools=tools,
-        specialist=SpecialistAgent(settings),
         evaluator=StubEvaluator(),
         sessions=InMemorySessionStore(60),
     )
@@ -107,22 +98,16 @@ async def test_analysis_returns_partial_report_when_one_tool_fails(
 
 
 @pytest.mark.asyncio
-async def test_specialist_failure_does_not_discard_tool_result(
-    card: CounterpartyCard,
-) -> None:
-    service = AnalysisService(
-        repository=StubRepository(card),
-        tools=LocalAnalysisToolClient(),
-        specialist=FailingSpecialist(),
-        evaluator=StubEvaluator(),
-        sessions=InMemorySessionStore(60),
-    )
+async def test_chapter_preserves_tool_output_without_rewriting(card) -> None:
+    original = await LocalAnalysisToolClient().call("analyze_general", card)
 
+    class Tool:
+        async def call(self, tool_name, supplied_card):
+            return original
+
+    service = build_service(StubRepository(card), Tool())
     chapter = await service._run_chapter("analyze_general", card)
-
-    assert chapter.chapter == "general"
-    assert chapter.error is None
-    assert chapter.data_sufficient is True
+    assert chapter is original
 
 
 @pytest.mark.asyncio
@@ -151,3 +136,40 @@ async def test_batch_analysis_keeps_input_order_and_missing_items(
     assert response.results[1].status == BatchAnalysisStatus.NOT_FOUND
     assert response.results[1].analysis is None
     assert response.results[1].error
+
+
+@pytest.mark.asyncio
+async def test_six_tools_start_before_evaluator_runs(card):
+    from counterparty_verification.domain import ChapterResult
+    from counterparty_verification.services import TOOL_NAMES
+
+    started = set()
+    all_started = asyncio.Event()
+    completed = set()
+
+    class ConcurrentTools:
+        async def call(self, name, supplied_card):
+            started.add(name)
+            if len(started) == len(TOOL_NAMES):
+                all_started.set()
+            await asyncio.wait_for(all_started.wait(), timeout=2)
+            completed.add(name)
+            return ChapterResult(chapter=name.removeprefix("analyze_"), conclusion=name)
+
+    class Evaluator(StubEvaluator):
+        calls = 0
+
+        async def summarize(self, *args):
+            assert completed == set(TOOL_NAMES)
+            self.calls += 1
+            return await super().summarize(*args)
+
+    evaluator = Evaluator()
+    service = AnalysisService(
+        repository=StubRepository(card), tools=ConcurrentTools(),
+        evaluator=evaluator, sessions=InMemorySessionStore(60),
+    )
+    response = await service.analyze(card.company_reports.inn)
+    assert evaluator.calls == 1
+    assert [chapter.conclusion for chapter in response.chapters] == list(TOOL_NAMES)
+    assert all(chapter.error is None for chapter in response.chapters)

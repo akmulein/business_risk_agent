@@ -23,9 +23,8 @@ from .prompt_constants import (
     EVALUATOR_INSTRUCTIONS,
     QUESTION_ANSWER_INSTRUCTIONS,
     REPUTATION_AGGREGATOR_INSTRUCTIONS,
-    SPECIALIST_INSTRUCTIONS,
 )
-from .reputation_rules import ReputationView
+from .reputation_rules import CHAPTER_LABELS, ReputationView
 from .settings import Settings, get_settings
 
 logger = logging.getLogger(__name__)
@@ -66,15 +65,6 @@ def _model(settings: Settings) -> OpenRouterModel:
     )
 
 
-def _chapter_fields(chapter: ChapterResult) -> set[str]:
-    fields = {item.field for item in chapter.evidence}
-    for factor in chapter.factors:
-        fields.update(item.field for item in factor.evidence)
-    for observation in chapter.observations:
-        fields.update(item.field for item in observation.evidence)
-    return fields
-
-
 def flatten_field_paths(value: Any, prefix: str = "") -> set[str]:
     paths: set[str] = set()
     if isinstance(value, dict):
@@ -88,45 +78,6 @@ def flatten_field_paths(value: Any, prefix: str = "") -> set[str]:
             paths.add(path)
             paths.update(flatten_field_paths(nested, path))
     return paths
-
-
-class SpecialistAgent:
-    def __init__(self, settings: Settings) -> None:
-        self.enabled = bool(settings.openrouter_api_key)
-        self.agent = (
-            Agent(
-                _model(settings),
-                output_type=GroundedText,
-                model_settings={"temperature": 0},
-
-                instructions=SPECIALIST_INSTRUCTIONS,
-
-            )
-            if self.enabled
-            else None
-        )
-
-    async def enrich(self, chapter: ChapterResult) -> ChapterResult:
-        if not self.agent:
-            logger.info("LLM call skipped (SpecialistAgent.enrich): agent disabled")
-            return chapter
-        payload = {
-            "task": (
-                "Кратко переформулируй готовое заключение, не меняя его смысл."
-            ),
-            "chapter": chapter.model_dump(mode="json"),
-        }
-
-        logger.info("LLM call -> SpecialistAgent.enrich chapter=%s", chapter.chapter)
-        result = await self.agent.run(json.dumps(payload, ensure_ascii=False))
-        logger.info("LLM call <- SpecialistAgent.enrich chapter=%s", chapter.chapter)
-
-        allowed = _chapter_fields(chapter)
-        if result.output.evidence_fields and set(
-            result.output.evidence_fields
-        ).issubset(allowed):
-            chapter.conclusion = result.output.text
-        return chapter
 
 
 class EvaluatorAgent:
@@ -293,13 +244,11 @@ class ReputationAggregateOutput(BaseModel):
 
 
 class ReputationAgent:
-    """Agent-as-tool: the LLM call that backs `analyze_reputation` itself.
+    """Summarize source factors, falling back to verbatim chapter groups.
 
-    Unlike `SpecialistAgent`/`EvaluatorAgent`, this agent does not enrich an
-    already-deterministic conclusion — it *is* the tool's aggregation logic
-    for a chapter whose raw material is free-form text. Same grounding and
-    evidence-validation discipline: no evidence, an unknown chapter, or a
-    reference outside the card and the answer is rejected.
+    Only responses with nonempty, chapter-local evidence are accepted.
+    Invalid evidence gets at most three attempts; model failures fall back
+    immediately so the source facts remain available.
     """
 
     def __init__(self, settings: Settings) -> None:
@@ -320,7 +269,9 @@ class ReputationAgent:
             return []
 
         if not self.agent:
-            raise RuntimeError("OPENROUTER_API_KEY is not configured")
+            logger.info("ReputationAgent: model disabled; using source factors")
+            return self._source_observations(view)
+
         payload = {
             chapter: [
                 {
@@ -333,32 +284,64 @@ class ReputationAgent:
             ]
             for chapter, entries in view.by_chapter.items()
         }
-        allowed = {entry.field("name") for entry in view.indexed}
+        allowed_by_chapter = {
+            chapter: {entry.field("name") for entry in entries}
+            for chapter, entries in view.by_chapter.items()
+        }
         values = {entry.field("name"): entry.item.name for entry in view.indexed}
+        base_prompt = json.dumps(payload, ensure_ascii=False)
+        for attempt in range(1, 4):
+            prompt = base_prompt
+            if attempt > 1:
+                prompt += (
+                    "\n\nПредыдущий ответ содержит некорректные ссылки. "
+                    "Верни непустой highlights и укажи для каждого утверждения "
+                    "хотя бы одно точное поле field из его раздела chapter."
+                )
+            try:
+                logger.info("LLM call -> ReputationAgent.aggregate attempt=%d", attempt)
+                result = await self.agent.run(prompt)
+            except Exception:
+                logger.exception("Reputation model failed; using source factors")
+                return self._source_observations(view)
 
-        grounded_highlights = [
-            highlight
-            for highlight in result.output.highlights
-            if highlight.chapter in view.chapters
-            and highlight.evidence_fields
-            and set(highlight.evidence_fields).issubset(allowed)
-        ]
-        if len(grounded_highlights) < len(result.output.highlights):
-            logger.info(
-                "ReputationAgent.aggregate: dropped %d ungrounded highlight(s)",
-                len(result.output.highlights) - len(grounded_highlights),
-            )
+            highlights = result.output.highlights
+            if highlights and all(
+                highlight.chapter in allowed_by_chapter
+                and highlight.evidence_fields
+                and set(highlight.evidence_fields).issubset(
+                    allowed_by_chapter[highlight.chapter]
+                )
+                for highlight in highlights
+            ):
+                logger.info("LLM call <- ReputationAgent.aggregate attempt=%d", attempt)
+                return [
+                    Observation(
+                        code=f"chapter_{highlight.chapter}",
+                        title=highlight.title,
+                        detail=highlight.text,
+                        evidence=[
+                            Evidence(field=field, value=values[field])
+                            for field in dict.fromkeys(highlight.evidence_fields)
+                        ],
+                    )
+                    for highlight in highlights
+                ]
+            logger.warning("Reputation evidence validation failed attempt=%d", attempt)
+
+        logger.warning("Reputation evidence retries exhausted; using source factors")
+        return self._source_observations(view)
+
+    @staticmethod
+    def _source_observations(view: ReputationView) -> list[Observation]:
         return [
             Observation(
-                code=f"chapter_{highlight.chapter}",
-                title=highlight.title,
-                detail=highlight.text,
-                evidence=[
-                    Evidence(field=field, value=values.get(field))
-                    for field in highlight.evidence_fields
-                ],
+                code=f"chapter_{chapter}",
+                title=CHAPTER_LABELS.get(chapter, chapter),
+                detail="; ".join(dict.fromkeys(entry.item.name for entry in entries)),
+                evidence=[entry.evidence("name") for entry in entries],
             )
-            for highlight in grounded_highlights
+            for chapter, entries in view.by_chapter.items()
         ]
 
 

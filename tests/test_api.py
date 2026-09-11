@@ -5,7 +5,6 @@ from httpx import ASGITransport, AsyncClient
 
 from counterparty_verification.agents import (
     QuestionAnswerAgent,
-    SpecialistAgent,
 )
 from counterparty_verification.api import create_app
 from counterparty_verification.chat_models import (
@@ -64,7 +63,6 @@ def app():
     application.state.analysis_service = AnalysisService(
         repository=repository,
         tools=LocalAnalysisToolClient(),
-        specialist=SpecialistAgent(settings),
         evaluator=StubEvaluator(),
         sessions=sessions,
     )

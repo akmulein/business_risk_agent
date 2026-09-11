@@ -47,11 +47,6 @@ CODE_ALIASES: dict[str, str] = {
     "аrbitrationDefendant": "arbitrationDefendant",
 }
 
-# How many raw texts per chapter are handed to the LLM prompt, to keep the
-# payload bounded regardless of how many factors a report carries.
-MAX_ITEMS_PER_CHAPTER = 10
-
-
 def _normalize_code(code: str | None) -> str | None:
     if code is None:
         return None

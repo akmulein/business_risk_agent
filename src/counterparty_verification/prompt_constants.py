@@ -9,14 +9,6 @@ missing, state that the data is insufficient. Keep numbers and statuses exact.
 Reply in Russian.
 """.strip()
 
-SPECIALIST_INSTRUCTIONS = (
-    SYSTEM_GROUNDING
-    + """
-
-Rewrite the supplied deterministic chapter conclusion clearly.
-"""
-).strip()
-
 EVALUATOR_INSTRUCTIONS = (
     SYSTEM_GROUNDING
     + """
