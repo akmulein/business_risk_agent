@@ -9,22 +9,22 @@ const RISK_LABELS: Record<RiskLevel, string> = {
 
 export const RISK_STYLES: Record<RiskLevel, { border: string; badge: string; dot: string }> = {
   LOW: {
-    border: 'border-l-[#27a35a]',
+    border: 'border-l-[#ffffff]',
     badge: 'bg-[#e9f7ef] text-[#14733b]',
     dot: 'bg-[#27a35a]',
   },
   MEDIUM: {
-    border: 'border-l-[#f2b705]',
+    border: 'border-l-[#ffffff]',
     badge: 'bg-[#fff6d8] text-[#755800]',
     dot: 'bg-[#f2b705]',
   },
   HIGH: {
-    border: 'border-l-[#ef3124]',
+    border: 'border-l-[#ffffff]',
     badge: 'bg-[#ffebe9] text-[#b5120a]',
     dot: 'bg-[#ef3124]',
   },
   UNKNOWN: {
-    border: 'border-l-[#a3a3a3]',
+    border: 'border-l-[#ffffff]',
     badge: 'bg-[#f0f0f0] text-[#616161]',
     dot: 'bg-[#a3a3a3]',
   },

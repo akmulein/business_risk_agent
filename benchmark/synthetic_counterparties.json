@@ -1,0 +1,4059 @@
+[
+  {
+    "_id": {
+      "date": {
+        "$date": "2026-08-27T21:00:00.000Z"
+      },
+      "ogrn": "7700000001000"
+    },
+    "report": {
+      "reportDate": {
+        "$date": "2026-08-27T21:00:00.000Z"
+      },
+      "baseInfo": {
+        "inn": "7700000001",
+        "ogrn": "1241600001048",
+        "shortName": "ООО ИДЕАЛЬНЫЙ ГИГАНТ",
+        "fullName": "ООО ИДЕАЛЬНЫЙ ГИГАНТ",
+        "registrationInfo": {
+          "registrationDate": {
+            "$date": "2024-01-14T21:00:00.000Z"
+          },
+          "yearsFromRegistration": 20
+        },
+        "riskLevel": "LOW",
+        "kpp": "168401001",
+        "okpo": "95020726",
+        "address": "420005,  РЕСПУБЛИКА ТАТАРСТАН (ТАТАРСТАН), городской округ ГОРОД КАЗАНЬ, Г КАЗАНЬ, УЛ АЛЕБАСТРОВАЯ, Д. 1А, ОФИС 3  ",
+        "email": "tekhprof@mail.ru",
+        "companySize": "Микропредприятие"
+      },
+      "foundersInfo": {
+        "shareCapital": 10000,
+        "cofounders": [
+          {
+            "name": "ШИРИКОВ ЕВГЕНИЙ ЛЕОНИДОВИЧ",
+            "inn": "130801590508",
+            "amount": 10000,
+            "share": 100,
+            "dateFrom": {
+              "$date": "2024-01-14T21:00:00.000Z"
+            },
+            "active": true
+          }
+        ],
+        "authPerson": {
+          "name": "ШИРИКОВ ЕВГЕНИЙ ЛЕОНИДОВИЧ",
+          "positionName": "ГЕНЕРАЛЬНЫЙ ДИРЕКТОР",
+          "inn": "130801590508",
+          "positionDate": {
+            "$date": "2024-01-14T21:00:00.000Z"
+          }
+        }
+      },
+      "kindsOfActivityInfo": {
+        "mainKindOfActivity": {
+          "code": "43.99.7",
+          "description": "Работы по сборке и монтажу сборных конструкций"
+        },
+        "otherKindsOfActivity": [
+          {
+            "code": "43.32.3",
+            "description": "Производство работ по внутренней отделке зданий (включая потолки, раздвижные и съемные перегородки и т.д.)"
+          },
+          {
+            "code": "25.11",
+            "description": "Производство строительных металлических конструкций, изделий и их частей"
+          },
+          {
+            "code": "52.10",
+            "description": "Деятельность по складированию и хранению"
+          },
+          {
+            "code": "43.22",
+            "description": "Производство санитарно-технических работ, монтаж отопительных систем и систем кондиционирования воздуха"
+          },
+          {
+            "code": "16.23",
+            "description": "Производство прочих деревянных строительных конструкций и столярных изделий"
+          },
+          {
+            "code": "25.12",
+            "description": "Производство металлических дверей и окон"
+          },
+          {
+            "code": "43.29",
+            "description": "Производство прочих строительно-монтажных работ"
+          },
+          {
+            "code": "46.73",
+            "description": "Торговля оптовая лесоматериалами, строительными материалами и санитарно-техническим оборудованием"
+          },
+          {
+            "code": "43.21",
+            "description": "Производство электромонтажных работ"
+          },
+          {
+            "code": "22.23",
+            "description": "Производство пластмассовых изделий, используемых в строительстве"
+          },
+          {
+            "code": "47.78",
+            "description": "Торговля розничная прочая в специализированных магазинах"
+          },
+          {
+            "code": "49.42",
+            "description": "Предоставление услуг по перевозкам"
+          },
+          {
+            "code": "25.61",
+            "description": "Обработка металлов и нанесение покрытий на металлы"
+          },
+          {
+            "code": "46.90",
+            "description": "Торговля оптовая неспециализированная"
+          },
+          {
+            "code": "25.62",
+            "description": "Обработка металлических изделий механическая"
+          },
+          {
+            "code": "49.41",
+            "description": "Деятельность автомобильного грузового транспорта"
+          },
+          {
+            "code": "43.33",
+            "description": "Работы по устройству покрытий полов и облицовке стен"
+          },
+          {
+            "code": "43.34",
+            "description": "Производство малярных и стекольных работ"
+          },
+          {
+            "code": "43.39",
+            "description": "Производство прочих отделочных и завершающих работ"
+          }
+        ]
+      },
+      "phones": [],
+      "status": {
+        "status": "CURRENT",
+        "date": {
+          "$date": "2026-01-12T21:00:00.000Z"
+        }
+      },
+      "finReports": [
+        {
+          "common": {
+            "year": 2025,
+            "proceeds": 5000000000,
+            "profit": 1000000000
+          },
+          "assets": {
+            "totalAssets": 2500000000
+          },
+          "liabilities": {
+            "totalLiabilities": 2500000000,
+            "shortTermLiabilities": {
+              "accountsPayable": 0
+            }
+          }
+        },
+        {
+          "common": {
+            "year": 2024,
+            "proceeds": 4500000000,
+            "profit": 800000000
+          },
+          "assets": {
+            "totalAssets": 2250000000
+          },
+          "liabilities": {
+            "totalLiabilities": 2250000000,
+            "shortTermLiabilities": {
+              "accountsPayable": 0
+            }
+          }
+        }
+      ],
+      "taxSystem": [
+        {
+          "fullName": "Общая система налогообложения",
+          "shortName": "ОСНО"
+        }
+      ],
+      "relatedCompanies": [],
+      "zskRiskLevel": "GREEN",
+      "reputationalRisks": {
+        "negative": [],
+        "positive": [
+          {
+            "code": "fnsBlocking",
+            "name": "Нет блокировок счетов.",
+            "chapter": "reestrs"
+          },
+          {
+            "code": "liquidationStatus",
+            "name": "Не в стадии банкротства.",
+            "chapter": "reestrs"
+          },
+          {
+            "code": "dishonestProvider",
+            "name": "Нет в РНП.",
+            "chapter": "reestrs"
+          }
+        ]
+      },
+      "arbitrationByStatus": {
+        "plaintiffArbitration": {
+          "plaintiffArbitrationFinished": {},
+          "plaintiffArbitrationAppealed": {},
+          "plaintiffArbitrationPending": {}
+        },
+        "defandantArbitration": {
+          "defandantArbitrationFinished": {},
+          "defandantArbitrationAppealed": {},
+          "defandantArbitrationPending": {}
+        }
+      },
+      "executionProceedings": [],
+      "procurements": [],
+      "licenses": [],
+      "arbitrationCases": []
+    }
+  },
+  {
+    "_id": {
+      "date": {
+        "$date": "2026-08-27T21:00:00.000Z"
+      },
+      "ogrn": "7700000002000"
+    },
+    "report": {
+      "reportDate": {
+        "$date": "2026-08-27T21:00:00.000Z"
+      },
+      "baseInfo": {
+        "inn": "7700000002",
+        "ogrn": "1241600001048",
+        "shortName": "ООО УВЕРЕННЫЙ СЕРЕДНЯК",
+        "fullName": "ООО УВЕРЕННЫЙ СЕРЕДНЯК",
+        "registrationInfo": {
+          "registrationDate": {
+            "$date": "2024-01-14T21:00:00.000Z"
+          },
+          "yearsFromRegistration": 5
+        },
+        "riskLevel": "LOW",
+        "kpp": "168401001",
+        "okpo": "95020726",
+        "address": "420005,  РЕСПУБЛИКА ТАТАРСТАН (ТАТАРСТАН), городской округ ГОРОД КАЗАНЬ, Г КАЗАНЬ, УЛ АЛЕБАСТРОВАЯ, Д. 1А, ОФИС 3  ",
+        "email": "tekhprof@mail.ru",
+        "companySize": "Микропредприятие"
+      },
+      "foundersInfo": {
+        "shareCapital": 10000,
+        "cofounders": [
+          {
+            "name": "ШИРИКОВ ЕВГЕНИЙ ЛЕОНИДОВИЧ",
+            "inn": "130801590508",
+            "amount": 10000,
+            "share": 100,
+            "dateFrom": {
+              "$date": "2024-01-14T21:00:00.000Z"
+            },
+            "active": true
+          }
+        ],
+        "authPerson": {
+          "name": "ШИРИКОВ ЕВГЕНИЙ ЛЕОНИДОВИЧ",
+          "positionName": "ГЕНЕРАЛЬНЫЙ ДИРЕКТОР",
+          "inn": "130801590508",
+          "positionDate": {
+            "$date": "2024-01-14T21:00:00.000Z"
+          }
+        }
+      },
+      "kindsOfActivityInfo": {
+        "mainKindOfActivity": {
+          "code": "43.99.7",
+          "description": "Работы по сборке и монтажу сборных конструкций"
+        },
+        "otherKindsOfActivity": [
+          {
+            "code": "43.32.3",
+            "description": "Производство работ по внутренней отделке зданий (включая потолки, раздвижные и съемные перегородки и т.д.)"
+          },
+          {
+            "code": "25.11",
+            "description": "Производство строительных металлических конструкций, изделий и их частей"
+          },
+          {
+            "code": "52.10",
+            "description": "Деятельность по складированию и хранению"
+          },
+          {
+            "code": "43.22",
+            "description": "Производство санитарно-технических работ, монтаж отопительных систем и систем кондиционирования воздуха"
+          },
+          {
+            "code": "16.23",
+            "description": "Производство прочих деревянных строительных конструкций и столярных изделий"
+          },
+          {
+            "code": "25.12",
+            "description": "Производство металлических дверей и окон"
+          },
+          {
+            "code": "43.29",
+            "description": "Производство прочих строительно-монтажных работ"
+          },
+          {
+            "code": "46.73",
+            "description": "Торговля оптовая лесоматериалами, строительными материалами и санитарно-техническим оборудованием"
+          },
+          {
+            "code": "43.21",
+            "description": "Производство электромонтажных работ"
+          },
+          {
+            "code": "22.23",
+            "description": "Производство пластмассовых изделий, используемых в строительстве"
+          },
+          {
+            "code": "47.78",
+            "description": "Торговля розничная прочая в специализированных магазинах"
+          },
+          {
+            "code": "49.42",
+            "description": "Предоставление услуг по перевозкам"
+          },
+          {
+            "code": "25.61",
+            "description": "Обработка металлов и нанесение покрытий на металлы"
+          },
+          {
+            "code": "46.90",
+            "description": "Торговля оптовая неспециализированная"
+          },
+          {
+            "code": "25.62",
+            "description": "Обработка металлических изделий механическая"
+          },
+          {
+            "code": "49.41",
+            "description": "Деятельность автомобильного грузового транспорта"
+          },
+          {
+            "code": "43.33",
+            "description": "Работы по устройству покрытий полов и облицовке стен"
+          },
+          {
+            "code": "43.34",
+            "description": "Производство малярных и стекольных работ"
+          },
+          {
+            "code": "43.39",
+            "description": "Производство прочих отделочных и завершающих работ"
+          }
+        ]
+      },
+      "phones": [],
+      "status": {
+        "status": "CURRENT",
+        "date": {
+          "$date": "2026-01-12T21:00:00.000Z"
+        }
+      },
+      "finReports": [
+        {
+          "common": {
+            "year": 2025,
+            "proceeds": 15000000,
+            "profit": 3000000
+          },
+          "assets": {
+            "totalAssets": 7500000
+          },
+          "liabilities": {
+            "totalLiabilities": 7500000,
+            "shortTermLiabilities": {
+              "accountsPayable": 0
+            }
+          }
+        }
+      ],
+      "taxSystem": [
+        {
+          "fullName": "Общая система налогообложения",
+          "shortName": "ОСНО"
+        }
+      ],
+      "relatedCompanies": [],
+      "zskRiskLevel": "GREEN",
+      "reputationalRisks": {
+        "negative": [],
+        "positive": []
+      },
+      "arbitrationByStatus": {
+        "plaintiffArbitration": {
+          "plaintiffArbitrationFinished": {},
+          "plaintiffArbitrationAppealed": {},
+          "plaintiffArbitrationPending": {}
+        },
+        "defandantArbitration": {
+          "defandantArbitrationFinished": {},
+          "defandantArbitrationAppealed": {},
+          "defandantArbitrationPending": {}
+        }
+      },
+      "executionProceedings": [],
+      "procurements": [],
+      "licenses": [],
+      "arbitrationCases": [
+        {
+          "year": 2025,
+          "plaintiffCount": 2,
+          "plaintiffAmount": 500000,
+          "defendantCount": 0,
+          "defendantAmount": 0
+        }
+      ]
+    }
+  },
+  {
+    "_id": {
+      "date": {
+        "$date": "2026-08-27T21:00:00.000Z"
+      },
+      "ogrn": "7700000003000"
+    },
+    "report": {
+      "reportDate": {
+        "$date": "2026-08-27T21:00:00.000Z"
+      },
+      "baseInfo": {
+        "inn": "7700000003",
+        "ogrn": "1241600001048",
+        "shortName": "ООО СВЕЖИЙ СТАРТАП",
+        "fullName": "ООО СВЕЖИЙ СТАРТАП",
+        "registrationInfo": {
+          "registrationDate": {
+            "$date": "2024-01-14T21:00:00.000Z"
+          },
+          "yearsFromRegistration": 0
+        },
+        "riskLevel": "LOW",
+        "kpp": "168401001",
+        "okpo": "95020726",
+        "address": "420005,  РЕСПУБЛИКА ТАТАРСТАН (ТАТАРСТАН), городской округ ГОРОД КАЗАНЬ, Г КАЗАНЬ, УЛ АЛЕБАСТРОВАЯ, Д. 1А, ОФИС 3  ",
+        "email": "tekhprof@mail.ru",
+        "companySize": "Микропредприятие"
+      },
+      "foundersInfo": {
+        "shareCapital": 10000,
+        "cofounders": [
+          {
+            "name": "ШИРИКОВ ЕВГЕНИЙ ЛЕОНИДОВИЧ",
+            "inn": "130801590508",
+            "amount": 10000,
+            "share": 100,
+            "dateFrom": {
+              "$date": "2024-01-14T21:00:00.000Z"
+            },
+            "active": true
+          }
+        ],
+        "authPerson": {
+          "name": "ШИРИКОВ ЕВГЕНИЙ ЛЕОНИДОВИЧ",
+          "positionName": "ГЕНЕРАЛЬНЫЙ ДИРЕКТОР",
+          "inn": "130801590508",
+          "positionDate": {
+            "$date": "2024-01-14T21:00:00.000Z"
+          }
+        }
+      },
+      "kindsOfActivityInfo": {
+        "mainKindOfActivity": {
+          "code": "43.99.7",
+          "description": "Работы по сборке и монтажу сборных конструкций"
+        },
+        "otherKindsOfActivity": [
+          {
+            "code": "43.32.3",
+            "description": "Производство работ по внутренней отделке зданий (включая потолки, раздвижные и съемные перегородки и т.д.)"
+          },
+          {
+            "code": "25.11",
+            "description": "Производство строительных металлических конструкций, изделий и их частей"
+          },
+          {
+            "code": "52.10",
+            "description": "Деятельность по складированию и хранению"
+          },
+          {
+            "code": "43.22",
+            "description": "Производство санитарно-технических работ, монтаж отопительных систем и систем кондиционирования воздуха"
+          },
+          {
+            "code": "16.23",
+            "description": "Производство прочих деревянных строительных конструкций и столярных изделий"
+          },
+          {
+            "code": "25.12",
+            "description": "Производство металлических дверей и окон"
+          },
+          {
+            "code": "43.29",
+            "description": "Производство прочих строительно-монтажных работ"
+          },
+          {
+            "code": "46.73",
+            "description": "Торговля оптовая лесоматериалами, строительными материалами и санитарно-техническим оборудованием"
+          },
+          {
+            "code": "43.21",
+            "description": "Производство электромонтажных работ"
+          },
+          {
+            "code": "22.23",
+            "description": "Производство пластмассовых изделий, используемых в строительстве"
+          },
+          {
+            "code": "47.78",
+            "description": "Торговля розничная прочая в специализированных магазинах"
+          },
+          {
+            "code": "49.42",
+            "description": "Предоставление услуг по перевозкам"
+          },
+          {
+            "code": "25.61",
+            "description": "Обработка металлов и нанесение покрытий на металлы"
+          },
+          {
+            "code": "46.90",
+            "description": "Торговля оптовая неспециализированная"
+          },
+          {
+            "code": "25.62",
+            "description": "Обработка металлических изделий механическая"
+          },
+          {
+            "code": "49.41",
+            "description": "Деятельность автомобильного грузового транспорта"
+          },
+          {
+            "code": "43.33",
+            "description": "Работы по устройству покрытий полов и облицовке стен"
+          },
+          {
+            "code": "43.34",
+            "description": "Производство малярных и стекольных работ"
+          },
+          {
+            "code": "43.39",
+            "description": "Производство прочих отделочных и завершающих работ"
+          }
+        ]
+      },
+      "phones": [],
+      "status": {
+        "status": "CURRENT",
+        "date": {
+          "$date": "2026-01-12T21:00:00.000Z"
+        }
+      },
+      "finReports": [],
+      "taxSystem": [
+        {
+          "fullName": "Общая система налогообложения",
+          "shortName": "ОСНО"
+        }
+      ],
+      "relatedCompanies": [],
+      "zskRiskLevel": "GREEN",
+      "reputationalRisks": {
+        "negative": [],
+        "positive": []
+      },
+      "arbitrationByStatus": {
+        "plaintiffArbitration": {
+          "plaintiffArbitrationFinished": {},
+          "plaintiffArbitrationAppealed": {},
+          "plaintiffArbitrationPending": {}
+        },
+        "defandantArbitration": {
+          "defandantArbitrationFinished": {},
+          "defandantArbitrationAppealed": {},
+          "defandantArbitrationPending": {}
+        }
+      },
+      "executionProceedings": [],
+      "procurements": [],
+      "licenses": [],
+      "arbitrationCases": []
+    }
+  },
+  {
+    "_id": {
+      "date": {
+        "$date": "2026-08-27T21:00:00.000Z"
+      },
+      "ogrn": "7700000004000"
+    },
+    "report": {
+      "reportDate": {
+        "$date": "2026-08-27T21:00:00.000Z"
+      },
+      "baseInfo": {
+        "inn": "7700000004",
+        "ogrn": "1241600001048",
+        "shortName": "ООО ОФИЦИАЛЬНЫЙ БАНКРОТ",
+        "fullName": "ООО ОФИЦИАЛЬНЫЙ БАНКРОТ",
+        "registrationInfo": {
+          "registrationDate": {
+            "$date": "2024-01-14T21:00:00.000Z"
+          },
+          "yearsFromRegistration": 8
+        },
+        "riskLevel": "HIGH",
+        "kpp": "168401001",
+        "okpo": "95020726",
+        "address": "420005,  РЕСПУБЛИКА ТАТАРСТАН (ТАТАРСТАН), городской округ ГОРОД КАЗАНЬ, Г КАЗАНЬ, УЛ АЛЕБАСТРОВАЯ, Д. 1А, ОФИС 3  ",
+        "email": "tekhprof@mail.ru",
+        "companySize": "Микропредприятие"
+      },
+      "foundersInfo": {
+        "shareCapital": 10000,
+        "cofounders": [
+          {
+            "name": "ШИРИКОВ ЕВГЕНИЙ ЛЕОНИДОВИЧ",
+            "inn": "130801590508",
+            "amount": 10000,
+            "share": 100,
+            "dateFrom": {
+              "$date": "2024-01-14T21:00:00.000Z"
+            },
+            "active": true
+          }
+        ],
+        "authPerson": {
+          "name": "ШИРИКОВ ЕВГЕНИЙ ЛЕОНИДОВИЧ",
+          "positionName": "ГЕНЕРАЛЬНЫЙ ДИРЕКТОР",
+          "inn": "130801590508",
+          "positionDate": {
+            "$date": "2024-01-14T21:00:00.000Z"
+          }
+        }
+      },
+      "kindsOfActivityInfo": {
+        "mainKindOfActivity": {
+          "code": "43.99.7",
+          "description": "Работы по сборке и монтажу сборных конструкций"
+        },
+        "otherKindsOfActivity": [
+          {
+            "code": "43.32.3",
+            "description": "Производство работ по внутренней отделке зданий (включая потолки, раздвижные и съемные перегородки и т.д.)"
+          },
+          {
+            "code": "25.11",
+            "description": "Производство строительных металлических конструкций, изделий и их частей"
+          },
+          {
+            "code": "52.10",
+            "description": "Деятельность по складированию и хранению"
+          },
+          {
+            "code": "43.22",
+            "description": "Производство санитарно-технических работ, монтаж отопительных систем и систем кондиционирования воздуха"
+          },
+          {
+            "code": "16.23",
+            "description": "Производство прочих деревянных строительных конструкций и столярных изделий"
+          },
+          {
+            "code": "25.12",
+            "description": "Производство металлических дверей и окон"
+          },
+          {
+            "code": "43.29",
+            "description": "Производство прочих строительно-монтажных работ"
+          },
+          {
+            "code": "46.73",
+            "description": "Торговля оптовая лесоматериалами, строительными материалами и санитарно-техническим оборудованием"
+          },
+          {
+            "code": "43.21",
+            "description": "Производство электромонтажных работ"
+          },
+          {
+            "code": "22.23",
+            "description": "Производство пластмассовых изделий, используемых в строительстве"
+          },
+          {
+            "code": "47.78",
+            "description": "Торговля розничная прочая в специализированных магазинах"
+          },
+          {
+            "code": "49.42",
+            "description": "Предоставление услуг по перевозкам"
+          },
+          {
+            "code": "25.61",
+            "description": "Обработка металлов и нанесение покрытий на металлы"
+          },
+          {
+            "code": "46.90",
+            "description": "Торговля оптовая неспециализированная"
+          },
+          {
+            "code": "25.62",
+            "description": "Обработка металлических изделий механическая"
+          },
+          {
+            "code": "49.41",
+            "description": "Деятельность автомобильного грузового транспорта"
+          },
+          {
+            "code": "43.33",
+            "description": "Работы по устройству покрытий полов и облицовке стен"
+          },
+          {
+            "code": "43.34",
+            "description": "Производство малярных и стекольных работ"
+          },
+          {
+            "code": "43.39",
+            "description": "Производство прочих отделочных и завершающих работ"
+          }
+        ]
+      },
+      "phones": [],
+      "status": {
+        "status": "CLOSED",
+        "date": {
+          "$date": "2026-01-12T21:00:00.000Z"
+        },
+        "reasonName": "Признание судом банкротом"
+      },
+      "finReports": [
+        {
+          "common": {
+            "year": 2025,
+            "proceeds": 0,
+            "profit": -50000000
+          },
+          "assets": {
+            "totalAssets": 0
+          },
+          "liabilities": {
+            "totalLiabilities": 0,
+            "shortTermLiabilities": {
+              "accountsPayable": 150000000
+            }
+          }
+        }
+      ],
+      "taxSystem": [
+        {
+          "fullName": "Общая система налогообложения",
+          "shortName": "ОСНО"
+        }
+      ],
+      "relatedCompanies": [],
+      "zskRiskLevel": "RED",
+      "reputationalRisks": {
+        "negative": [
+          {
+            "code": "liquidationStatus",
+            "name": "Организация в процессе ликвидации/банкротства.",
+            "chapter": "reestrs"
+          }
+        ],
+        "positive": []
+      },
+      "arbitrationByStatus": {
+        "plaintiffArbitration": {
+          "plaintiffArbitrationFinished": {},
+          "plaintiffArbitrationAppealed": {},
+          "plaintiffArbitrationPending": {}
+        },
+        "defandantArbitration": {
+          "defandantArbitrationFinished": {},
+          "defandantArbitrationAppealed": {},
+          "defandantArbitrationPending": {}
+        }
+      },
+      "executionProceedings": [],
+      "procurements": [],
+      "licenses": [],
+      "arbitrationCases": []
+    }
+  },
+  {
+    "_id": {
+      "date": {
+        "$date": "2026-08-27T21:00:00.000Z"
+      },
+      "ogrn": "7700000005000"
+    },
+    "report": {
+      "reportDate": {
+        "$date": "2026-08-27T21:00:00.000Z"
+      },
+      "baseInfo": {
+        "inn": "7700000005",
+        "ogrn": "1241600001048",
+        "shortName": "ООО ФИКТИВНАЯ КОНТОРА",
+        "fullName": "ООО ФИКТИВНАЯ КОНТОРА",
+        "registrationInfo": {
+          "registrationDate": {
+            "$date": "2024-01-14T21:00:00.000Z"
+          },
+          "yearsFromRegistration": 1
+        },
+        "riskLevel": "HIGH",
+        "kpp": "168401001",
+        "okpo": "95020726",
+        "address": "420005,  РЕСПУБЛИКА ТАТАРСТАН (ТАТАРСТАН), городской округ ГОРОД КАЗАНЬ, Г КАЗАНЬ, УЛ АЛЕБАСТРОВАЯ, Д. 1А, ОФИС 3  ",
+        "email": "tekhprof@mail.ru",
+        "companySize": "Микропредприятие"
+      },
+      "foundersInfo": {
+        "shareCapital": 10000,
+        "cofounders": [
+          {
+            "name": "ШИРИКОВ ЕВГЕНИЙ ЛЕОНИДОВИЧ",
+            "inn": "130801590508",
+            "amount": 10000,
+            "share": 100,
+            "dateFrom": {
+              "$date": "2024-01-14T21:00:00.000Z"
+            },
+            "active": true
+          }
+        ],
+        "authPerson": {
+          "name": "ШИРИКОВ ЕВГЕНИЙ ЛЕОНИДОВИЧ",
+          "positionName": "ГЕНЕРАЛЬНЫЙ ДИРЕКТОР",
+          "inn": "130801590508",
+          "positionDate": {
+            "$date": "2024-01-14T21:00:00.000Z"
+          }
+        }
+      },
+      "kindsOfActivityInfo": {
+        "mainKindOfActivity": {
+          "code": "43.99.7",
+          "description": "Работы по сборке и монтажу сборных конструкций"
+        },
+        "otherKindsOfActivity": [
+          {
+            "code": "43.32.3",
+            "description": "Производство работ по внутренней отделке зданий (включая потолки, раздвижные и съемные перегородки и т.д.)"
+          },
+          {
+            "code": "25.11",
+            "description": "Производство строительных металлических конструкций, изделий и их частей"
+          },
+          {
+            "code": "52.10",
+            "description": "Деятельность по складированию и хранению"
+          },
+          {
+            "code": "43.22",
+            "description": "Производство санитарно-технических работ, монтаж отопительных систем и систем кондиционирования воздуха"
+          },
+          {
+            "code": "16.23",
+            "description": "Производство прочих деревянных строительных конструкций и столярных изделий"
+          },
+          {
+            "code": "25.12",
+            "description": "Производство металлических дверей и окон"
+          },
+          {
+            "code": "43.29",
+            "description": "Производство прочих строительно-монтажных работ"
+          },
+          {
+            "code": "46.73",
+            "description": "Торговля оптовая лесоматериалами, строительными материалами и санитарно-техническим оборудованием"
+          },
+          {
+            "code": "43.21",
+            "description": "Производство электромонтажных работ"
+          },
+          {
+            "code": "22.23",
+            "description": "Производство пластмассовых изделий, используемых в строительстве"
+          },
+          {
+            "code": "47.78",
+            "description": "Торговля розничная прочая в специализированных магазинах"
+          },
+          {
+            "code": "49.42",
+            "description": "Предоставление услуг по перевозкам"
+          },
+          {
+            "code": "25.61",
+            "description": "Обработка металлов и нанесение покрытий на металлы"
+          },
+          {
+            "code": "46.90",
+            "description": "Торговля оптовая неспециализированная"
+          },
+          {
+            "code": "25.62",
+            "description": "Обработка металлических изделий механическая"
+          },
+          {
+            "code": "49.41",
+            "description": "Деятельность автомобильного грузового транспорта"
+          },
+          {
+            "code": "43.33",
+            "description": "Работы по устройству покрытий полов и облицовке стен"
+          },
+          {
+            "code": "43.34",
+            "description": "Производство малярных и стекольных работ"
+          },
+          {
+            "code": "43.39",
+            "description": "Производство прочих отделочных и завершающих работ"
+          }
+        ]
+      },
+      "phones": [],
+      "status": {
+        "status": "CURRENT",
+        "date": {
+          "$date": "2026-01-12T21:00:00.000Z"
+        }
+      },
+      "finReports": [
+        {
+          "common": {
+            "year": 2025,
+            "proceeds": 0,
+            "profit": 0
+          },
+          "assets": {
+            "totalAssets": 0
+          },
+          "liabilities": {
+            "totalLiabilities": 0,
+            "shortTermLiabilities": {
+              "accountsPayable": 0
+            }
+          }
+        }
+      ],
+      "taxSystem": [
+        {
+          "fullName": "Общая система налогообложения",
+          "shortName": "ОСНО"
+        }
+      ],
+      "relatedCompanies": [],
+      "zskRiskLevel": "RED",
+      "reputationalRisks": {
+        "negative": [
+          {
+            "code": "invalidAddress",
+            "name": "Находится в реестре организаций с фиктивным адресом.",
+            "chapter": "reestrs"
+          },
+          {
+            "code": "taxArrears",
+            "name": "Имеются крупные задолженности перед ФНС.",
+            "chapter": "reestrs"
+          }
+        ],
+        "positive": []
+      },
+      "arbitrationByStatus": {
+        "plaintiffArbitration": {
+          "plaintiffArbitrationFinished": {},
+          "plaintiffArbitrationAppealed": {},
+          "plaintiffArbitrationPending": {}
+        },
+        "defandantArbitration": {
+          "defandantArbitrationFinished": {},
+          "defandantArbitrationAppealed": {},
+          "defandantArbitrationPending": {}
+        }
+      },
+      "executionProceedings": [],
+      "procurements": [],
+      "licenses": [],
+      "arbitrationCases": []
+    }
+  },
+  {
+    "_id": {
+      "date": {
+        "$date": "2026-08-27T21:00:00.000Z"
+      },
+      "ogrn": "7700000006000"
+    },
+    "report": {
+      "reportDate": {
+        "$date": "2026-08-27T21:00:00.000Z"
+      },
+      "baseInfo": {
+        "inn": "7700000006",
+        "ogrn": "1241600001048",
+        "shortName": "ООО ЖЕСТКИЙ НЕПЛАТЕЛЬЩИК",
+        "fullName": "ООО ЖЕСТКИЙ НЕПЛАТЕЛЬЩИК",
+        "registrationInfo": {
+          "registrationDate": {
+            "$date": "2024-01-14T21:00:00.000Z"
+          },
+          "yearsFromRegistration": 3
+        },
+        "riskLevel": "HIGH",
+        "kpp": "168401001",
+        "okpo": "95020726",
+        "address": "420005,  РЕСПУБЛИКА ТАТАРСТАН (ТАТАРСТАН), городской округ ГОРОД КАЗАНЬ, Г КАЗАНЬ, УЛ АЛЕБАСТРОВАЯ, Д. 1А, ОФИС 3  ",
+        "email": "tekhprof@mail.ru",
+        "companySize": "Микропредприятие"
+      },
+      "foundersInfo": {
+        "shareCapital": 10000,
+        "cofounders": [
+          {
+            "name": "ШИРИКОВ ЕВГЕНИЙ ЛЕОНИДОВИЧ",
+            "inn": "130801590508",
+            "amount": 10000,
+            "share": 100,
+            "dateFrom": {
+              "$date": "2024-01-14T21:00:00.000Z"
+            },
+            "active": true
+          }
+        ],
+        "authPerson": {
+          "name": "ШИРИКОВ ЕВГЕНИЙ ЛЕОНИДОВИЧ",
+          "positionName": "ГЕНЕРАЛЬНЫЙ ДИРЕКТОР",
+          "inn": "130801590508",
+          "positionDate": {
+            "$date": "2024-01-14T21:00:00.000Z"
+          }
+        }
+      },
+      "kindsOfActivityInfo": {
+        "mainKindOfActivity": {
+          "code": "43.99.7",
+          "description": "Работы по сборке и монтажу сборных конструкций"
+        },
+        "otherKindsOfActivity": [
+          {
+            "code": "43.32.3",
+            "description": "Производство работ по внутренней отделке зданий (включая потолки, раздвижные и съемные перегородки и т.д.)"
+          },
+          {
+            "code": "25.11",
+            "description": "Производство строительных металлических конструкций, изделий и их частей"
+          },
+          {
+            "code": "52.10",
+            "description": "Деятельность по складированию и хранению"
+          },
+          {
+            "code": "43.22",
+            "description": "Производство санитарно-технических работ, монтаж отопительных систем и систем кондиционирования воздуха"
+          },
+          {
+            "code": "16.23",
+            "description": "Производство прочих деревянных строительных конструкций и столярных изделий"
+          },
+          {
+            "code": "25.12",
+            "description": "Производство металлических дверей и окон"
+          },
+          {
+            "code": "43.29",
+            "description": "Производство прочих строительно-монтажных работ"
+          },
+          {
+            "code": "46.73",
+            "description": "Торговля оптовая лесоматериалами, строительными материалами и санитарно-техническим оборудованием"
+          },
+          {
+            "code": "43.21",
+            "description": "Производство электромонтажных работ"
+          },
+          {
+            "code": "22.23",
+            "description": "Производство пластмассовых изделий, используемых в строительстве"
+          },
+          {
+            "code": "47.78",
+            "description": "Торговля розничная прочая в специализированных магазинах"
+          },
+          {
+            "code": "49.42",
+            "description": "Предоставление услуг по перевозкам"
+          },
+          {
+            "code": "25.61",
+            "description": "Обработка металлов и нанесение покрытий на металлы"
+          },
+          {
+            "code": "46.90",
+            "description": "Торговля оптовая неспециализированная"
+          },
+          {
+            "code": "25.62",
+            "description": "Обработка металлических изделий механическая"
+          },
+          {
+            "code": "49.41",
+            "description": "Деятельность автомобильного грузового транспорта"
+          },
+          {
+            "code": "43.33",
+            "description": "Работы по устройству покрытий полов и облицовке стен"
+          },
+          {
+            "code": "43.34",
+            "description": "Производство малярных и стекольных работ"
+          },
+          {
+            "code": "43.39",
+            "description": "Производство прочих отделочных и завершающих работ"
+          }
+        ]
+      },
+      "phones": [],
+      "status": {
+        "status": "CURRENT",
+        "date": {
+          "$date": "2026-01-12T21:00:00.000Z"
+        }
+      },
+      "finReports": [
+        {
+          "common": {
+            "year": 2025,
+            "proceeds": 1000000,
+            "profit": -2000000
+          },
+          "assets": {
+            "totalAssets": 500000
+          },
+          "liabilities": {
+            "totalLiabilities": 500000,
+            "shortTermLiabilities": {
+              "accountsPayable": 0
+            }
+          }
+        }
+      ],
+      "taxSystem": [
+        {
+          "fullName": "Общая система налогообложения",
+          "shortName": "ОСНО"
+        }
+      ],
+      "relatedCompanies": [],
+      "zskRiskLevel": "RED",
+      "reputationalRisks": {
+        "negative": [
+          {
+            "code": "fnsBlocking",
+            "name": "Есть блокировки банковских счетов по постановлениям ФНС.",
+            "chapter": "reestrs"
+          },
+          {
+            "code": "executionProceedings",
+            "name": "Есть активные исполнительные производства.",
+            "chapter": "execproc"
+          }
+        ],
+        "positive": []
+      },
+      "arbitrationByStatus": {
+        "plaintiffArbitration": {
+          "plaintiffArbitrationFinished": {},
+          "plaintiffArbitrationAppealed": {},
+          "plaintiffArbitrationPending": {}
+        },
+        "defandantArbitration": {
+          "defandantArbitrationFinished": {},
+          "defandantArbitrationAppealed": {},
+          "defandantArbitrationPending": {}
+        }
+      },
+      "executionProceedings": [
+        {
+          "active": true,
+          "number": "12345/25/77000-ИП",
+          "amount": 1000000
+        },
+        {
+          "active": true,
+          "number": "12345/25/77001-ИП",
+          "amount": 2500000
+        },
+        {
+          "active": true,
+          "number": "12345/25/77002-ИП",
+          "amount": 500000
+        }
+      ],
+      "procurements": [],
+      "licenses": [],
+      "arbitrationCases": []
+    }
+  },
+  {
+    "_id": {
+      "date": {
+        "$date": "2026-08-27T21:00:00.000Z"
+      },
+      "ogrn": "7700000007000"
+    },
+    "report": {
+      "reportDate": {
+        "$date": "2026-08-27T21:00:00.000Z"
+      },
+      "baseInfo": {
+        "inn": "7700000007",
+        "ogrn": "1241600001048",
+        "shortName": "ООО ТОКСИЧНЫЙ РУКОВОДИТЕЛЬ",
+        "fullName": "ООО ТОКСИЧНЫЙ РУКОВОДИТЕЛЬ",
+        "registrationInfo": {
+          "registrationDate": {
+            "$date": "2024-01-14T21:00:00.000Z"
+          },
+          "yearsFromRegistration": 4
+        },
+        "riskLevel": "MEDIUM",
+        "kpp": "168401001",
+        "okpo": "95020726",
+        "address": "420005,  РЕСПУБЛИКА ТАТАРСТАН (ТАТАРСТАН), городской округ ГОРОД КАЗАНЬ, Г КАЗАНЬ, УЛ АЛЕБАСТРОВАЯ, Д. 1А, ОФИС 3  ",
+        "email": "tekhprof@mail.ru",
+        "companySize": "Микропредприятие"
+      },
+      "foundersInfo": {
+        "shareCapital": 10000,
+        "cofounders": [
+          {
+            "name": "ШИРИКОВ ЕВГЕНИЙ ЛЕОНИДОВИЧ",
+            "inn": "130801590508",
+            "amount": 10000,
+            "share": 100,
+            "dateFrom": {
+              "$date": "2024-01-14T21:00:00.000Z"
+            },
+            "active": true
+          }
+        ],
+        "authPerson": {
+          "name": "ШИРИКОВ ЕВГЕНИЙ ЛЕОНИДОВИЧ",
+          "positionName": "ГЕНЕРАЛЬНЫЙ ДИРЕКТОР",
+          "inn": "130801590508",
+          "positionDate": {
+            "$date": "2024-01-14T21:00:00.000Z"
+          }
+        }
+      },
+      "kindsOfActivityInfo": {
+        "mainKindOfActivity": {
+          "code": "43.99.7",
+          "description": "Работы по сборке и монтажу сборных конструкций"
+        },
+        "otherKindsOfActivity": [
+          {
+            "code": "43.32.3",
+            "description": "Производство работ по внутренней отделке зданий (включая потолки, раздвижные и съемные перегородки и т.д.)"
+          },
+          {
+            "code": "25.11",
+            "description": "Производство строительных металлических конструкций, изделий и их частей"
+          },
+          {
+            "code": "52.10",
+            "description": "Деятельность по складированию и хранению"
+          },
+          {
+            "code": "43.22",
+            "description": "Производство санитарно-технических работ, монтаж отопительных систем и систем кондиционирования воздуха"
+          },
+          {
+            "code": "16.23",
+            "description": "Производство прочих деревянных строительных конструкций и столярных изделий"
+          },
+          {
+            "code": "25.12",
+            "description": "Производство металлических дверей и окон"
+          },
+          {
+            "code": "43.29",
+            "description": "Производство прочих строительно-монтажных работ"
+          },
+          {
+            "code": "46.73",
+            "description": "Торговля оптовая лесоматериалами, строительными материалами и санитарно-техническим оборудованием"
+          },
+          {
+            "code": "43.21",
+            "description": "Производство электромонтажных работ"
+          },
+          {
+            "code": "22.23",
+            "description": "Производство пластмассовых изделий, используемых в строительстве"
+          },
+          {
+            "code": "47.78",
+            "description": "Торговля розничная прочая в специализированных магазинах"
+          },
+          {
+            "code": "49.42",
+            "description": "Предоставление услуг по перевозкам"
+          },
+          {
+            "code": "25.61",
+            "description": "Обработка металлов и нанесение покрытий на металлы"
+          },
+          {
+            "code": "46.90",
+            "description": "Торговля оптовая неспециализированная"
+          },
+          {
+            "code": "25.62",
+            "description": "Обработка металлических изделий механическая"
+          },
+          {
+            "code": "49.41",
+            "description": "Деятельность автомобильного грузового транспорта"
+          },
+          {
+            "code": "43.33",
+            "description": "Работы по устройству покрытий полов и облицовке стен"
+          },
+          {
+            "code": "43.34",
+            "description": "Производство малярных и стекольных работ"
+          },
+          {
+            "code": "43.39",
+            "description": "Производство прочих отделочных и завершающих работ"
+          }
+        ]
+      },
+      "phones": [],
+      "status": {
+        "status": "CURRENT",
+        "date": {
+          "$date": "2026-01-12T21:00:00.000Z"
+        }
+      },
+      "finReports": [
+        {
+          "common": {
+            "year": 2025,
+            "proceeds": 20000000,
+            "profit": 1000000
+          },
+          "assets": {
+            "totalAssets": 10000000
+          },
+          "liabilities": {
+            "totalLiabilities": 10000000,
+            "shortTermLiabilities": {
+              "accountsPayable": 0
+            }
+          }
+        }
+      ],
+      "taxSystem": [
+        {
+          "fullName": "Общая система налогообложения",
+          "shortName": "ОСНО"
+        }
+      ],
+      "relatedCompanies": [],
+      "zskRiskLevel": "YELLOW",
+      "reputationalRisks": {
+        "negative": [
+          {
+            "code": "disqualifiedAuthpersons",
+            "name": "Руководитель дисквалифицирован.",
+            "chapter": "manager"
+          }
+        ],
+        "positive": []
+      },
+      "arbitrationByStatus": {
+        "plaintiffArbitration": {
+          "plaintiffArbitrationFinished": {},
+          "plaintiffArbitrationAppealed": {},
+          "plaintiffArbitrationPending": {}
+        },
+        "defandantArbitration": {
+          "defandantArbitrationFinished": {},
+          "defandantArbitrationAppealed": {},
+          "defandantArbitrationPending": {}
+        }
+      },
+      "executionProceedings": [],
+      "procurements": [],
+      "licenses": [],
+      "arbitrationCases": []
+    }
+  },
+  {
+    "_id": {
+      "date": {
+        "$date": "2026-08-27T21:00:00.000Z"
+      },
+      "ogrn": "7700000008000"
+    },
+    "report": {
+      "reportDate": {
+        "$date": "2026-08-27T21:00:00.000Z"
+      },
+      "baseInfo": {
+        "inn": "7700000008",
+        "ogrn": "1241600001048",
+        "shortName": "ООО НЕДОБРОСОВЕСТНЫЙ ПОСТАВЩИК",
+        "fullName": "ООО НЕДОБРОСОВЕСТНЫЙ ПОСТАВЩИК",
+        "registrationInfo": {
+          "registrationDate": {
+            "$date": "2024-01-14T21:00:00.000Z"
+          },
+          "yearsFromRegistration": 6
+        },
+        "riskLevel": "MEDIUM",
+        "kpp": "168401001",
+        "okpo": "95020726",
+        "address": "420005,  РЕСПУБЛИКА ТАТАРСТАН (ТАТАРСТАН), городской округ ГОРОД КАЗАНЬ, Г КАЗАНЬ, УЛ АЛЕБАСТРОВАЯ, Д. 1А, ОФИС 3  ",
+        "email": "tekhprof@mail.ru",
+        "companySize": "Микропредприятие"
+      },
+      "foundersInfo": {
+        "shareCapital": 10000,
+        "cofounders": [
+          {
+            "name": "ШИРИКОВ ЕВГЕНИЙ ЛЕОНИДОВИЧ",
+            "inn": "130801590508",
+            "amount": 10000,
+            "share": 100,
+            "dateFrom": {
+              "$date": "2024-01-14T21:00:00.000Z"
+            },
+            "active": true
+          }
+        ],
+        "authPerson": {
+          "name": "ШИРИКОВ ЕВГЕНИЙ ЛЕОНИДОВИЧ",
+          "positionName": "ГЕНЕРАЛЬНЫЙ ДИРЕКТОР",
+          "inn": "130801590508",
+          "positionDate": {
+            "$date": "2024-01-14T21:00:00.000Z"
+          }
+        }
+      },
+      "kindsOfActivityInfo": {
+        "mainKindOfActivity": {
+          "code": "43.99.7",
+          "description": "Работы по сборке и монтажу сборных конструкций"
+        },
+        "otherKindsOfActivity": [
+          {
+            "code": "43.32.3",
+            "description": "Производство работ по внутренней отделке зданий (включая потолки, раздвижные и съемные перегородки и т.д.)"
+          },
+          {
+            "code": "25.11",
+            "description": "Производство строительных металлических конструкций, изделий и их частей"
+          },
+          {
+            "code": "52.10",
+            "description": "Деятельность по складированию и хранению"
+          },
+          {
+            "code": "43.22",
+            "description": "Производство санитарно-технических работ, монтаж отопительных систем и систем кондиционирования воздуха"
+          },
+          {
+            "code": "16.23",
+            "description": "Производство прочих деревянных строительных конструкций и столярных изделий"
+          },
+          {
+            "code": "25.12",
+            "description": "Производство металлических дверей и окон"
+          },
+          {
+            "code": "43.29",
+            "description": "Производство прочих строительно-монтажных работ"
+          },
+          {
+            "code": "46.73",
+            "description": "Торговля оптовая лесоматериалами, строительными материалами и санитарно-техническим оборудованием"
+          },
+          {
+            "code": "43.21",
+            "description": "Производство электромонтажных работ"
+          },
+          {
+            "code": "22.23",
+            "description": "Производство пластмассовых изделий, используемых в строительстве"
+          },
+          {
+            "code": "47.78",
+            "description": "Торговля розничная прочая в специализированных магазинах"
+          },
+          {
+            "code": "49.42",
+            "description": "Предоставление услуг по перевозкам"
+          },
+          {
+            "code": "25.61",
+            "description": "Обработка металлов и нанесение покрытий на металлы"
+          },
+          {
+            "code": "46.90",
+            "description": "Торговля оптовая неспециализированная"
+          },
+          {
+            "code": "25.62",
+            "description": "Обработка металлических изделий механическая"
+          },
+          {
+            "code": "49.41",
+            "description": "Деятельность автомобильного грузового транспорта"
+          },
+          {
+            "code": "43.33",
+            "description": "Работы по устройству покрытий полов и облицовке стен"
+          },
+          {
+            "code": "43.34",
+            "description": "Производство малярных и стекольных работ"
+          },
+          {
+            "code": "43.39",
+            "description": "Производство прочих отделочных и завершающих работ"
+          }
+        ]
+      },
+      "phones": [],
+      "status": {
+        "status": "CURRENT",
+        "date": {
+          "$date": "2026-01-12T21:00:00.000Z"
+        }
+      },
+      "finReports": [
+        {
+          "common": {
+            "year": 2025,
+            "proceeds": 40000000,
+            "profit": 500000
+          },
+          "assets": {
+            "totalAssets": 20000000
+          },
+          "liabilities": {
+            "totalLiabilities": 20000000,
+            "shortTermLiabilities": {
+              "accountsPayable": 0
+            }
+          }
+        }
+      ],
+      "taxSystem": [
+        {
+          "fullName": "Общая система налогообложения",
+          "shortName": "ОСНО"
+        }
+      ],
+      "relatedCompanies": [],
+      "zskRiskLevel": "YELLOW",
+      "reputationalRisks": {
+        "negative": [
+          {
+            "code": "dishonestProvider",
+            "name": "Находится в реестре недобросовестных поставщиков.",
+            "chapter": "reestrs"
+          },
+          {
+            "code": "arbitrationDefendant",
+            "name": "Выступает ответчиком по арбитражным делам.",
+            "chapter": "arbitr"
+          }
+        ],
+        "positive": []
+      },
+      "arbitrationByStatus": {
+        "plaintiffArbitration": {
+          "plaintiffArbitrationFinished": {},
+          "plaintiffArbitrationAppealed": {},
+          "plaintiffArbitrationPending": {}
+        },
+        "defandantArbitration": {
+          "defandantArbitrationFinished": {},
+          "defandantArbitrationAppealed": {},
+          "defandantArbitrationPending": {}
+        }
+      },
+      "executionProceedings": [],
+      "procurements": [],
+      "licenses": [],
+      "arbitrationCases": [
+        {
+          "year": 2025,
+          "plaintiffCount": 0,
+          "plaintiffAmount": 0,
+          "defendantCount": 3,
+          "defendantAmount": 15000000
+        }
+      ]
+    }
+  },
+  {
+    "_id": {
+      "date": {
+        "$date": "2026-08-27T21:00:00.000Z"
+      },
+      "ogrn": "7700000009000"
+    },
+    "report": {
+      "reportDate": {
+        "$date": "2026-08-27T21:00:00.000Z"
+      },
+      "baseInfo": {
+        "inn": "7700000009",
+        "ogrn": "1241600001048",
+        "shortName": "ООО БОГАТЫЙ НО ЗАСУЖЕННЫЙ",
+        "fullName": "ООО БОГАТЫЙ НО ЗАСУЖЕННЫЙ",
+        "registrationInfo": {
+          "registrationDate": {
+            "$date": "2024-01-14T21:00:00.000Z"
+          },
+          "yearsFromRegistration": 12
+        },
+        "riskLevel": "MEDIUM",
+        "kpp": "168401001",
+        "okpo": "95020726",
+        "address": "420005,  РЕСПУБЛИКА ТАТАРСТАН (ТАТАРСТАН), городской округ ГОРОД КАЗАНЬ, Г КАЗАНЬ, УЛ АЛЕБАСТРОВАЯ, Д. 1А, ОФИС 3  ",
+        "email": "tekhprof@mail.ru",
+        "companySize": "Микропредприятие"
+      },
+      "foundersInfo": {
+        "shareCapital": 10000,
+        "cofounders": [
+          {
+            "name": "ШИРИКОВ ЕВГЕНИЙ ЛЕОНИДОВИЧ",
+            "inn": "130801590508",
+            "amount": 10000,
+            "share": 100,
+            "dateFrom": {
+              "$date": "2024-01-14T21:00:00.000Z"
+            },
+            "active": true
+          }
+        ],
+        "authPerson": {
+          "name": "ШИРИКОВ ЕВГЕНИЙ ЛЕОНИДОВИЧ",
+          "positionName": "ГЕНЕРАЛЬНЫЙ ДИРЕКТОР",
+          "inn": "130801590508",
+          "positionDate": {
+            "$date": "2024-01-14T21:00:00.000Z"
+          }
+        }
+      },
+      "kindsOfActivityInfo": {
+        "mainKindOfActivity": {
+          "code": "43.99.7",
+          "description": "Работы по сборке и монтажу сборных конструкций"
+        },
+        "otherKindsOfActivity": [
+          {
+            "code": "43.32.3",
+            "description": "Производство работ по внутренней отделке зданий (включая потолки, раздвижные и съемные перегородки и т.д.)"
+          },
+          {
+            "code": "25.11",
+            "description": "Производство строительных металлических конструкций, изделий и их частей"
+          },
+          {
+            "code": "52.10",
+            "description": "Деятельность по складированию и хранению"
+          },
+          {
+            "code": "43.22",
+            "description": "Производство санитарно-технических работ, монтаж отопительных систем и систем кондиционирования воздуха"
+          },
+          {
+            "code": "16.23",
+            "description": "Производство прочих деревянных строительных конструкций и столярных изделий"
+          },
+          {
+            "code": "25.12",
+            "description": "Производство металлических дверей и окон"
+          },
+          {
+            "code": "43.29",
+            "description": "Производство прочих строительно-монтажных работ"
+          },
+          {
+            "code": "46.73",
+            "description": "Торговля оптовая лесоматериалами, строительными материалами и санитарно-техническим оборудованием"
+          },
+          {
+            "code": "43.21",
+            "description": "Производство электромонтажных работ"
+          },
+          {
+            "code": "22.23",
+            "description": "Производство пластмассовых изделий, используемых в строительстве"
+          },
+          {
+            "code": "47.78",
+            "description": "Торговля розничная прочая в специализированных магазинах"
+          },
+          {
+            "code": "49.42",
+            "description": "Предоставление услуг по перевозкам"
+          },
+          {
+            "code": "25.61",
+            "description": "Обработка металлов и нанесение покрытий на металлы"
+          },
+          {
+            "code": "46.90",
+            "description": "Торговля оптовая неспециализированная"
+          },
+          {
+            "code": "25.62",
+            "description": "Обработка металлических изделий механическая"
+          },
+          {
+            "code": "49.41",
+            "description": "Деятельность автомобильного грузового транспорта"
+          },
+          {
+            "code": "43.33",
+            "description": "Работы по устройству покрытий полов и облицовке стен"
+          },
+          {
+            "code": "43.34",
+            "description": "Производство малярных и стекольных работ"
+          },
+          {
+            "code": "43.39",
+            "description": "Производство прочих отделочных и завершающих работ"
+          }
+        ]
+      },
+      "phones": [],
+      "status": {
+        "status": "CURRENT",
+        "date": {
+          "$date": "2026-01-12T21:00:00.000Z"
+        }
+      },
+      "finReports": [
+        {
+          "common": {
+            "year": 2025,
+            "proceeds": 3000000000,
+            "profit": 200000000
+          },
+          "assets": {
+            "totalAssets": 1500000000
+          },
+          "liabilities": {
+            "totalLiabilities": 1500000000,
+            "shortTermLiabilities": {
+              "accountsPayable": 0
+            }
+          }
+        }
+      ],
+      "taxSystem": [
+        {
+          "fullName": "Общая система налогообложения",
+          "shortName": "ОСНО"
+        }
+      ],
+      "relatedCompanies": [],
+      "zskRiskLevel": "GREEN",
+      "reputationalRisks": {
+        "negative": [
+          {
+            "code": "arbitrationDefendant",
+            "name": "Выступает ответчиком по арбитражным делам.",
+            "chapter": "arbitr"
+          }
+        ],
+        "positive": []
+      },
+      "arbitrationByStatus": {
+        "plaintiffArbitration": {
+          "plaintiffArbitrationFinished": {},
+          "plaintiffArbitrationAppealed": {},
+          "plaintiffArbitrationPending": {}
+        },
+        "defandantArbitration": {
+          "defandantArbitrationFinished": {},
+          "defandantArbitrationAppealed": {},
+          "defandantArbitrationPending": {}
+        }
+      },
+      "executionProceedings": [],
+      "procurements": [],
+      "licenses": [],
+      "arbitrationCases": [
+        {
+          "year": 2025,
+          "plaintiffCount": 0,
+          "plaintiffAmount": 0,
+          "defendantCount": 1,
+          "defendantAmount": 5000000000
+        }
+      ]
+    }
+  },
+  {
+    "_id": {
+      "date": {
+        "$date": "2026-08-27T21:00:00.000Z"
+      },
+      "ogrn": "7700000010000"
+    },
+    "report": {
+      "reportDate": {
+        "$date": "2026-08-27T21:00:00.000Z"
+      },
+      "baseInfo": {
+        "inn": "7700000010",
+        "ogrn": "1241600001048",
+        "shortName": "ООО СУТЯЖНИК",
+        "fullName": "ООО СУТЯЖНИК",
+        "registrationInfo": {
+          "registrationDate": {
+            "$date": "2024-01-14T21:00:00.000Z"
+          },
+          "yearsFromRegistration": 7
+        },
+        "riskLevel": "LOW",
+        "kpp": "168401001",
+        "okpo": "95020726",
+        "address": "420005,  РЕСПУБЛИКА ТАТАРСТАН (ТАТАРСТАН), городской округ ГОРОД КАЗАНЬ, Г КАЗАНЬ, УЛ АЛЕБАСТРОВАЯ, Д. 1А, ОФИС 3  ",
+        "email": "tekhprof@mail.ru",
+        "companySize": "Микропредприятие"
+      },
+      "foundersInfo": {
+        "shareCapital": 10000,
+        "cofounders": [
+          {
+            "name": "ШИРИКОВ ЕВГЕНИЙ ЛЕОНИДОВИЧ",
+            "inn": "130801590508",
+            "amount": 10000,
+            "share": 100,
+            "dateFrom": {
+              "$date": "2024-01-14T21:00:00.000Z"
+            },
+            "active": true
+          }
+        ],
+        "authPerson": {
+          "name": "ШИРИКОВ ЕВГЕНИЙ ЛЕОНИДОВИЧ",
+          "positionName": "ГЕНЕРАЛЬНЫЙ ДИРЕКТОР",
+          "inn": "130801590508",
+          "positionDate": {
+            "$date": "2024-01-14T21:00:00.000Z"
+          }
+        }
+      },
+      "kindsOfActivityInfo": {
+        "mainKindOfActivity": {
+          "code": "43.99.7",
+          "description": "Работы по сборке и монтажу сборных конструкций"
+        },
+        "otherKindsOfActivity": [
+          {
+            "code": "43.32.3",
+            "description": "Производство работ по внутренней отделке зданий (включая потолки, раздвижные и съемные перегородки и т.д.)"
+          },
+          {
+            "code": "25.11",
+            "description": "Производство строительных металлических конструкций, изделий и их частей"
+          },
+          {
+            "code": "52.10",
+            "description": "Деятельность по складированию и хранению"
+          },
+          {
+            "code": "43.22",
+            "description": "Производство санитарно-технических работ, монтаж отопительных систем и систем кондиционирования воздуха"
+          },
+          {
+            "code": "16.23",
+            "description": "Производство прочих деревянных строительных конструкций и столярных изделий"
+          },
+          {
+            "code": "25.12",
+            "description": "Производство металлических дверей и окон"
+          },
+          {
+            "code": "43.29",
+            "description": "Производство прочих строительно-монтажных работ"
+          },
+          {
+            "code": "46.73",
+            "description": "Торговля оптовая лесоматериалами, строительными материалами и санитарно-техническим оборудованием"
+          },
+          {
+            "code": "43.21",
+            "description": "Производство электромонтажных работ"
+          },
+          {
+            "code": "22.23",
+            "description": "Производство пластмассовых изделий, используемых в строительстве"
+          },
+          {
+            "code": "47.78",
+            "description": "Торговля розничная прочая в специализированных магазинах"
+          },
+          {
+            "code": "49.42",
+            "description": "Предоставление услуг по перевозкам"
+          },
+          {
+            "code": "25.61",
+            "description": "Обработка металлов и нанесение покрытий на металлы"
+          },
+          {
+            "code": "46.90",
+            "description": "Торговля оптовая неспециализированная"
+          },
+          {
+            "code": "25.62",
+            "description": "Обработка металлических изделий механическая"
+          },
+          {
+            "code": "49.41",
+            "description": "Деятельность автомобильного грузового транспорта"
+          },
+          {
+            "code": "43.33",
+            "description": "Работы по устройству покрытий полов и облицовке стен"
+          },
+          {
+            "code": "43.34",
+            "description": "Производство малярных и стекольных работ"
+          },
+          {
+            "code": "43.39",
+            "description": "Производство прочих отделочных и завершающих работ"
+          }
+        ]
+      },
+      "phones": [],
+      "status": {
+        "status": "CURRENT",
+        "date": {
+          "$date": "2026-01-12T21:00:00.000Z"
+        }
+      },
+      "finReports": [
+        {
+          "common": {
+            "year": 2025,
+            "proceeds": 50000000,
+            "profit": 2000000
+          },
+          "assets": {
+            "totalAssets": 25000000
+          },
+          "liabilities": {
+            "totalLiabilities": 25000000,
+            "shortTermLiabilities": {
+              "accountsPayable": 0
+            }
+          }
+        }
+      ],
+      "taxSystem": [
+        {
+          "fullName": "Общая система налогообложения",
+          "shortName": "ОСНО"
+        }
+      ],
+      "relatedCompanies": [],
+      "zskRiskLevel": "GREEN",
+      "reputationalRisks": {
+        "negative": [],
+        "positive": []
+      },
+      "arbitrationByStatus": {
+        "plaintiffArbitration": {
+          "plaintiffArbitrationFinished": {},
+          "plaintiffArbitrationAppealed": {},
+          "plaintiffArbitrationPending": {}
+        },
+        "defandantArbitration": {
+          "defandantArbitrationFinished": {},
+          "defandantArbitrationAppealed": {},
+          "defandantArbitrationPending": {}
+        }
+      },
+      "executionProceedings": [],
+      "procurements": [],
+      "licenses": [],
+      "arbitrationCases": [
+        {
+          "year": 2025,
+          "plaintiffCount": 150,
+          "plaintiffAmount": 30000000,
+          "defendantCount": 0,
+          "defendantAmount": 0
+        }
+      ]
+    }
+  },
+  {
+    "_id": {
+      "date": {
+        "$date": "2026-08-27T21:00:00.000Z"
+      },
+      "ogrn": "7700000011000"
+    },
+    "report": {
+      "reportDate": {
+        "$date": "2026-08-27T21:00:00.000Z"
+      },
+      "baseInfo": {
+        "inn": "7700000011",
+        "ogrn": "1241600001048",
+        "shortName": "ООО РЕЗКОЕ ПАДЕНИЕ",
+        "fullName": "ООО РЕЗКОЕ ПАДЕНИЕ",
+        "registrationInfo": {
+          "registrationDate": {
+            "$date": "2024-01-14T21:00:00.000Z"
+          },
+          "yearsFromRegistration": 5
+        },
+        "riskLevel": "MEDIUM",
+        "kpp": "168401001",
+        "okpo": "95020726",
+        "address": "420005,  РЕСПУБЛИКА ТАТАРСТАН (ТАТАРСТАН), городской округ ГОРОД КАЗАНЬ, Г КАЗАНЬ, УЛ АЛЕБАСТРОВАЯ, Д. 1А, ОФИС 3  ",
+        "email": "tekhprof@mail.ru",
+        "companySize": "Микропредприятие"
+      },
+      "foundersInfo": {
+        "shareCapital": 10000,
+        "cofounders": [
+          {
+            "name": "ШИРИКОВ ЕВГЕНИЙ ЛЕОНИДОВИЧ",
+            "inn": "130801590508",
+            "amount": 10000,
+            "share": 100,
+            "dateFrom": {
+              "$date": "2024-01-14T21:00:00.000Z"
+            },
+            "active": true
+          }
+        ],
+        "authPerson": {
+          "name": "ШИРИКОВ ЕВГЕНИЙ ЛЕОНИДОВИЧ",
+          "positionName": "ГЕНЕРАЛЬНЫЙ ДИРЕКТОР",
+          "inn": "130801590508",
+          "positionDate": {
+            "$date": "2024-01-14T21:00:00.000Z"
+          }
+        }
+      },
+      "kindsOfActivityInfo": {
+        "mainKindOfActivity": {
+          "code": "43.99.7",
+          "description": "Работы по сборке и монтажу сборных конструкций"
+        },
+        "otherKindsOfActivity": [
+          {
+            "code": "43.32.3",
+            "description": "Производство работ по внутренней отделке зданий (включая потолки, раздвижные и съемные перегородки и т.д.)"
+          },
+          {
+            "code": "25.11",
+            "description": "Производство строительных металлических конструкций, изделий и их частей"
+          },
+          {
+            "code": "52.10",
+            "description": "Деятельность по складированию и хранению"
+          },
+          {
+            "code": "43.22",
+            "description": "Производство санитарно-технических работ, монтаж отопительных систем и систем кондиционирования воздуха"
+          },
+          {
+            "code": "16.23",
+            "description": "Производство прочих деревянных строительных конструкций и столярных изделий"
+          },
+          {
+            "code": "25.12",
+            "description": "Производство металлических дверей и окон"
+          },
+          {
+            "code": "43.29",
+            "description": "Производство прочих строительно-монтажных работ"
+          },
+          {
+            "code": "46.73",
+            "description": "Торговля оптовая лесоматериалами, строительными материалами и санитарно-техническим оборудованием"
+          },
+          {
+            "code": "43.21",
+            "description": "Производство электромонтажных работ"
+          },
+          {
+            "code": "22.23",
+            "description": "Производство пластмассовых изделий, используемых в строительстве"
+          },
+          {
+            "code": "47.78",
+            "description": "Торговля розничная прочая в специализированных магазинах"
+          },
+          {
+            "code": "49.42",
+            "description": "Предоставление услуг по перевозкам"
+          },
+          {
+            "code": "25.61",
+            "description": "Обработка металлов и нанесение покрытий на металлы"
+          },
+          {
+            "code": "46.90",
+            "description": "Торговля оптовая неспециализированная"
+          },
+          {
+            "code": "25.62",
+            "description": "Обработка металлических изделий механическая"
+          },
+          {
+            "code": "49.41",
+            "description": "Деятельность автомобильного грузового транспорта"
+          },
+          {
+            "code": "43.33",
+            "description": "Работы по устройству покрытий полов и облицовке стен"
+          },
+          {
+            "code": "43.34",
+            "description": "Производство малярных и стекольных работ"
+          },
+          {
+            "code": "43.39",
+            "description": "Производство прочих отделочных и завершающих работ"
+          }
+        ]
+      },
+      "phones": [],
+      "status": {
+        "status": "CURRENT",
+        "date": {
+          "$date": "2026-01-12T21:00:00.000Z"
+        }
+      },
+      "finReports": [
+        {
+          "common": {
+            "year": 2025,
+            "proceeds": 2000000,
+            "profit": -5000000
+          },
+          "assets": {
+            "totalAssets": 1000000
+          },
+          "liabilities": {
+            "totalLiabilities": 1000000,
+            "shortTermLiabilities": {
+              "accountsPayable": 0
+            }
+          }
+        },
+        {
+          "common": {
+            "year": 2024,
+            "proceeds": 100000000,
+            "profit": 15000000
+          },
+          "assets": {
+            "totalAssets": 50000000
+          },
+          "liabilities": {
+            "totalLiabilities": 50000000,
+            "shortTermLiabilities": {
+              "accountsPayable": 0
+            }
+          }
+        },
+        {
+          "common": {
+            "year": 2023,
+            "proceeds": 500000000,
+            "profit": 40000000
+          },
+          "assets": {
+            "totalAssets": 250000000
+          },
+          "liabilities": {
+            "totalLiabilities": 250000000,
+            "shortTermLiabilities": {
+              "accountsPayable": 0
+            }
+          }
+        }
+      ],
+      "taxSystem": [
+        {
+          "fullName": "Общая система налогообложения",
+          "shortName": "ОСНО"
+        }
+      ],
+      "relatedCompanies": [],
+      "zskRiskLevel": "YELLOW",
+      "reputationalRisks": {
+        "negative": [],
+        "positive": []
+      },
+      "arbitrationByStatus": {
+        "plaintiffArbitration": {
+          "plaintiffArbitrationFinished": {},
+          "plaintiffArbitrationAppealed": {},
+          "plaintiffArbitrationPending": {}
+        },
+        "defandantArbitration": {
+          "defandantArbitrationFinished": {},
+          "defandantArbitrationAppealed": {},
+          "defandantArbitrationPending": {}
+        }
+      },
+      "executionProceedings": [],
+      "procurements": [],
+      "licenses": [],
+      "arbitrationCases": []
+    }
+  },
+  {
+    "_id": {
+      "date": {
+        "$date": "2026-08-27T21:00:00.000Z"
+      },
+      "ogrn": "7700000012000"
+    },
+    "report": {
+      "reportDate": {
+        "$date": "2026-08-27T21:00:00.000Z"
+      },
+      "baseInfo": {
+        "inn": "7700000012",
+        "ogrn": "1241600001048",
+        "shortName": "ООО ЧУДО РОСТ",
+        "fullName": "ООО ЧУДО РОСТ",
+        "registrationInfo": {
+          "registrationDate": {
+            "$date": "2024-01-14T21:00:00.000Z"
+          },
+          "yearsFromRegistration": 3
+        },
+        "riskLevel": "MEDIUM",
+        "kpp": "168401001",
+        "okpo": "95020726",
+        "address": "420005,  РЕСПУБЛИКА ТАТАРСТАН (ТАТАРСТАН), городской округ ГОРОД КАЗАНЬ, Г КАЗАНЬ, УЛ АЛЕБАСТРОВАЯ, Д. 1А, ОФИС 3  ",
+        "email": "tekhprof@mail.ru",
+        "companySize": "Микропредприятие"
+      },
+      "foundersInfo": {
+        "shareCapital": 10000,
+        "cofounders": [
+          {
+            "name": "ШИРИКОВ ЕВГЕНИЙ ЛЕОНИДОВИЧ",
+            "inn": "130801590508",
+            "amount": 10000,
+            "share": 100,
+            "dateFrom": {
+              "$date": "2024-01-14T21:00:00.000Z"
+            },
+            "active": true
+          }
+        ],
+        "authPerson": {
+          "name": "ШИРИКОВ ЕВГЕНИЙ ЛЕОНИДОВИЧ",
+          "positionName": "ГЕНЕРАЛЬНЫЙ ДИРЕКТОР",
+          "inn": "130801590508",
+          "positionDate": {
+            "$date": "2024-01-14T21:00:00.000Z"
+          }
+        }
+      },
+      "kindsOfActivityInfo": {
+        "mainKindOfActivity": {
+          "code": "43.99.7",
+          "description": "Работы по сборке и монтажу сборных конструкций"
+        },
+        "otherKindsOfActivity": [
+          {
+            "code": "43.32.3",
+            "description": "Производство работ по внутренней отделке зданий (включая потолки, раздвижные и съемные перегородки и т.д.)"
+          },
+          {
+            "code": "25.11",
+            "description": "Производство строительных металлических конструкций, изделий и их частей"
+          },
+          {
+            "code": "52.10",
+            "description": "Деятельность по складированию и хранению"
+          },
+          {
+            "code": "43.22",
+            "description": "Производство санитарно-технических работ, монтаж отопительных систем и систем кондиционирования воздуха"
+          },
+          {
+            "code": "16.23",
+            "description": "Производство прочих деревянных строительных конструкций и столярных изделий"
+          },
+          {
+            "code": "25.12",
+            "description": "Производство металлических дверей и окон"
+          },
+          {
+            "code": "43.29",
+            "description": "Производство прочих строительно-монтажных работ"
+          },
+          {
+            "code": "46.73",
+            "description": "Торговля оптовая лесоматериалами, строительными материалами и санитарно-техническим оборудованием"
+          },
+          {
+            "code": "43.21",
+            "description": "Производство электромонтажных работ"
+          },
+          {
+            "code": "22.23",
+            "description": "Производство пластмассовых изделий, используемых в строительстве"
+          },
+          {
+            "code": "47.78",
+            "description": "Торговля розничная прочая в специализированных магазинах"
+          },
+          {
+            "code": "49.42",
+            "description": "Предоставление услуг по перевозкам"
+          },
+          {
+            "code": "25.61",
+            "description": "Обработка металлов и нанесение покрытий на металлы"
+          },
+          {
+            "code": "46.90",
+            "description": "Торговля оптовая неспециализированная"
+          },
+          {
+            "code": "25.62",
+            "description": "Обработка металлических изделий механическая"
+          },
+          {
+            "code": "49.41",
+            "description": "Деятельность автомобильного грузового транспорта"
+          },
+          {
+            "code": "43.33",
+            "description": "Работы по устройству покрытий полов и облицовке стен"
+          },
+          {
+            "code": "43.34",
+            "description": "Производство малярных и стекольных работ"
+          },
+          {
+            "code": "43.39",
+            "description": "Производство прочих отделочных и завершающих работ"
+          }
+        ]
+      },
+      "phones": [],
+      "status": {
+        "status": "CURRENT",
+        "date": {
+          "$date": "2026-01-12T21:00:00.000Z"
+        }
+      },
+      "finReports": [
+        {
+          "common": {
+            "year": 2025,
+            "proceeds": 5000000000,
+            "profit": 1000000
+          },
+          "assets": {
+            "totalAssets": 2500000000
+          },
+          "liabilities": {
+            "totalLiabilities": 2500000000,
+            "shortTermLiabilities": {
+              "accountsPayable": 0
+            }
+          }
+        },
+        {
+          "common": {
+            "year": 2024,
+            "proceeds": 0,
+            "profit": 0
+          },
+          "assets": {
+            "totalAssets": 0
+          },
+          "liabilities": {
+            "totalLiabilities": 0,
+            "shortTermLiabilities": {
+              "accountsPayable": 0
+            }
+          }
+        },
+        {
+          "common": {
+            "year": 2023,
+            "proceeds": 0,
+            "profit": 0
+          },
+          "assets": {
+            "totalAssets": 0
+          },
+          "liabilities": {
+            "totalLiabilities": 0,
+            "shortTermLiabilities": {
+              "accountsPayable": 0
+            }
+          }
+        }
+      ],
+      "taxSystem": [
+        {
+          "fullName": "Общая система налогообложения",
+          "shortName": "ОСНО"
+        }
+      ],
+      "relatedCompanies": [],
+      "zskRiskLevel": "YELLOW",
+      "reputationalRisks": {
+        "negative": [],
+        "positive": []
+      },
+      "arbitrationByStatus": {
+        "plaintiffArbitration": {
+          "plaintiffArbitrationFinished": {},
+          "plaintiffArbitrationAppealed": {},
+          "plaintiffArbitrationPending": {}
+        },
+        "defandantArbitration": {
+          "defandantArbitrationFinished": {},
+          "defandantArbitrationAppealed": {},
+          "defandantArbitrationPending": {}
+        }
+      },
+      "executionProceedings": [],
+      "procurements": [],
+      "licenses": [],
+      "arbitrationCases": []
+    }
+  },
+  {
+    "_id": {
+      "date": {
+        "$date": "2026-08-27T21:00:00.000Z"
+      },
+      "ogrn": "7700000013000"
+    },
+    "report": {
+      "reportDate": {
+        "$date": "2026-08-27T21:00:00.000Z"
+      },
+      "baseInfo": {
+        "inn": "7700000013",
+        "ogrn": "1241600001048",
+        "shortName": "ООО БРОШЕНКА",
+        "fullName": "ООО БРОШЕНКА",
+        "registrationInfo": {
+          "registrationDate": {
+            "$date": "2024-01-14T21:00:00.000Z"
+          },
+          "yearsFromRegistration": 10
+        },
+        "riskLevel": "HIGH",
+        "kpp": "168401001",
+        "okpo": "95020726",
+        "address": "420005,  РЕСПУБЛИКА ТАТАРСТАН (ТАТАРСТАН), городской округ ГОРОД КАЗАНЬ, Г КАЗАНЬ, УЛ АЛЕБАСТРОВАЯ, Д. 1А, ОФИС 3  ",
+        "email": "tekhprof@mail.ru",
+        "companySize": "Микропредприятие"
+      },
+      "foundersInfo": {
+        "shareCapital": 10000,
+        "cofounders": [
+          {
+            "name": "ШИРИКОВ ЕВГЕНИЙ ЛЕОНИДОВИЧ",
+            "inn": "130801590508",
+            "amount": 10000,
+            "share": 100,
+            "dateFrom": {
+              "$date": "2024-01-14T21:00:00.000Z"
+            },
+            "active": true
+          }
+        ],
+        "authPerson": {
+          "name": "ШИРИКОВ ЕВГЕНИЙ ЛЕОНИДОВИЧ",
+          "positionName": "ГЕНЕРАЛЬНЫЙ ДИРЕКТОР",
+          "inn": "130801590508",
+          "positionDate": {
+            "$date": "2024-01-14T21:00:00.000Z"
+          }
+        }
+      },
+      "kindsOfActivityInfo": {
+        "mainKindOfActivity": {
+          "code": "43.99.7",
+          "description": "Работы по сборке и монтажу сборных конструкций"
+        },
+        "otherKindsOfActivity": [
+          {
+            "code": "43.32.3",
+            "description": "Производство работ по внутренней отделке зданий (включая потолки, раздвижные и съемные перегородки и т.д.)"
+          },
+          {
+            "code": "25.11",
+            "description": "Производство строительных металлических конструкций, изделий и их частей"
+          },
+          {
+            "code": "52.10",
+            "description": "Деятельность по складированию и хранению"
+          },
+          {
+            "code": "43.22",
+            "description": "Производство санитарно-технических работ, монтаж отопительных систем и систем кондиционирования воздуха"
+          },
+          {
+            "code": "16.23",
+            "description": "Производство прочих деревянных строительных конструкций и столярных изделий"
+          },
+          {
+            "code": "25.12",
+            "description": "Производство металлических дверей и окон"
+          },
+          {
+            "code": "43.29",
+            "description": "Производство прочих строительно-монтажных работ"
+          },
+          {
+            "code": "46.73",
+            "description": "Торговля оптовая лесоматериалами, строительными материалами и санитарно-техническим оборудованием"
+          },
+          {
+            "code": "43.21",
+            "description": "Производство электромонтажных работ"
+          },
+          {
+            "code": "22.23",
+            "description": "Производство пластмассовых изделий, используемых в строительстве"
+          },
+          {
+            "code": "47.78",
+            "description": "Торговля розничная прочая в специализированных магазинах"
+          },
+          {
+            "code": "49.42",
+            "description": "Предоставление услуг по перевозкам"
+          },
+          {
+            "code": "25.61",
+            "description": "Обработка металлов и нанесение покрытий на металлы"
+          },
+          {
+            "code": "46.90",
+            "description": "Торговля оптовая неспециализированная"
+          },
+          {
+            "code": "25.62",
+            "description": "Обработка металлических изделий механическая"
+          },
+          {
+            "code": "49.41",
+            "description": "Деятельность автомобильного грузового транспорта"
+          },
+          {
+            "code": "43.33",
+            "description": "Работы по устройству покрытий полов и облицовке стен"
+          },
+          {
+            "code": "43.34",
+            "description": "Производство малярных и стекольных работ"
+          },
+          {
+            "code": "43.39",
+            "description": "Производство прочих отделочных и завершающих работ"
+          }
+        ]
+      },
+      "phones": [],
+      "status": {
+        "status": "CURRENT",
+        "date": {
+          "$date": "2026-01-12T21:00:00.000Z"
+        },
+        "reasonName": "Предстоящее исключение из ЕГРЮЛ"
+      },
+      "finReports": [
+        {
+          "common": {
+            "year": 2025,
+            "proceeds": 0,
+            "profit": 0
+          },
+          "assets": {
+            "totalAssets": 0
+          },
+          "liabilities": {
+            "totalLiabilities": 0,
+            "shortTermLiabilities": {
+              "accountsPayable": 0
+            }
+          }
+        },
+        {
+          "common": {
+            "year": 2024,
+            "proceeds": 0,
+            "profit": 0
+          },
+          "assets": {
+            "totalAssets": 0
+          },
+          "liabilities": {
+            "totalLiabilities": 0,
+            "shortTermLiabilities": {
+              "accountsPayable": 0
+            }
+          }
+        }
+      ],
+      "taxSystem": [
+        {
+          "fullName": "Общая система налогообложения",
+          "shortName": "ОСНО"
+        }
+      ],
+      "relatedCompanies": [],
+      "zskRiskLevel": "RED",
+      "reputationalRisks": {
+        "negative": [
+          {
+            "code": "invalidAddress",
+            "name": "Находится в реестре организаций с фиктивным адресом.",
+            "chapter": "reestrs"
+          }
+        ],
+        "positive": []
+      },
+      "arbitrationByStatus": {
+        "plaintiffArbitration": {
+          "plaintiffArbitrationFinished": {},
+          "plaintiffArbitrationAppealed": {},
+          "plaintiffArbitrationPending": {}
+        },
+        "defandantArbitration": {
+          "defandantArbitrationFinished": {},
+          "defandantArbitrationAppealed": {},
+          "defandantArbitrationPending": {}
+        }
+      },
+      "executionProceedings": [],
+      "procurements": [],
+      "licenses": [],
+      "arbitrationCases": []
+    }
+  },
+  {
+    "_id": {
+      "date": {
+        "$date": "2026-08-27T21:00:00.000Z"
+      },
+      "ogrn": "7700000014000"
+    },
+    "report": {
+      "reportDate": {
+        "$date": "2026-08-27T21:00:00.000Z"
+      },
+      "baseInfo": {
+        "inn": "7700000014",
+        "ogrn": "1241600001048",
+        "shortName": "ООО ПУСТЫШКА С ДОЛГАМИ",
+        "fullName": "ООО ПУСТЫШКА С ДОЛГАМИ",
+        "registrationInfo": {
+          "registrationDate": {
+            "$date": "2024-01-14T21:00:00.000Z"
+          },
+          "yearsFromRegistration": 4
+        },
+        "riskLevel": "HIGH",
+        "kpp": "168401001",
+        "okpo": "95020726",
+        "address": "420005,  РЕСПУБЛИКА ТАТАРСТАН (ТАТАРСТАН), городской округ ГОРОД КАЗАНЬ, Г КАЗАНЬ, УЛ АЛЕБАСТРОВАЯ, Д. 1А, ОФИС 3  ",
+        "email": "tekhprof@mail.ru",
+        "companySize": "Микропредприятие"
+      },
+      "foundersInfo": {
+        "shareCapital": 10000,
+        "cofounders": [
+          {
+            "name": "ШИРИКОВ ЕВГЕНИЙ ЛЕОНИДОВИЧ",
+            "inn": "130801590508",
+            "amount": 10000,
+            "share": 100,
+            "dateFrom": {
+              "$date": "2024-01-14T21:00:00.000Z"
+            },
+            "active": true
+          }
+        ],
+        "authPerson": {
+          "name": "ШИРИКОВ ЕВГЕНИЙ ЛЕОНИДОВИЧ",
+          "positionName": "ГЕНЕРАЛЬНЫЙ ДИРЕКТОР",
+          "inn": "130801590508",
+          "positionDate": {
+            "$date": "2024-01-14T21:00:00.000Z"
+          }
+        }
+      },
+      "kindsOfActivityInfo": {
+        "mainKindOfActivity": {
+          "code": "43.99.7",
+          "description": "Работы по сборке и монтажу сборных конструкций"
+        },
+        "otherKindsOfActivity": [
+          {
+            "code": "43.32.3",
+            "description": "Производство работ по внутренней отделке зданий (включая потолки, раздвижные и съемные перегородки и т.д.)"
+          },
+          {
+            "code": "25.11",
+            "description": "Производство строительных металлических конструкций, изделий и их частей"
+          },
+          {
+            "code": "52.10",
+            "description": "Деятельность по складированию и хранению"
+          },
+          {
+            "code": "43.22",
+            "description": "Производство санитарно-технических работ, монтаж отопительных систем и систем кондиционирования воздуха"
+          },
+          {
+            "code": "16.23",
+            "description": "Производство прочих деревянных строительных конструкций и столярных изделий"
+          },
+          {
+            "code": "25.12",
+            "description": "Производство металлических дверей и окон"
+          },
+          {
+            "code": "43.29",
+            "description": "Производство прочих строительно-монтажных работ"
+          },
+          {
+            "code": "46.73",
+            "description": "Торговля оптовая лесоматериалами, строительными материалами и санитарно-техническим оборудованием"
+          },
+          {
+            "code": "43.21",
+            "description": "Производство электромонтажных работ"
+          },
+          {
+            "code": "22.23",
+            "description": "Производство пластмассовых изделий, используемых в строительстве"
+          },
+          {
+            "code": "47.78",
+            "description": "Торговля розничная прочая в специализированных магазинах"
+          },
+          {
+            "code": "49.42",
+            "description": "Предоставление услуг по перевозкам"
+          },
+          {
+            "code": "25.61",
+            "description": "Обработка металлов и нанесение покрытий на металлы"
+          },
+          {
+            "code": "46.90",
+            "description": "Торговля оптовая неспециализированная"
+          },
+          {
+            "code": "25.62",
+            "description": "Обработка металлических изделий механическая"
+          },
+          {
+            "code": "49.41",
+            "description": "Деятельность автомобильного грузового транспорта"
+          },
+          {
+            "code": "43.33",
+            "description": "Работы по устройству покрытий полов и облицовке стен"
+          },
+          {
+            "code": "43.34",
+            "description": "Производство малярных и стекольных работ"
+          },
+          {
+            "code": "43.39",
+            "description": "Производство прочих отделочных и завершающих работ"
+          }
+        ]
+      },
+      "phones": [],
+      "status": {
+        "status": "CURRENT",
+        "date": {
+          "$date": "2026-01-12T21:00:00.000Z"
+        }
+      },
+      "finReports": [
+        {
+          "common": {
+            "year": 2025,
+            "proceeds": 0,
+            "profit": -50000000
+          },
+          "assets": {
+            "totalAssets": 0
+          },
+          "liabilities": {
+            "totalLiabilities": 0,
+            "shortTermLiabilities": {
+              "accountsPayable": 50000000
+            }
+          }
+        }
+      ],
+      "taxSystem": [
+        {
+          "fullName": "Общая система налогообложения",
+          "shortName": "ОСНО"
+        }
+      ],
+      "relatedCompanies": [],
+      "zskRiskLevel": "RED",
+      "reputationalRisks": {
+        "negative": [
+          {
+            "code": "executionProceedings",
+            "name": "Есть активные исполнительные производства.",
+            "chapter": "execproc"
+          }
+        ],
+        "positive": []
+      },
+      "arbitrationByStatus": {
+        "plaintiffArbitration": {
+          "plaintiffArbitrationFinished": {},
+          "plaintiffArbitrationAppealed": {},
+          "plaintiffArbitrationPending": {}
+        },
+        "defandantArbitration": {
+          "defandantArbitrationFinished": {},
+          "defandantArbitrationAppealed": {},
+          "defandantArbitrationPending": {}
+        }
+      },
+      "executionProceedings": [
+        {
+          "active": true,
+          "number": "12345/25/77000-ИП",
+          "amount": 5000000
+        },
+        {
+          "active": true,
+          "number": "12345/25/77001-ИП",
+          "amount": 10000000
+        }
+      ],
+      "procurements": [],
+      "licenses": [],
+      "arbitrationCases": []
+    }
+  },
+  {
+    "_id": {
+      "date": {
+        "$date": "2026-08-27T21:00:00.000Z"
+      },
+      "ogrn": "7700000015000"
+    },
+    "report": {
+      "reportDate": {
+        "$date": "2026-08-27T21:00:00.000Z"
+      },
+      "baseInfo": {
+        "inn": "7700000015",
+        "ogrn": "1241600001048",
+        "shortName": "ООО ПРОБЛЕМНЫЕ СВЯЗИ",
+        "fullName": "ООО ПРОБЛЕМНЫЕ СВЯЗИ",
+        "registrationInfo": {
+          "registrationDate": {
+            "$date": "2024-01-14T21:00:00.000Z"
+          },
+          "yearsFromRegistration": 6
+        },
+        "riskLevel": "MEDIUM",
+        "kpp": "168401001",
+        "okpo": "95020726",
+        "address": "420005,  РЕСПУБЛИКА ТАТАРСТАН (ТАТАРСТАН), городской округ ГОРОД КАЗАНЬ, Г КАЗАНЬ, УЛ АЛЕБАСТРОВАЯ, Д. 1А, ОФИС 3  ",
+        "email": "tekhprof@mail.ru",
+        "companySize": "Микропредприятие"
+      },
+      "foundersInfo": {
+        "shareCapital": 10000,
+        "cofounders": [
+          {
+            "name": "ШИРИКОВ ЕВГЕНИЙ ЛЕОНИДОВИЧ",
+            "inn": "130801590508",
+            "amount": 10000,
+            "share": 100,
+            "dateFrom": {
+              "$date": "2024-01-14T21:00:00.000Z"
+            },
+            "active": true
+          }
+        ],
+        "authPerson": {
+          "name": "ШИРИКОВ ЕВГЕНИЙ ЛЕОНИДОВИЧ",
+          "positionName": "ГЕНЕРАЛЬНЫЙ ДИРЕКТОР",
+          "inn": "130801590508",
+          "positionDate": {
+            "$date": "2024-01-14T21:00:00.000Z"
+          }
+        }
+      },
+      "kindsOfActivityInfo": {
+        "mainKindOfActivity": {
+          "code": "43.99.7",
+          "description": "Работы по сборке и монтажу сборных конструкций"
+        },
+        "otherKindsOfActivity": [
+          {
+            "code": "43.32.3",
+            "description": "Производство работ по внутренней отделке зданий (включая потолки, раздвижные и съемные перегородки и т.д.)"
+          },
+          {
+            "code": "25.11",
+            "description": "Производство строительных металлических конструкций, изделий и их частей"
+          },
+          {
+            "code": "52.10",
+            "description": "Деятельность по складированию и хранению"
+          },
+          {
+            "code": "43.22",
+            "description": "Производство санитарно-технических работ, монтаж отопительных систем и систем кондиционирования воздуха"
+          },
+          {
+            "code": "16.23",
+            "description": "Производство прочих деревянных строительных конструкций и столярных изделий"
+          },
+          {
+            "code": "25.12",
+            "description": "Производство металлических дверей и окон"
+          },
+          {
+            "code": "43.29",
+            "description": "Производство прочих строительно-монтажных работ"
+          },
+          {
+            "code": "46.73",
+            "description": "Торговля оптовая лесоматериалами, строительными материалами и санитарно-техническим оборудованием"
+          },
+          {
+            "code": "43.21",
+            "description": "Производство электромонтажных работ"
+          },
+          {
+            "code": "22.23",
+            "description": "Производство пластмассовых изделий, используемых в строительстве"
+          },
+          {
+            "code": "47.78",
+            "description": "Торговля розничная прочая в специализированных магазинах"
+          },
+          {
+            "code": "49.42",
+            "description": "Предоставление услуг по перевозкам"
+          },
+          {
+            "code": "25.61",
+            "description": "Обработка металлов и нанесение покрытий на металлы"
+          },
+          {
+            "code": "46.90",
+            "description": "Торговля оптовая неспециализированная"
+          },
+          {
+            "code": "25.62",
+            "description": "Обработка металлических изделий механическая"
+          },
+          {
+            "code": "49.41",
+            "description": "Деятельность автомобильного грузового транспорта"
+          },
+          {
+            "code": "43.33",
+            "description": "Работы по устройству покрытий полов и облицовке стен"
+          },
+          {
+            "code": "43.34",
+            "description": "Производство малярных и стекольных работ"
+          },
+          {
+            "code": "43.39",
+            "description": "Производство прочих отделочных и завершающих работ"
+          }
+        ]
+      },
+      "phones": [],
+      "status": {
+        "status": "CURRENT",
+        "date": {
+          "$date": "2026-01-12T21:00:00.000Z"
+        }
+      },
+      "finReports": [
+        {
+          "common": {
+            "year": 2025,
+            "proceeds": 80000000,
+            "profit": 5000000
+          },
+          "assets": {
+            "totalAssets": 40000000
+          },
+          "liabilities": {
+            "totalLiabilities": 40000000,
+            "shortTermLiabilities": {
+              "accountsPayable": 0
+            }
+          }
+        }
+      ],
+      "taxSystem": [
+        {
+          "fullName": "Общая система налогообложения",
+          "shortName": "ОСНО"
+        }
+      ],
+      "relatedCompanies": [
+        {
+          "inn": "9999999999",
+          "name": "ООО МАССОВЫЙ БАНКРОТ"
+        }
+      ],
+      "zskRiskLevel": "GREEN",
+      "reputationalRisks": {
+        "negative": [],
+        "positive": []
+      },
+      "arbitrationByStatus": {
+        "plaintiffArbitration": {
+          "plaintiffArbitrationFinished": {},
+          "plaintiffArbitrationAppealed": {},
+          "plaintiffArbitrationPending": {}
+        },
+        "defandantArbitration": {
+          "defandantArbitrationFinished": {},
+          "defandantArbitrationAppealed": {},
+          "defandantArbitrationPending": {}
+        }
+      },
+      "executionProceedings": [],
+      "procurements": [],
+      "licenses": [],
+      "arbitrationCases": []
+    }
+  },
+  {
+    "_id": {
+      "date": {
+        "$date": "2026-08-27T21:00:00.000Z"
+      },
+      "ogrn": "7700000016000"
+    },
+    "report": {
+      "reportDate": {
+        "$date": "2026-08-27T21:00:00.000Z"
+      },
+      "baseInfo": {
+        "inn": "7700000016",
+        "ogrn": "1241600001048",
+        "shortName": "ООО ЛИШЕНЦЫ",
+        "fullName": "ООО ЛИШЕНЦЫ",
+        "registrationInfo": {
+          "registrationDate": {
+            "$date": "2024-01-14T21:00:00.000Z"
+          },
+          "yearsFromRegistration": 9
+        },
+        "riskLevel": "MEDIUM",
+        "kpp": "168401001",
+        "okpo": "95020726",
+        "address": "420005,  РЕСПУБЛИКА ТАТАРСТАН (ТАТАРСТАН), городской округ ГОРОД КАЗАНЬ, Г КАЗАНЬ, УЛ АЛЕБАСТРОВАЯ, Д. 1А, ОФИС 3  ",
+        "email": "tekhprof@mail.ru",
+        "companySize": "Микропредприятие"
+      },
+      "foundersInfo": {
+        "shareCapital": 10000,
+        "cofounders": [
+          {
+            "name": "ШИРИКОВ ЕВГЕНИЙ ЛЕОНИДОВИЧ",
+            "inn": "130801590508",
+            "amount": 10000,
+            "share": 100,
+            "dateFrom": {
+              "$date": "2024-01-14T21:00:00.000Z"
+            },
+            "active": true
+          }
+        ],
+        "authPerson": {
+          "name": "ШИРИКОВ ЕВГЕНИЙ ЛЕОНИДОВИЧ",
+          "positionName": "ГЕНЕРАЛЬНЫЙ ДИРЕКТОР",
+          "inn": "130801590508",
+          "positionDate": {
+            "$date": "2024-01-14T21:00:00.000Z"
+          }
+        }
+      },
+      "kindsOfActivityInfo": {
+        "mainKindOfActivity": {
+          "code": "43.99.7",
+          "description": "Работы по сборке и монтажу сборных конструкций"
+        },
+        "otherKindsOfActivity": [
+          {
+            "code": "43.32.3",
+            "description": "Производство работ по внутренней отделке зданий (включая потолки, раздвижные и съемные перегородки и т.д.)"
+          },
+          {
+            "code": "25.11",
+            "description": "Производство строительных металлических конструкций, изделий и их частей"
+          },
+          {
+            "code": "52.10",
+            "description": "Деятельность по складированию и хранению"
+          },
+          {
+            "code": "43.22",
+            "description": "Производство санитарно-технических работ, монтаж отопительных систем и систем кондиционирования воздуха"
+          },
+          {
+            "code": "16.23",
+            "description": "Производство прочих деревянных строительных конструкций и столярных изделий"
+          },
+          {
+            "code": "25.12",
+            "description": "Производство металлических дверей и окон"
+          },
+          {
+            "code": "43.29",
+            "description": "Производство прочих строительно-монтажных работ"
+          },
+          {
+            "code": "46.73",
+            "description": "Торговля оптовая лесоматериалами, строительными материалами и санитарно-техническим оборудованием"
+          },
+          {
+            "code": "43.21",
+            "description": "Производство электромонтажных работ"
+          },
+          {
+            "code": "22.23",
+            "description": "Производство пластмассовых изделий, используемых в строительстве"
+          },
+          {
+            "code": "47.78",
+            "description": "Торговля розничная прочая в специализированных магазинах"
+          },
+          {
+            "code": "49.42",
+            "description": "Предоставление услуг по перевозкам"
+          },
+          {
+            "code": "25.61",
+            "description": "Обработка металлов и нанесение покрытий на металлы"
+          },
+          {
+            "code": "46.90",
+            "description": "Торговля оптовая неспециализированная"
+          },
+          {
+            "code": "25.62",
+            "description": "Обработка металлических изделий механическая"
+          },
+          {
+            "code": "49.41",
+            "description": "Деятельность автомобильного грузового транспорта"
+          },
+          {
+            "code": "43.33",
+            "description": "Работы по устройству покрытий полов и облицовке стен"
+          },
+          {
+            "code": "43.34",
+            "description": "Производство малярных и стекольных работ"
+          },
+          {
+            "code": "43.39",
+            "description": "Производство прочих отделочных и завершающих работ"
+          }
+        ]
+      },
+      "phones": [],
+      "status": {
+        "status": "CURRENT",
+        "date": {
+          "$date": "2026-01-12T21:00:00.000Z"
+        }
+      },
+      "finReports": [
+        {
+          "common": {
+            "year": 2025,
+            "proceeds": 120000000,
+            "profit": 10000000
+          },
+          "assets": {
+            "totalAssets": 60000000
+          },
+          "liabilities": {
+            "totalLiabilities": 60000000,
+            "shortTermLiabilities": {
+              "accountsPayable": 0
+            }
+          }
+        }
+      ],
+      "taxSystem": [
+        {
+          "fullName": "Общая система налогообложения",
+          "shortName": "ОСНО"
+        }
+      ],
+      "relatedCompanies": [],
+      "zskRiskLevel": "YELLOW",
+      "reputationalRisks": {
+        "negative": [],
+        "positive": []
+      },
+      "arbitrationByStatus": {
+        "plaintiffArbitration": {
+          "plaintiffArbitrationFinished": {},
+          "plaintiffArbitrationAppealed": {},
+          "plaintiffArbitrationPending": {}
+        },
+        "defandantArbitration": {
+          "defandantArbitrationFinished": {},
+          "defandantArbitrationAppealed": {},
+          "defandantArbitrationPending": {}
+        }
+      },
+      "executionProceedings": [],
+      "procurements": [],
+      "licenses": [
+        {
+          "number": "123",
+          "name": "Лицензия",
+          "status": "EXPIRED"
+        }
+      ],
+      "arbitrationCases": []
+    }
+  },
+  {
+    "_id": {
+      "date": {
+        "$date": "2026-08-27T21:00:00.000Z"
+      },
+      "ogrn": "7700000017000"
+    },
+    "report": {
+      "reportDate": {
+        "$date": "2026-08-27T21:00:00.000Z"
+      },
+      "baseInfo": {
+        "inn": "7700000017",
+        "ogrn": "1241600001048",
+        "shortName": "ООО ТОЛЬКО ОТКРЫЛИСЬ",
+        "fullName": "ООО ТОЛЬКО ОТКРЫЛИСЬ",
+        "registrationInfo": {
+          "registrationDate": {
+            "$date": "2024-01-14T21:00:00.000Z"
+          },
+          "yearsFromRegistration": 0
+        },
+        "riskLevel": "LOW",
+        "kpp": "168401001",
+        "okpo": "95020726",
+        "address": "420005,  РЕСПУБЛИКА ТАТАРСТАН (ТАТАРСТАН), городской округ ГОРОД КАЗАНЬ, Г КАЗАНЬ, УЛ АЛЕБАСТРОВАЯ, Д. 1А, ОФИС 3  ",
+        "email": "tekhprof@mail.ru",
+        "companySize": "Микропредприятие"
+      },
+      "foundersInfo": {
+        "shareCapital": 10000,
+        "cofounders": [
+          {
+            "name": "ШИРИКОВ ЕВГЕНИЙ ЛЕОНИДОВИЧ",
+            "inn": "130801590508",
+            "amount": 10000,
+            "share": 100,
+            "dateFrom": {
+              "$date": "2024-01-14T21:00:00.000Z"
+            },
+            "active": true
+          }
+        ],
+        "authPerson": {
+          "name": "ШИРИКОВ ЕВГЕНИЙ ЛЕОНИДОВИЧ",
+          "positionName": "ГЕНЕРАЛЬНЫЙ ДИРЕКТОР",
+          "inn": "130801590508",
+          "positionDate": {
+            "$date": "2024-01-14T21:00:00.000Z"
+          }
+        }
+      },
+      "kindsOfActivityInfo": {
+        "mainKindOfActivity": {
+          "code": "43.99.7",
+          "description": "Работы по сборке и монтажу сборных конструкций"
+        },
+        "otherKindsOfActivity": [
+          {
+            "code": "43.32.3",
+            "description": "Производство работ по внутренней отделке зданий (включая потолки, раздвижные и съемные перегородки и т.д.)"
+          },
+          {
+            "code": "25.11",
+            "description": "Производство строительных металлических конструкций, изделий и их частей"
+          },
+          {
+            "code": "52.10",
+            "description": "Деятельность по складированию и хранению"
+          },
+          {
+            "code": "43.22",
+            "description": "Производство санитарно-технических работ, монтаж отопительных систем и систем кондиционирования воздуха"
+          },
+          {
+            "code": "16.23",
+            "description": "Производство прочих деревянных строительных конструкций и столярных изделий"
+          },
+          {
+            "code": "25.12",
+            "description": "Производство металлических дверей и окон"
+          },
+          {
+            "code": "43.29",
+            "description": "Производство прочих строительно-монтажных работ"
+          },
+          {
+            "code": "46.73",
+            "description": "Торговля оптовая лесоматериалами, строительными материалами и санитарно-техническим оборудованием"
+          },
+          {
+            "code": "43.21",
+            "description": "Производство электромонтажных работ"
+          },
+          {
+            "code": "22.23",
+            "description": "Производство пластмассовых изделий, используемых в строительстве"
+          },
+          {
+            "code": "47.78",
+            "description": "Торговля розничная прочая в специализированных магазинах"
+          },
+          {
+            "code": "49.42",
+            "description": "Предоставление услуг по перевозкам"
+          },
+          {
+            "code": "25.61",
+            "description": "Обработка металлов и нанесение покрытий на металлы"
+          },
+          {
+            "code": "46.90",
+            "description": "Торговля оптовая неспециализированная"
+          },
+          {
+            "code": "25.62",
+            "description": "Обработка металлических изделий механическая"
+          },
+          {
+            "code": "49.41",
+            "description": "Деятельность автомобильного грузового транспорта"
+          },
+          {
+            "code": "43.33",
+            "description": "Работы по устройству покрытий полов и облицовке стен"
+          },
+          {
+            "code": "43.34",
+            "description": "Производство малярных и стекольных работ"
+          },
+          {
+            "code": "43.39",
+            "description": "Производство прочих отделочных и завершающих работ"
+          }
+        ]
+      },
+      "phones": [],
+      "status": {
+        "status": "CURRENT",
+        "date": {
+          "$date": "2026-01-12T21:00:00.000Z"
+        }
+      },
+      "finReports": [],
+      "taxSystem": [
+        {
+          "fullName": "Общая система налогообложения",
+          "shortName": "ОСНО"
+        }
+      ],
+      "relatedCompanies": [],
+      "zskRiskLevel": "GREEN",
+      "reputationalRisks": {
+        "negative": [],
+        "positive": []
+      },
+      "arbitrationByStatus": {
+        "plaintiffArbitration": {
+          "plaintiffArbitrationFinished": {},
+          "plaintiffArbitrationAppealed": {},
+          "plaintiffArbitrationPending": {}
+        },
+        "defandantArbitration": {
+          "defandantArbitrationFinished": {},
+          "defandantArbitrationAppealed": {},
+          "defandantArbitrationPending": {}
+        }
+      },
+      "executionProceedings": [],
+      "procurements": [],
+      "licenses": [],
+      "arbitrationCases": []
+    }
+  },
+  {
+    "_id": {
+      "date": {
+        "$date": "2026-08-27T21:00:00.000Z"
+      },
+      "ogrn": "7700000018000"
+    },
+    "report": {
+      "reportDate": {
+        "$date": "2026-08-27T21:00:00.000Z"
+      },
+      "baseInfo": {
+        "inn": "7700000018",
+        "ogrn": "1241600001048",
+        "shortName": "ООО СМЕШАННЫЙ АРБИТРАЖ",
+        "fullName": "ООО СМЕШАННЫЙ АРБИТРАЖ",
+        "registrationInfo": {
+          "registrationDate": {
+            "$date": "2024-01-14T21:00:00.000Z"
+          },
+          "yearsFromRegistration": 8
+        },
+        "riskLevel": "MEDIUM",
+        "kpp": "168401001",
+        "okpo": "95020726",
+        "address": "420005,  РЕСПУБЛИКА ТАТАРСТАН (ТАТАРСТАН), городской округ ГОРОД КАЗАНЬ, Г КАЗАНЬ, УЛ АЛЕБАСТРОВАЯ, Д. 1А, ОФИС 3  ",
+        "email": "tekhprof@mail.ru",
+        "companySize": "Микропредприятие"
+      },
+      "foundersInfo": {
+        "shareCapital": 10000,
+        "cofounders": [
+          {
+            "name": "ШИРИКОВ ЕВГЕНИЙ ЛЕОНИДОВИЧ",
+            "inn": "130801590508",
+            "amount": 10000,
+            "share": 100,
+            "dateFrom": {
+              "$date": "2024-01-14T21:00:00.000Z"
+            },
+            "active": true
+          }
+        ],
+        "authPerson": {
+          "name": "ШИРИКОВ ЕВГЕНИЙ ЛЕОНИДОВИЧ",
+          "positionName": "ГЕНЕРАЛЬНЫЙ ДИРЕКТОР",
+          "inn": "130801590508",
+          "positionDate": {
+            "$date": "2024-01-14T21:00:00.000Z"
+          }
+        }
+      },
+      "kindsOfActivityInfo": {
+        "mainKindOfActivity": {
+          "code": "43.99.7",
+          "description": "Работы по сборке и монтажу сборных конструкций"
+        },
+        "otherKindsOfActivity": [
+          {
+            "code": "43.32.3",
+            "description": "Производство работ по внутренней отделке зданий (включая потолки, раздвижные и съемные перегородки и т.д.)"
+          },
+          {
+            "code": "25.11",
+            "description": "Производство строительных металлических конструкций, изделий и их частей"
+          },
+          {
+            "code": "52.10",
+            "description": "Деятельность по складированию и хранению"
+          },
+          {
+            "code": "43.22",
+            "description": "Производство санитарно-технических работ, монтаж отопительных систем и систем кондиционирования воздуха"
+          },
+          {
+            "code": "16.23",
+            "description": "Производство прочих деревянных строительных конструкций и столярных изделий"
+          },
+          {
+            "code": "25.12",
+            "description": "Производство металлических дверей и окон"
+          },
+          {
+            "code": "43.29",
+            "description": "Производство прочих строительно-монтажных работ"
+          },
+          {
+            "code": "46.73",
+            "description": "Торговля оптовая лесоматериалами, строительными материалами и санитарно-техническим оборудованием"
+          },
+          {
+            "code": "43.21",
+            "description": "Производство электромонтажных работ"
+          },
+          {
+            "code": "22.23",
+            "description": "Производство пластмассовых изделий, используемых в строительстве"
+          },
+          {
+            "code": "47.78",
+            "description": "Торговля розничная прочая в специализированных магазинах"
+          },
+          {
+            "code": "49.42",
+            "description": "Предоставление услуг по перевозкам"
+          },
+          {
+            "code": "25.61",
+            "description": "Обработка металлов и нанесение покрытий на металлы"
+          },
+          {
+            "code": "46.90",
+            "description": "Торговля оптовая неспециализированная"
+          },
+          {
+            "code": "25.62",
+            "description": "Обработка металлических изделий механическая"
+          },
+          {
+            "code": "49.41",
+            "description": "Деятельность автомобильного грузового транспорта"
+          },
+          {
+            "code": "43.33",
+            "description": "Работы по устройству покрытий полов и облицовке стен"
+          },
+          {
+            "code": "43.34",
+            "description": "Производство малярных и стекольных работ"
+          },
+          {
+            "code": "43.39",
+            "description": "Производство прочих отделочных и завершающих работ"
+          }
+        ]
+      },
+      "phones": [],
+      "status": {
+        "status": "CURRENT",
+        "date": {
+          "$date": "2026-01-12T21:00:00.000Z"
+        }
+      },
+      "finReports": [
+        {
+          "common": {
+            "year": 2025,
+            "proceeds": 45000000,
+            "profit": 2000000
+          },
+          "assets": {
+            "totalAssets": 22500000
+          },
+          "liabilities": {
+            "totalLiabilities": 22500000,
+            "shortTermLiabilities": {
+              "accountsPayable": 0
+            }
+          }
+        }
+      ],
+      "taxSystem": [
+        {
+          "fullName": "Общая система налогообложения",
+          "shortName": "ОСНО"
+        }
+      ],
+      "relatedCompanies": [],
+      "zskRiskLevel": "GREEN",
+      "reputationalRisks": {
+        "negative": [
+          {
+            "code": "arbitrationDefendant",
+            "name": "Выступает ответчиком по арбитражным делам.",
+            "chapter": "arbitr"
+          }
+        ],
+        "positive": []
+      },
+      "arbitrationByStatus": {
+        "plaintiffArbitration": {
+          "plaintiffArbitrationFinished": {},
+          "plaintiffArbitrationAppealed": {},
+          "plaintiffArbitrationPending": {}
+        },
+        "defandantArbitration": {
+          "defandantArbitrationFinished": {},
+          "defandantArbitrationAppealed": {},
+          "defandantArbitrationPending": {}
+        }
+      },
+      "executionProceedings": [],
+      "procurements": [],
+      "licenses": [],
+      "arbitrationCases": [
+        {
+          "year": 2025,
+          "plaintiffCount": 5,
+          "plaintiffAmount": 5000000,
+          "defendantCount": 5,
+          "defendantAmount": 5000000
+        }
+      ]
+    }
+  },
+  {
+    "_id": {
+      "date": {
+        "$date": "2026-08-27T21:00:00.000Z"
+      },
+      "ogrn": "7700000019000"
+    },
+    "report": {
+      "reportDate": {
+        "$date": "2026-08-27T21:00:00.000Z"
+      },
+      "baseInfo": {
+        "inn": "7700000019",
+        "ogrn": "1241600001048",
+        "shortName": "ООО ДОЛЖНИК ГОСУДАРСТВУ",
+        "fullName": "ООО ДОЛЖНИК ГОСУДАРСТВУ",
+        "registrationInfo": {
+          "registrationDate": {
+            "$date": "2024-01-14T21:00:00.000Z"
+          },
+          "yearsFromRegistration": 5
+        },
+        "riskLevel": "HIGH",
+        "kpp": "168401001",
+        "okpo": "95020726",
+        "address": "420005,  РЕСПУБЛИКА ТАТАРСТАН (ТАТАРСТАН), городской округ ГОРОД КАЗАНЬ, Г КАЗАНЬ, УЛ АЛЕБАСТРОВАЯ, Д. 1А, ОФИС 3  ",
+        "email": "tekhprof@mail.ru",
+        "companySize": "Микропредприятие"
+      },
+      "foundersInfo": {
+        "shareCapital": 10000,
+        "cofounders": [
+          {
+            "name": "ШИРИКОВ ЕВГЕНИЙ ЛЕОНИДОВИЧ",
+            "inn": "130801590508",
+            "amount": 10000,
+            "share": 100,
+            "dateFrom": {
+              "$date": "2024-01-14T21:00:00.000Z"
+            },
+            "active": true
+          }
+        ],
+        "authPerson": {
+          "name": "ШИРИКОВ ЕВГЕНИЙ ЛЕОНИДОВИЧ",
+          "positionName": "ГЕНЕРАЛЬНЫЙ ДИРЕКТОР",
+          "inn": "130801590508",
+          "positionDate": {
+            "$date": "2024-01-14T21:00:00.000Z"
+          }
+        }
+      },
+      "kindsOfActivityInfo": {
+        "mainKindOfActivity": {
+          "code": "43.99.7",
+          "description": "Работы по сборке и монтажу сборных конструкций"
+        },
+        "otherKindsOfActivity": [
+          {
+            "code": "43.32.3",
+            "description": "Производство работ по внутренней отделке зданий (включая потолки, раздвижные и съемные перегородки и т.д.)"
+          },
+          {
+            "code": "25.11",
+            "description": "Производство строительных металлических конструкций, изделий и их частей"
+          },
+          {
+            "code": "52.10",
+            "description": "Деятельность по складированию и хранению"
+          },
+          {
+            "code": "43.22",
+            "description": "Производство санитарно-технических работ, монтаж отопительных систем и систем кондиционирования воздуха"
+          },
+          {
+            "code": "16.23",
+            "description": "Производство прочих деревянных строительных конструкций и столярных изделий"
+          },
+          {
+            "code": "25.12",
+            "description": "Производство металлических дверей и окон"
+          },
+          {
+            "code": "43.29",
+            "description": "Производство прочих строительно-монтажных работ"
+          },
+          {
+            "code": "46.73",
+            "description": "Торговля оптовая лесоматериалами, строительными материалами и санитарно-техническим оборудованием"
+          },
+          {
+            "code": "43.21",
+            "description": "Производство электромонтажных работ"
+          },
+          {
+            "code": "22.23",
+            "description": "Производство пластмассовых изделий, используемых в строительстве"
+          },
+          {
+            "code": "47.78",
+            "description": "Торговля розничная прочая в специализированных магазинах"
+          },
+          {
+            "code": "49.42",
+            "description": "Предоставление услуг по перевозкам"
+          },
+          {
+            "code": "25.61",
+            "description": "Обработка металлов и нанесение покрытий на металлы"
+          },
+          {
+            "code": "46.90",
+            "description": "Торговля оптовая неспециализированная"
+          },
+          {
+            "code": "25.62",
+            "description": "Обработка металлических изделий механическая"
+          },
+          {
+            "code": "49.41",
+            "description": "Деятельность автомобильного грузового транспорта"
+          },
+          {
+            "code": "43.33",
+            "description": "Работы по устройству покрытий полов и облицовке стен"
+          },
+          {
+            "code": "43.34",
+            "description": "Производство малярных и стекольных работ"
+          },
+          {
+            "code": "43.39",
+            "description": "Производство прочих отделочных и завершающих работ"
+          }
+        ]
+      },
+      "phones": [],
+      "status": {
+        "status": "CURRENT",
+        "date": {
+          "$date": "2026-01-12T21:00:00.000Z"
+        }
+      },
+      "finReports": [
+        {
+          "common": {
+            "year": 2025,
+            "proceeds": 60000000,
+            "profit": 100000
+          },
+          "assets": {
+            "totalAssets": 30000000
+          },
+          "liabilities": {
+            "totalLiabilities": 30000000,
+            "shortTermLiabilities": {
+              "accountsPayable": 0
+            }
+          }
+        }
+      ],
+      "taxSystem": [
+        {
+          "fullName": "Общая система налогообложения",
+          "shortName": "ОСНО"
+        }
+      ],
+      "relatedCompanies": [],
+      "zskRiskLevel": "YELLOW",
+      "reputationalRisks": {
+        "negative": [
+          {
+            "code": "taxArrears",
+            "name": "Имеются крупные задолженности перед ФНС.",
+            "chapter": "reestrs"
+          }
+        ],
+        "positive": []
+      },
+      "arbitrationByStatus": {
+        "plaintiffArbitration": {
+          "plaintiffArbitrationFinished": {},
+          "plaintiffArbitrationAppealed": {},
+          "plaintiffArbitrationPending": {}
+        },
+        "defandantArbitration": {
+          "defandantArbitrationFinished": {},
+          "defandantArbitrationAppealed": {},
+          "defandantArbitrationPending": {}
+        }
+      },
+      "executionProceedings": [],
+      "procurements": [],
+      "licenses": [],
+      "arbitrationCases": []
+    }
+  },
+  {
+    "_id": {
+      "date": {
+        "$date": "2026-08-27T21:00:00.000Z"
+      },
+      "ogrn": "7700000020000"
+    },
+    "report": {
+      "reportDate": {
+        "$date": "2026-08-27T21:00:00.000Z"
+      },
+      "baseInfo": {
+        "inn": "7700000020",
+        "ogrn": "1241600001048",
+        "shortName": "ООО КОРОЛЬ ХОЛДИНГОВ",
+        "fullName": "ООО КОРОЛЬ ХОЛДИНГОВ",
+        "registrationInfo": {
+          "registrationDate": {
+            "$date": "2024-01-14T21:00:00.000Z"
+          },
+          "yearsFromRegistration": 15
+        },
+        "riskLevel": "LOW",
+        "kpp": "168401001",
+        "okpo": "95020726",
+        "address": "420005,  РЕСПУБЛИКА ТАТАРСТАН (ТАТАРСТАН), городской округ ГОРОД КАЗАНЬ, Г КАЗАНЬ, УЛ АЛЕБАСТРОВАЯ, Д. 1А, ОФИС 3  ",
+        "email": "tekhprof@mail.ru",
+        "companySize": "Микропредприятие"
+      },
+      "foundersInfo": {
+        "shareCapital": 5000000000,
+        "cofounders": [
+          {
+            "name": "ШИРИКОВ ЕВГЕНИЙ ЛЕОНИДОВИЧ",
+            "inn": "130801590508",
+            "amount": 10000,
+            "share": 100,
+            "dateFrom": {
+              "$date": "2024-01-14T21:00:00.000Z"
+            },
+            "active": true
+          }
+        ],
+        "authPerson": {
+          "name": "ШИРИКОВ ЕВГЕНИЙ ЛЕОНИДОВИЧ",
+          "positionName": "ГЕНЕРАЛЬНЫЙ ДИРЕКТОР",
+          "inn": "130801590508",
+          "positionDate": {
+            "$date": "2024-01-14T21:00:00.000Z"
+          }
+        }
+      },
+      "kindsOfActivityInfo": {
+        "mainKindOfActivity": {
+          "code": "43.99.7",
+          "description": "Работы по сборке и монтажу сборных конструкций"
+        },
+        "otherKindsOfActivity": [
+          {
+            "code": "43.32.3",
+            "description": "Производство работ по внутренней отделке зданий (включая потолки, раздвижные и съемные перегородки и т.д.)"
+          },
+          {
+            "code": "25.11",
+            "description": "Производство строительных металлических конструкций, изделий и их частей"
+          },
+          {
+            "code": "52.10",
+            "description": "Деятельность по складированию и хранению"
+          },
+          {
+            "code": "43.22",
+            "description": "Производство санитарно-технических работ, монтаж отопительных систем и систем кондиционирования воздуха"
+          },
+          {
+            "code": "16.23",
+            "description": "Производство прочих деревянных строительных конструкций и столярных изделий"
+          },
+          {
+            "code": "25.12",
+            "description": "Производство металлических дверей и окон"
+          },
+          {
+            "code": "43.29",
+            "description": "Производство прочих строительно-монтажных работ"
+          },
+          {
+            "code": "46.73",
+            "description": "Торговля оптовая лесоматериалами, строительными материалами и санитарно-техническим оборудованием"
+          },
+          {
+            "code": "43.21",
+            "description": "Производство электромонтажных работ"
+          },
+          {
+            "code": "22.23",
+            "description": "Производство пластмассовых изделий, используемых в строительстве"
+          },
+          {
+            "code": "47.78",
+            "description": "Торговля розничная прочая в специализированных магазинах"
+          },
+          {
+            "code": "49.42",
+            "description": "Предоставление услуг по перевозкам"
+          },
+          {
+            "code": "25.61",
+            "description": "Обработка металлов и нанесение покрытий на металлы"
+          },
+          {
+            "code": "46.90",
+            "description": "Торговля оптовая неспециализированная"
+          },
+          {
+            "code": "25.62",
+            "description": "Обработка металлических изделий механическая"
+          },
+          {
+            "code": "49.41",
+            "description": "Деятельность автомобильного грузового транспорта"
+          },
+          {
+            "code": "43.33",
+            "description": "Работы по устройству покрытий полов и облицовке стен"
+          },
+          {
+            "code": "43.34",
+            "description": "Производство малярных и стекольных работ"
+          },
+          {
+            "code": "43.39",
+            "description": "Производство прочих отделочных и завершающих работ"
+          }
+        ]
+      },
+      "phones": [],
+      "status": {
+        "status": "CURRENT",
+        "date": {
+          "$date": "2026-01-12T21:00:00.000Z"
+        }
+      },
+      "finReports": [
+        {
+          "common": {
+            "year": 2025,
+            "proceeds": 10000000000,
+            "profit": 2000000000
+          },
+          "assets": {
+            "totalAssets": 5000000000
+          },
+          "liabilities": {
+            "totalLiabilities": 5000000000,
+            "shortTermLiabilities": {
+              "accountsPayable": 0
+            }
+          }
+        }
+      ],
+      "taxSystem": [
+        {
+          "fullName": "Общая система налогообложения",
+          "shortName": "ОСНО"
+        }
+      ],
+      "relatedCompanies": [],
+      "zskRiskLevel": "GREEN",
+      "reputationalRisks": {
+        "negative": [],
+        "positive": []
+      },
+      "arbitrationByStatus": {
+        "plaintiffArbitration": {
+          "plaintiffArbitrationFinished": {},
+          "plaintiffArbitrationAppealed": {},
+          "plaintiffArbitrationPending": {}
+        },
+        "defandantArbitration": {
+          "defandantArbitrationFinished": {},
+          "defandantArbitrationAppealed": {},
+          "defandantArbitrationPending": {}
+        }
+      },
+      "executionProceedings": [],
+      "procurements": [],
+      "branchesInfo": {
+        "branchesCount": 15,
+        "branches": []
+      },
+      "licenses": [],
+      "arbitrationCases": []
+    }
+  }
+]

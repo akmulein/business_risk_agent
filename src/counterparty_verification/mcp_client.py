@@ -16,17 +16,15 @@ class AnalysisToolClient(Protocol):
 
 
 class HttpMcpAnalysisClient:
-    def __init__(self, url: str, timeout_seconds: float = 30) -> None:
+    def __init__(self, url: str) -> None:
         self.url = url
-        self.timeout_seconds = timeout_seconds
 
     @retry(stop=stop_after_attempt(2), wait=wait_fixed(0.2), reraise=True)
     async def call(self, tool_name: str, card: CounterpartyCard) -> ChapterResult:
-        async with Client(self.url, timeout=self.timeout_seconds) as client:
+        async with Client(self.url) as client:
             result = await client.call_tool(
                 tool_name,
                 {"card": card.model_dump(mode="json")},
-                timeout=self.timeout_seconds,
             )
         payload = getattr(result, "data", None)
         if payload is None:

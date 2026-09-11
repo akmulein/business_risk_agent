@@ -17,10 +17,7 @@ class Settings(BaseSettings):
     openrouter_model: str = "~deepseek/deepseek-v4-flash-latest"
 
     mcp_url: str = "http://localhost:8001/mcp"
-    mcp_timeout_seconds: float = Field(default=30, gt=0)
-    analysis_timeout_seconds: float = Field(default=90, gt=0)
     session_ttl_seconds: int = Field(default=3600, gt=0)
-    chat_timeout_seconds: float = Field(default=60, gt=0)
     chat_history_limit: int = Field(default=12, ge=0, le=50)
     chat_max_tokens: int = Field(default=2048, ge=128, le=8192)
 
