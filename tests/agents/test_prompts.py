@@ -1,7 +1,9 @@
 from counterparty_verification.agents.prompts import (
+    COMPARISON_INSTRUCTIONS,
     EVALUATOR_INSTRUCTIONS,
     MCP_SERVER_INSTRUCTIONS,
     QUESTION_ANSWER_INSTRUCTIONS,
+    SUMMARY_GROUNDING,
     SYSTEM_GROUNDING,
 )
 
@@ -10,10 +12,13 @@ def test_all_prompt_constants_are_loaded() -> None:
     prompts = (
         MCP_SERVER_INSTRUCTIONS,
         SYSTEM_GROUNDING,
+        SUMMARY_GROUNDING,
         EVALUATOR_INSTRUCTIONS,
+        COMPARISON_INSTRUCTIONS,
         QUESTION_ANSWER_INSTRUCTIONS,
     )
 
     assert all(prompt.strip() for prompt in prompts)
-    assert SYSTEM_GROUNDING in EVALUATOR_INSTRUCTIONS
+    assert SUMMARY_GROUNDING in EVALUATOR_INSTRUCTIONS
+    assert SUMMARY_GROUNDING in COMPARISON_INSTRUCTIONS
     assert SYSTEM_GROUNDING in QUESTION_ANSWER_INSTRUCTIONS

@@ -32,7 +32,7 @@ class StubChatAgent:
 
 
 class StubEvaluator:
-    async def summarize(self, company_name, risk_level, factors):
+    async def summarize(self, company_name, risk_level, chapters):
         return AnalysisSummary(
             risk_level=risk_level,
             summary=f"{company_name}: тестовое LLM-саммари",

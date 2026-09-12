@@ -67,7 +67,9 @@ def _fallback_summary(
     computed -- no model call involved.
     """
     flagged = [
-        factor for factor in factors if factor.status in (RiskLevel.MEDIUM, RiskLevel.HIGH)
+        factor
+        for factor in factors
+        if factor.status in (RiskLevel.MEDIUM, RiskLevel.HIGH)
     ]
     risk_label = _RISK_LABELS_RU[risk_level]
     if flagged:
@@ -82,7 +84,9 @@ def _fallback_summary(
             f"{risk_label}. Разделы, требующие внимания, не выявлены."
         )
     key_factors = [detail for factor in flagged for detail in factor.details][:5]
-    return AnalysisSummary(risk_level=risk_level, summary=summary, key_factors=key_factors)
+    return AnalysisSummary(
+        risk_level=risk_level, summary=summary, key_factors=key_factors
+    )
 
 
 class AnalysisService:
@@ -111,6 +115,23 @@ class AnalysisService:
         cards_by_inn = {card.company_reports.inn: card for card in cards}
         semaphore = asyncio.Semaphore(BATCH_ANALYSIS_CONCURRENCY)
 
+        async def collect_one(
+            inn: str, card: CounterpartyCard
+        ) -> tuple[str, list[ChapterResult]]:
+            async with semaphore:
+                return inn, await self._collect_chapters(card)
+
+        chapters_by_inn = dict(
+            await asyncio.gather(
+                *(collect_one(inn, card) for inn, card in cards_by_inn.items())
+            )
+        )
+        comparison = (
+            build_comparison(list(cards_by_inn.values()))
+            if len(cards_by_inn) >= 2
+            else None
+        )
+
         async def analyze_one(inn: str) -> BatchAnalysisItem:
             card = cards_by_inn.get(inn)
             if card is None:
@@ -120,41 +141,53 @@ class AnalysisService:
                     error="Контрагент с таким ИНН не найден",
                 )
             async with semaphore:
-                analysis = await self._analyze_card(inn, card)
+                analysis = await self._build_analysis(inn, card, chapters_by_inn[inn])
             return BatchAnalysisItem(
                 inn=inn,
                 status=BatchAnalysisStatus.SUCCESS,
                 analysis=analysis,
             )
 
-        results = list(await asyncio.gather(*(analyze_one(inn) for inn in inns)))
-        successful_cards = [
-            cards_by_inn[item.inn]
-            for item in results
-            if item.status == BatchAnalysisStatus.SUCCESS and item.analysis is not None
-        ]
-        comparison = None
-        if len(successful_cards) >= 2:
-            comparison = build_comparison(successful_cards)
+        async def summarize_comparison() -> None:
+            assert comparison is not None
             try:
                 if self.comparison_agent is None:
                     raise RuntimeError("Comparison agent is not configured")
                 comparison.summary = await self.comparison_agent.summarize(
-                    comparison.companies
+                    comparison.companies, chapters_by_inn
                 )
             except Exception:
                 logger.exception("Comparison summary generation failed")
                 comparison.summary_error = (
                     "Не удалось сформировать сравнительный анализ"
                 )
-        return BatchAnalysisResponse(results=results, comparison=comparison)
+
+        # Every summary consumes prepared tool results; no summary depends on
+        # another model response. TaskGroup also cancels peers on cancellation.
+        async with asyncio.TaskGroup() as group:
+            tasks = [group.create_task(analyze_one(inn)) for inn in inns]
+            if comparison is not None:
+                group.create_task(summarize_comparison())
+
+        return BatchAnalysisResponse(
+            results=[task.result() for task in tasks], comparison=comparison
+        )
+
+    async def _collect_chapters(self, card: CounterpartyCard) -> list[ChapterResult]:
+        return list(
+            await asyncio.gather(
+                *(self._run_chapter(name, card) for name in TOOL_NAMES)
+            )
+        )
 
     async def _analyze_card(self, inn: str, card: CounterpartyCard) -> AnalysisResponse:
-        chapters = await asyncio.gather(
-            *(self._run_chapter(name, card) for name in TOOL_NAMES)
-        )
+        chapters = await self._collect_chapters(card)
+        return await self._build_analysis(inn, card, chapters)
+
+    async def _build_analysis(
+        self, inn: str, card: CounterpartyCard, chapters: list[ChapterResult]
+    ) -> AnalysisResponse:
         factor_summary = build_factor_summary(card, chapters)
-        summary_factors = build_factor_summary(card, chapters, compact=False)
         bank_risk_level = card.company_reports.risk_level or RiskLevel.UNKNOWN
         company_name = (
             card.company_reports.short_name or card.company_reports.full_name or inn
@@ -163,13 +196,17 @@ class AnalysisService:
             summary = await self.evaluator.summarize(
                 company_name,
                 bank_risk_level,
-                summary_factors,
+                chapters,
             )
         except Exception:
             logger.exception(
                 "Evaluator unavailable for inn=%s; using deterministic summary", inn
             )
-            summary = _fallback_summary(company_name, bank_risk_level, summary_factors)
+            summary = _fallback_summary(
+                company_name,
+                bank_risk_level,
+                build_factor_summary(card, chapters, compact=False),
+            )
         response = AnalysisResponse(
             analysis_id=str(uuid4()),
             inn=inn,
