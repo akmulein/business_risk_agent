@@ -26,7 +26,6 @@ src/counterparty_verification/
 └── mcp/            # MCP-сервер и клиент
 
 frontend/       # интерфейс
-tests/          # тесты
 docs/rules/     # описание бизнес-правил по разделам
 scripts/mongo/  # импорт данных и создание индексов
 data/seed/      # исходные данные для сидирования MongoDB
