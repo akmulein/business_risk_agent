@@ -3,6 +3,8 @@ from functools import lru_cache
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from counterparty_verification.domain import MAX_BATCH_INNS
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
@@ -19,6 +21,14 @@ class Settings(BaseSettings):
     session_ttl_seconds: int = Field(default=3600, gt=0)
     chat_history_limit: int = Field(default=12, ge=0, le=50)
     chat_max_tokens: int = Field(default=2048, ge=128, le=8192)
+
+    # How many companies in a batch may collect their MCP chapters at once.
+    # Chapter tool calls are cheap in-memory computation over a reused MCP
+    # connection, so this can cover a whole batch.
+    batch_chapter_concurrency: int = Field(default=MAX_BATCH_INNS, ge=1)
+    # How many OpenRouter calls (per-company summaries + the comparison
+    # summary) may be in flight at once; bounded by the upstream rate limit.
+    batch_llm_concurrency: int = Field(default=3, ge=1)
 
     repository_backend: str = "mongo"
     database_url: str = (

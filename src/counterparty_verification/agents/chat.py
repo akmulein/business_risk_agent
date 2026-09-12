@@ -5,7 +5,7 @@ import logging
 from typing import Any
 
 from pydantic import BaseModel, Field
-from pydantic_ai import Agent, ModelSettings
+from pydantic_ai import Agent
 from pydantic_ai.models.openrouter import OpenRouterModel
 
 from counterparty_verification.agents.prompts import MODEL_SYSTEM_PROMPT
@@ -85,10 +85,11 @@ class ReportChatAgent:
                 _openrouter_model(settings),
                 output_type=ChatModelOutput,
                 instructions=MODEL_SYSTEM_PROMPT,
-                model_settings=ModelSettings(
-                    max_tokens=settings.chat_max_tokens,
-                    temperature=0,
-                ),
+                model_settings={
+                    "max_tokens": settings.chat_max_tokens,
+                    "temperature": 0,
+                    "openrouter_reasoning": {"enabled": False},
+                },
             )
         else:
             self.agent = None

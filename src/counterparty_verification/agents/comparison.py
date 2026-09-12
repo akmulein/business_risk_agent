@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
 from time import perf_counter
@@ -10,6 +11,7 @@ from pydantic_ai import Agent
 from counterparty_verification.agents.prompts import COMPARISON_INSTRUCTIONS
 from counterparty_verification.agents.provider import _model
 from counterparty_verification.agents.summary_context import chapter_context
+from counterparty_verification.analysis.timing import record, record_llm_result, timed
 from counterparty_verification.domain import (
     ChapterResult,
     ComparisonCompany,
@@ -55,7 +57,13 @@ class ComparisonAgent:
                 _model(settings),
                 output_type=str,
                 instructions=COMPARISON_INSTRUCTIONS,
-                model_settings={"temperature": 0},
+                # See agents/evaluator.py -- same reasoning for sorting
+                # OpenRouter providers by throughput and disabling reasoning.
+                model_settings={
+                    "temperature": 0,
+                    "openrouter_provider": {"sort": "throughput"},
+                    "openrouter_reasoning": {"enabled": False},
+                },
                 retries=0,
             )
             if self.enabled
@@ -82,7 +90,17 @@ class ComparisonAgent:
         inns = ",".join(company.inn for company in companies)
         started = perf_counter()
         logger.info("LLM call -> ComparisonAgent.summarize inns=%s", inns)
-        result = await self.agent.run(json.dumps(payload, ensure_ascii=False))
+        prompt = json.dumps(payload, ensure_ascii=False)
+        record(
+            "llm_input",
+            kind="comparison",
+            inns=inns,
+            input_chars=len(prompt),
+            input_sha256=hashlib.sha256(prompt.encode()).hexdigest(),
+        )
+        with timed("llm", kind="comparison", inns=inns):
+            result = await self.agent.run(prompt)
+        record_llm_result(result, kind="comparison", inns=inns)
         summary = result.output.strip()
         if not summary:
             raise RuntimeError("Comparison model returned an empty summary")

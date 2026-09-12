@@ -2,7 +2,7 @@ import logging
 from contextlib import asynccontextmanager
 from typing import Annotated
 
-from fastapi import Depends, FastAPI, HTTPException, Request, status
+from fastapi import Depends, FastAPI, HTTPException, Request, Response, status
 
 from counterparty_verification.agents.chat import (
     ChatModelNotConfiguredError,
@@ -19,6 +19,7 @@ from counterparty_verification.analysis.service import (
     AnalysisService,
     UpstreamServiceError,
 )
+from counterparty_verification.analysis.timing import analysis_trace, timed
 from counterparty_verification.chat.models import (
     ChatHistoryResponse,
     ChatMessageRequest,
@@ -84,6 +85,8 @@ def create_app(
     else:
         chat_store = InMemoryChatSessionStore(config.session_ttl_seconds)
 
+    mcp_client = HttpMcpAnalysisClient(config.mcp_url)
+
     @asynccontextmanager
     async def lifespan(_: FastAPI):
         await chat_store.ensure_indexes()
@@ -91,6 +94,7 @@ def create_app(
         close = getattr(repository, "close", None)
         if close is not None:
             await close()
+        await mcp_client.aclose()
 
     app = FastAPI(
         title=config.app_name,
@@ -101,10 +105,12 @@ def create_app(
     sessions = InMemorySessionStore(config.session_ttl_seconds)
     analysis_service = AnalysisService(
         repository=repository,
-        tools=HttpMcpAnalysisClient(config.mcp_url),
+        tools=mcp_client,
         evaluator=EvaluatorAgent(config),
         sessions=sessions,
         comparison_agent=ComparisonAgent(config),
+        chapter_concurrency=config.batch_chapter_concurrency,
+        llm_concurrency=config.batch_llm_concurrency,
     )
     question_service = QuestionService(
         sessions,
@@ -184,12 +190,16 @@ def create_app(
     )
     async def create_analysis(
         payload: AnalysisRequest,
+        http_response: Response,
         service: AnalysisDep,
         chat: ChatDep,
     ) -> BatchAnalysisResponse:
-        response = await service.analyze_many(payload.inns)
-        response.chat_id = await chat.create_for_analysis(response)
-        return response
+        with analysis_trace(payload.inns) as trace_id:
+            http_response.headers["X-Analysis-Trace-Id"] = trace_id
+            response = await service.analyze_many(payload.inns)
+            with timed("chat_save"):
+                response.chat_id = await chat.create_for_analysis(response)
+            return response
 
     @app.post(
         "/api/v1/chats/{chat_id}/messages",

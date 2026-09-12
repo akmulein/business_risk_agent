@@ -18,10 +18,14 @@ class AnalysisToolClient(Protocol):
 class HttpMcpAnalysisClient:
     def __init__(self, url: str) -> None:
         self.url = url
+        # One Client for the process lifetime: fastmcp's Client reference-counts
+        # nested `async with` entries and reuses the live session, so this avoids
+        # paying a full MCP handshake on every single tool call.
+        self._client = Client(url)
 
     @retry(stop=stop_after_attempt(2), wait=wait_fixed(0.2), reraise=True)
     async def call(self, tool_name: str, card: CounterpartyCard) -> ChapterResult:
-        async with Client(self.url) as client:
+        async with self._client as client:
             result = await client.call_tool(
                 tool_name,
                 {"card": card.model_dump(mode="json")},
@@ -35,6 +39,9 @@ class HttpMcpAnalysisClient:
             )
             payload = json.loads(text)
         return ChapterResult.model_validate(payload)
+
+    async def aclose(self) -> None:
+        await self._client.close()
 
 
 class LocalAnalysisToolClient:

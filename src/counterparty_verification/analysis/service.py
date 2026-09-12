@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+from time import perf_counter
 from uuid import uuid4
 
 from counterparty_verification.agents.comparison import ComparisonAgent
@@ -12,6 +13,7 @@ from counterparty_verification.analysis.presentation import (
     build_factor_summary,
     build_visualization_data,
 )
+from counterparty_verification.analysis.timing import record, timed
 from counterparty_verification.domain import (
     AnalysisResponse,
     AnalysisSummary,
@@ -35,8 +37,6 @@ TOOL_NAMES = (
     "analyze_finance",
     "analyze_procurement",
 )
-
-BATCH_ANALYSIS_CONCURRENCY = 3
 
 logger = logging.getLogger(__name__)
 
@@ -97,12 +97,16 @@ class AnalysisService:
         evaluator: EvaluatorAgent,
         sessions: InMemorySessionStore,
         comparison_agent: ComparisonAgent | None = None,
+        chapter_concurrency: int = 10,
+        llm_concurrency: int = 3,
     ) -> None:
         self.repository = repository
         self.tools = tools
         self.evaluator = evaluator
         self.sessions = sessions
         self.comparison_agent = comparison_agent
+        self.chapter_concurrency = chapter_concurrency
+        self.llm_concurrency = llm_concurrency
 
     async def analyze(self, inn: str) -> AnalysisResponse:
         card = await self.repository.get_by_inn(inn)
@@ -111,28 +115,42 @@ class AnalysisService:
         return await self._analyze_card(inn, card)
 
     async def analyze_many(self, inns: list[str]) -> BatchAnalysisResponse:
-        cards = await self.repository.get_many_by_inns(inns)
-        cards_by_inn = {card.company_reports.inn: card for card in cards}
-        semaphore = asyncio.Semaphore(BATCH_ANALYSIS_CONCURRENCY)
-
-        async def collect_one(
-            inn: str, card: CounterpartyCard
-        ) -> tuple[str, list[ChapterResult]]:
-            async with semaphore:
-                return inn, await self._collect_chapters(card)
-
-        chapters_by_inn = dict(
-            await asyncio.gather(
-                *(collect_one(inn, card) for inn, card in cards_by_inn.items())
-            )
+        record(
+            "batch_config",
+            chapter_concurrency=self.chapter_concurrency,
+            llm_concurrency=self.llm_concurrency,
         )
+        with timed("database", inns=inns):
+            cards = await self.repository.get_many_by_inns(inns)
+        cards_by_inn = {card.company_reports.inn: card for card in cards}
+
+        # Depends only on the cards, not on any chapter/LLM result -- compute
+        # it up front instead of waiting on anything.
         comparison = (
             build_comparison(list(cards_by_inn.values()))
             if len(cards_by_inn) >= 2
             else None
         )
 
-        async def analyze_one(inn: str) -> BatchAnalysisItem:
+        chapter_semaphore = asyncio.Semaphore(self.chapter_concurrency)
+        llm_semaphore = asyncio.Semaphore(self.llm_concurrency)
+
+        async def collect_one(card: CounterpartyCard) -> list[ChapterResult]:
+            queued = perf_counter()
+            async with chapter_semaphore:
+                inn = card.company_reports.inn
+                record(
+                    "slot_acquired",
+                    pool="chapters",
+                    inn=inn,
+                    wait_ms=(perf_counter() - queued) * 1000,
+                )
+                with timed("chapters", inn=inn):
+                    return await self._collect_chapters(card)
+
+        async def analyze_one(
+            inn: str, chapter_tasks: dict[str, asyncio.Task[list[ChapterResult]]]
+        ) -> BatchAnalysisItem:
             card = cards_by_inn.get(inn)
             if card is None:
                 return BatchAnalysisItem(
@@ -140,22 +158,48 @@ class AnalysisService:
                     status=BatchAnalysisStatus.NOT_FOUND,
                     error="Контрагент с таким ИНН не найден",
                 )
-            async with semaphore:
-                analysis = await self._build_analysis(inn, card, chapters_by_inn[inn])
+            chapters = await chapter_tasks[inn]
+            queued = perf_counter()
+            record("slot_queued", pool="llm", kind="individual", inn=inn)
+            async with llm_semaphore:
+                record(
+                    "slot_acquired",
+                    pool="llm",
+                    kind="individual",
+                    inn=inn,
+                    wait_ms=(perf_counter() - queued) * 1000,
+                )
+                with timed("individual", inn=inn):
+                    analysis = await self._build_analysis(inn, card, chapters)
             return BatchAnalysisItem(
                 inn=inn,
                 status=BatchAnalysisStatus.SUCCESS,
                 analysis=analysis,
             )
 
-        async def summarize_comparison() -> None:
+        async def summarize_comparison(
+            chapter_tasks: dict[str, asyncio.Task[list[ChapterResult]]],
+        ) -> None:
             assert comparison is not None
             try:
                 if self.comparison_agent is None:
                     raise RuntimeError("Comparison agent is not configured")
-                comparison.summary = await self.comparison_agent.summarize(
-                    comparison.companies, chapters_by_inn
-                )
+                chapters_by_inn = {
+                    inn: await chapter_tasks[inn] for inn in cards_by_inn
+                }
+                queued = perf_counter()
+                record("slot_queued", pool="llm", kind="comparison")
+                async with llm_semaphore:
+                    record(
+                        "slot_acquired",
+                        pool="llm",
+                        kind="comparison",
+                        wait_ms=(perf_counter() - queued) * 1000,
+                    )
+                    with timed("comparison"):
+                        comparison.summary = await self.comparison_agent.summarize(
+                            comparison.companies, chapters_by_inn
+                        )
             except Exception:
                 logger.exception("Comparison summary generation failed")
                 comparison.summary_error = (
@@ -165,9 +209,13 @@ class AnalysisService:
         # Every summary consumes prepared tool results; no summary depends on
         # another model response. TaskGroup also cancels peers on cancellation.
         async with asyncio.TaskGroup() as group:
-            tasks = [group.create_task(analyze_one(inn)) for inn in inns]
+            chapter_tasks = {
+                inn: group.create_task(collect_one(card))
+                for inn, card in cards_by_inn.items()
+            }
+            tasks = [group.create_task(analyze_one(inn, chapter_tasks)) for inn in inns]
             if comparison is not None:
-                group.create_task(summarize_comparison())
+                group.create_task(summarize_comparison(chapter_tasks))
 
         return BatchAnalysisResponse(
             results=[task.result() for task in tasks], comparison=comparison
@@ -217,7 +265,8 @@ class AnalysisService:
             company_profile=build_company_profile(card),
             visualization_data=build_visualization_data(card),
         )
-        await self.sessions.put(card, response)
+        with timed("session_save", inn=inn):
+            await self.sessions.put(card, response)
         return response
 
     async def _run_chapter(
@@ -225,7 +274,8 @@ class AnalysisService:
     ) -> ChapterResult:
         chapter_name = tool_name.removeprefix("analyze_")
         try:
-            chapter = await self.tools.call(tool_name, card)
+            with timed("tool", tool=tool_name, inn=card.company_reports.inn):
+                chapter = await self.tools.call(tool_name, card)
         except Exception as error:
             logger.exception("MCP analysis chapter failed: %s", chapter_name)
             return ChapterResult(
