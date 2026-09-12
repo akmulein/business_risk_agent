@@ -47,7 +47,7 @@ def _qty(value: float | int | None) -> str:
     number = float(value)
     if abs(number - round(number)) < 1e-9:
         return f"{int(round(number)):,}".replace(",", " ")
-    return f"{number:g}"
+    return f"{number:,.2f}".replace(",", " ").replace(".", ",")
 
 
 # ---------------------------------------------------------------------------
@@ -287,9 +287,8 @@ def _check_leverage(view: FinanceView) -> Observation | None:
         evidence = [latest.evidence("sustainability"), latest.evidence("year")]
         detail = (
             f"Коэффициент финансовой устойчивости за {latest.item.year} год — "
-            f"{sustainability:.2f} (меньше {SUSTAINABILITY_LOW:g}): собственный "
-            "капитал и долгосрочные обязательства покрывают меньше половины "
-            "активов."
+            f"{sustainability:.2f}: собственный капитал и долгосрочные "
+            "обязательства покрывают меньше половины активов."
         )
     elif computed_debt_share is not None:
         if computed_debt_share < LEVERAGE_HIGH:
@@ -302,8 +301,7 @@ def _check_leverage(view: FinanceView) -> Observation | None:
         detail = (
             f"Коэффициент устойчивости в отчёте не указан. По балансу доля "
             f"обязательств в активах за {latest.item.year} год — "
-            f"{computed_debt_share * 100:.1f}% (не меньше "
-            f"{LEVERAGE_HIGH * 100:g}%)."
+            f"{computed_debt_share * 100:.1f}%."
         )
     else:
         return None

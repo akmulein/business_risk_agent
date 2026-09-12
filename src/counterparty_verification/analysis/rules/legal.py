@@ -70,7 +70,7 @@ def _qty(value: float | int | None) -> str:
     number = float(value)
     if abs(number - round(number)) < 1e-9:
         return f"{int(round(number)):,}".replace(",", " ")
-    return f"{number:g}"
+    return f"{number:,.2f}".replace(",", " ").replace(".", ",")
 
 
 def _ratio_text(part: float, whole: float) -> str:
@@ -466,8 +466,7 @@ def _check_arbitration_trend(view: LegalView) -> Observation | None:
         for year, (count, amount, _) in ((item, totals[item]) for item in years)
     )
     reason = (
-        f"за {last} год показатель не меньше чем в {TREND_GROWTH:g} раза "
-        f"выше {previous}"
+        f"за {last} год нагрузка заметно выше, чем за {previous}"
         if doubled
         else f"три года подряд ({expected[0]}–{expected[2]}) нагрузка растёт"
     )
@@ -505,7 +504,7 @@ def _check_enforcement_load(view: LegalView) -> Observation | None:
         :MAX_EVENT_IDS
     ]
     dates = [
-        as_date(row.item.event_date).isoformat()
+        f"{as_date(row.item.event_date):%d.%m.%Y}"
         for row in active
         if as_date(row.item.event_date) is not None
     ][:MAX_EVENT_IDS]
@@ -571,9 +570,9 @@ def _format_inspection(entry: IndexedEvent) -> str:
     start = as_date(item.event_date)
     end = as_date(item.end_date)
     if start is not None:
-        bits.append(f"с {start.isoformat()}")
+        bits.append(f"с {start:%d.%m.%Y}")
     if end is not None:
-        bits.append(f"по {end.isoformat()}")
+        bits.append(f"по {end:%d.%m.%Y}")
     return ", ".join(bits) if bits else "сведения не указаны"
 
 

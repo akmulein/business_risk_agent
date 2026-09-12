@@ -55,36 +55,12 @@ def test_current_status_is_silent() -> None:
     assert "closed_status" not in _observed(card)
 
 
-def test_yellow_and_red_zsk_levels_are_observed() -> None:
-    for level in ("YELLOW", "RED"):
-        card = _card(zsk_risk_level=level)
+def test_our_own_assessment_is_never_reported_back_as_an_observation() -> None:
+    """The provider of these figures is us, so repeating our own ЗСК and risk
+    level tells the reader nothing about the counterparty."""
+    card = _card(zsk_risk_level="RED", risk_level="HIGH")
 
-        detail = _observed(card)["zsk_level"].detail
-
-        assert level in detail
-        assert "поставщика данных" in detail
-
-
-def test_green_zsk_level_is_silent() -> None:
-    card = _card(zsk_risk_level="GREEN")
-
-    assert "zsk_level" not in _observed(card)
-
-
-def test_medium_and_high_provider_risk_level_are_observed() -> None:
-    for level in ("MEDIUM", "HIGH"):
-        card = _card(risk_level=level)
-
-        detail = _observed(card)["provider_risk_level"].detail
-
-        assert level in detail
-        assert "своей методике" in detail
-
-
-def test_low_provider_risk_level_is_silent() -> None:
-    card = _card(risk_level="LOW")
-
-    assert "provider_risk_level" not in _observed(card)
+    assert not _observed(card)
 
 
 def test_quiet_general_card_produces_no_observations() -> None:
@@ -113,9 +89,7 @@ def test_every_evidence_path_exists_in_the_card() -> None:
 
     assert paths
     assert paths <= allowed
-    assert {"closed_status", "zsk_level", "provider_risk_level"} <= _observed(
-        card
-    ).keys()
+    assert "closed_status" in _observed(card)
 
 
 @pytest.mark.parametrize("check", CHECKS, ids=lambda check: check.code)
@@ -127,4 +101,4 @@ def test_check_codes_are_unique() -> None:
     codes = [check.code for check in CHECKS]
 
     assert len(codes) == len(set(codes))
-    assert len(codes) == 3
+    assert len(codes) == 1

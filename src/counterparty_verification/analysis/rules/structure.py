@@ -480,7 +480,7 @@ def _check_director_change(view: StructureView) -> Observation | None:
         "director_change",
         "Руководитель сменился в течение последнего года",
         f"{director.item.name or 'Руководитель'} вступил в должность "
-        f"{director.date_from.isoformat()}, за {days} дней до даты отчёта."
+        f"{director.date_from:%d.%m.%Y}, за {days} дней до даты отчёта."
         f"{recent} Стоит уточнить причину смены и убедиться, что договор "
         "подписывает действующий руководитель.",
         [

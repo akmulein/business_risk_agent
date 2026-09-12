@@ -41,7 +41,6 @@ class EvaluatorAgent:
 
         payload = {
             "company": company_name,
-            "bank_risk_level": risk_level.value,
             "chapters": chapter_context(chapters),
         }
         started = perf_counter()

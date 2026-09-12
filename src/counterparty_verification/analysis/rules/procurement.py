@@ -54,7 +54,7 @@ def _qty(value: float | int | None) -> str:
     number = float(value)
     if abs(number - round(number)) < 1e-9:
         return f"{int(round(number)):,}".replace(",", " ")
-    return f"{number:g}"
+    return f"{number:,.2f}".replace(",", " ").replace(".", ",")
 
 
 def _is_223_fz(code: str | None) -> bool:
@@ -204,7 +204,7 @@ def _check_abnormal_win_rate(view: ProcurementView) -> Observation | None:
             "abnormal_win_rate",
             "Низкая результативность участия в тендерах",
             f"Из {admitted} поданных заявок выиграно {winners} "
-            f"({win_rate * 100:.1f}%, не больше {LOW_WIN_RATE * 100:g}%). "
+            f"({win_rate * 100:.1f}%). "
             "Стоит уточнить, почему компания системно не побеждает — это "
             "может говорить о слабой конкурентоспособности либо об участии "
             "для видимости.",
@@ -215,7 +215,7 @@ def _check_abnormal_win_rate(view: ProcurementView) -> Observation | None:
             "abnormal_win_rate",
             "Почти стопроцентная результативность участия в тендерах",
             f"Из {admitted} поданных заявок выиграно {winners} "
-            f"({win_rate * 100:.1f}%, не меньше {HIGH_WIN_RATE * 100:g}%). "
+            f"({win_rate * 100:.1f}%). "
             "Само по себе это не нарушение, но при таком количестве тендеров "
             "заслуживает отдельной проверки на признаки согласованности с "
             "заказчиком.",
@@ -370,8 +370,8 @@ def _check_law_regime_mix(view: ProcurementView) -> Observation | None:
     return _observed(
         "law_regime_mix",
         "Закупки почти полностью проходят по 223-ФЗ",
-        f"Доля контрактов по 223-ФЗ составляет {share * 100:.1f}% ({basis}, "
-        f"не меньше {LAW_223_SHARE_HIGH * 100:g}%). Закон 223-ФЗ даёт "
+        f"Доля контрактов по 223-ФЗ составляет {share * 100:.1f}% ({basis}). "
+        "Закон 223-ФЗ даёт "
         "заказчику больше свободы в процедурах закупки, чем 44-ФЗ, — это не "
         "нарушение само по себе, но стоит отдельно посмотреть на условия "
         "таких контрактов.",

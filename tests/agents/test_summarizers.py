@@ -78,6 +78,30 @@ async def test_summaries_accept_plain_text_without_citation_or_sentence_limits(
 
 
 @pytest.mark.parametrize("kind", ["individual", "comparison"])
+async def test_payload_carries_no_raw_enum_values(monkeypatch, kind, card, chapters):
+    """A model can only repeat what it was given, so statuses reach it already
+    spelled out in Russian -- never as LOW, HIGH or ISSUE."""
+    prompts = []
+
+    def model(messages, info):
+        prompts.append(
+            next(
+                part.content
+                for message in reversed(messages)
+                for part in message.parts
+                if isinstance(part, UserPromptPart)
+            )
+        )
+        return ModelResponse(parts=[TextPart("Сводка")])
+
+    agent = make_agent(monkeypatch, kind, model)
+    await summarize(agent, kind, card, chapters)
+
+    for value in ("LOW", "MEDIUM", "HIGH", "UNKNOWN", "ISSUE", "NO_DATA"):
+        assert value not in prompts[0]
+
+
+@pytest.mark.parametrize("kind", ["individual", "comparison"])
 async def test_summary_model_error_is_not_retried(monkeypatch, kind, card, chapters):
     calls = []
 

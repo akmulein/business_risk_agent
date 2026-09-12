@@ -1,6 +1,15 @@
 from typing import Any
 
-from counterparty_verification.domain import ChapterResult
+from counterparty_verification.domain import ChapterResult, RiskLevel
+
+# The model can only repeat what it is given, so no raw enum value is ever
+# passed to a summarizer -- every status reaches it already spelled out.
+SEVERITY_LABELS = {
+    RiskLevel.LOW: "низкая",
+    RiskLevel.MEDIUM: "средняя",
+    RiskLevel.HIGH: "высокая",
+    RiskLevel.UNKNOWN: "не определена",
+}
 
 
 def chapter_context(chapters: list[ChapterResult]) -> list[dict[str, Any]]:
@@ -17,7 +26,7 @@ def chapter_context(chapters: list[ChapterResult]) -> list[dict[str, Any]]:
                 {
                     "title": item.title,
                     "detail": item.detail,
-                    "severity": item.severity.value,
+                    "severity": SEVERITY_LABELS[item.severity],
                 }
                 for item in chapter.factors
             ],

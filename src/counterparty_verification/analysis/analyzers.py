@@ -31,6 +31,7 @@ from counterparty_verification.analysis.rules.procurement import (
 from counterparty_verification.analysis.rules.procurement import (
     run_checks as run_procurement_checks,
 )
+from counterparty_verification.analysis.rules.procurement import _qty as _amount
 from counterparty_verification.analysis.rules.reputation import (
     build_view as build_reputation_view,
 )
@@ -321,7 +322,7 @@ def _procurement_conclusion(
     signed_amount = sum(agg.signed_amount for agg in view.by_year.values())
     parts = [
         f"Госзакупки за {len(view.years)} год(лет), подписано контрактов: "
-        f"{signed_count} на сумму {signed_amount:g} ₽."
+        f"{signed_count} на сумму {_amount(signed_amount)} ₽."
     ]
     if observations:
         titles = "; ".join(item.title.lower() for item in observations)
