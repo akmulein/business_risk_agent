@@ -228,3 +228,23 @@ __marimo__/
 
 # Local secrets
 .env
+
+# Evaluation generated artifacts
+eval/**/.DS_Store
+eval/**/__pycache__/
+eval/**/cases/
+eval/**/handoff/
+eval/**/model-calls/
+eval/**/model-inputs/
+eval/**/archived-incomplete-runs/
+eval/**/request.json
+eval/**/response.json
+eval/**/comparison.json
+eval/**/structured-comparison.json
+eval/**/individual-summaries.json
+eval/**/errors.json
+eval/**/*.jsonl
+eval/**/tool-validation.json
+eval/**/review-bundle/
+eval/**/audit*/
+eval/**/judge*/

@@ -358,6 +358,16 @@ class ComparisonCompany(BaseModel):
     active_enforcements: int | None = None
     fns_status: VerificationStatus = VerificationStatus.NO_DATA
     bankruptcy_status: VerificationStatus = VerificationStatus.NO_DATA
+    # Internal fields used to build an unambiguous LLM context. They stay out
+    # of the public API response, whose comparison contract remains unchanged.
+    finished_defendant_cases: int | None = Field(default=None, exclude=True)
+    appealed_defendant_cases: int | None = Field(default=None, exclude=True)
+    historical_defendant_cases_present: bool | None = Field(
+        default=None, exclude=True
+    )
+    total_enforcements: int | None = Field(default=None, exclude=True)
+    inactive_enforcements: int | None = Field(default=None, exclude=True)
+    legal_data_sufficient: bool = Field(default=False, exclude=True)
 
 
 class BatchComparison(BaseModel):

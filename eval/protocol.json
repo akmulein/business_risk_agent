@@ -1,0 +1,706 @@
+{
+  "version": "benchmark",
+  "frozen_at": "2026-09-15T10:50:03.529142+00:00",
+  "raw_snapshot": "data/seed/contractors_audit.snapshot.json",
+  "raw_snapshot_sha256": "34bdf82e3286bfbb1c2b0e4d441dde25c90fd58b1d623d6192f2653dd6641f55",
+  "main_groups": {
+    "G01": [
+      "5029069967",
+      "9706026247"
+    ],
+    "G02": [
+      "052500690823",
+      "343703064945",
+      "9714021411"
+    ],
+    "G03": [
+      "2016003057",
+      "234701002417",
+      "772601396114",
+      "6321305439",
+      "2100006761"
+    ],
+    "G04": [
+      "1660266560",
+      "3715005612"
+    ],
+    "G05": [
+      "9714079997",
+      "7802932240",
+      "3666269345"
+    ],
+    "G06": [
+      "421412008124",
+      "2364004929",
+      "501207152100",
+      "3664234989",
+      "7708332207"
+    ],
+    "G07": [
+      "592061218009",
+      "0278949271"
+    ],
+    "G08": [
+      "7805327192",
+      "3123346195",
+      "620417452834"
+    ],
+    "G09": [
+      "5032257375",
+      "2368001703",
+      "301110278577",
+      "5074059470",
+      "6311087260"
+    ],
+    "G10": [
+      "2311304742",
+      "7816085851"
+    ],
+    "G11": [
+      "8622002583",
+      "6164137887",
+      "505305266801"
+    ],
+    "G12": [
+      "7708336868",
+      "2312263270",
+      "773467509356",
+      "9721079780",
+      "2466275727"
+    ],
+    "G13": [
+      "9727128465",
+      "7813664770"
+    ],
+    "G14": [
+      "7728380537",
+      "7826131151",
+      "616205958623"
+    ],
+    "G15": [
+      "3711039473",
+      "4720028039",
+      "5261137785",
+      "7103029029",
+      "6732241319"
+    ],
+    "G16": [
+      "010701412150",
+      "9713021306"
+    ],
+    "G17": [
+      "9724033310",
+      "9721159668",
+      "7449088645"
+    ],
+    "G18": [
+      "7720966601",
+      "9701318454",
+      "6452924721",
+      "1327036448",
+      "7714497158"
+    ],
+    "G19": [
+      "9701166515",
+      "770804624926"
+    ],
+    "G20": [
+      "7810984404",
+      "233000064283",
+      "9714038662"
+    ],
+    "G21": [
+      "1901132406",
+      "234803704704",
+      "7714729497",
+      "7104080194",
+      "9727071240"
+    ],
+    "G22": [
+      "7720901442",
+      "771965001547"
+    ],
+    "G23": [
+      "666201003180",
+      "2901324364",
+      "5001146298"
+    ],
+    "G24": [
+      "6165169320",
+      "772377037026",
+      "9703030189",
+      "7751352552",
+      "5837083280"
+    ],
+    "G25": [
+      "780216530635",
+      "615513451530"
+    ],
+    "G26": [
+      "7724398540",
+      "540325003268",
+      "0278917431"
+    ],
+    "G27": [
+      "9703198304",
+      "4000036100",
+      "6731007348",
+      "8905068592",
+      "1684017097"
+    ],
+    "G28": [
+      "7447131126",
+      "120705254031"
+    ],
+    "G29": [
+      "9201513489",
+      "470606601830",
+      "9705152496"
+    ],
+    "G30": [
+      "5036158015",
+      "503200230096",
+      "3100037306",
+      "5244026965",
+      "1650051822"
+    ]
+  },
+  "stability_groups": [
+    "G01",
+    "G02",
+    "G09",
+    "G20",
+    "G25",
+    "G27"
+  ],
+  "expected": {
+    "main_groups": 30,
+    "main_individual_n": 100,
+    "main_comparison_n": 30,
+    "comparison_group_sizes": {
+      "2": 10,
+      "3": 10,
+      "5": 10
+    },
+    "stability_groups": 6,
+    "stability_additional_runs": 12
+  },
+  "generation_plan": [
+    {
+      "group_id": "G01",
+      "run_id": "r1",
+      "inns": [
+        "5029069967",
+        "9706026247"
+      ],
+      "evaluation_set": "main"
+    },
+    {
+      "group_id": "G01",
+      "run_id": "r2",
+      "inns": [
+        "5029069967",
+        "9706026247"
+      ],
+      "evaluation_set": "stability"
+    },
+    {
+      "group_id": "G01",
+      "run_id": "r3",
+      "inns": [
+        "5029069967",
+        "9706026247"
+      ],
+      "evaluation_set": "stability"
+    },
+    {
+      "group_id": "G02",
+      "run_id": "r1",
+      "inns": [
+        "052500690823",
+        "343703064945",
+        "9714021411"
+      ],
+      "evaluation_set": "main"
+    },
+    {
+      "group_id": "G02",
+      "run_id": "r2",
+      "inns": [
+        "052500690823",
+        "343703064945",
+        "9714021411"
+      ],
+      "evaluation_set": "stability"
+    },
+    {
+      "group_id": "G02",
+      "run_id": "r3",
+      "inns": [
+        "052500690823",
+        "343703064945",
+        "9714021411"
+      ],
+      "evaluation_set": "stability"
+    },
+    {
+      "group_id": "G03",
+      "run_id": "r1",
+      "inns": [
+        "2016003057",
+        "234701002417",
+        "772601396114",
+        "6321305439",
+        "2100006761"
+      ],
+      "evaluation_set": "main"
+    },
+    {
+      "group_id": "G04",
+      "run_id": "r1",
+      "inns": [
+        "1660266560",
+        "3715005612"
+      ],
+      "evaluation_set": "main"
+    },
+    {
+      "group_id": "G05",
+      "run_id": "r1",
+      "inns": [
+        "9714079997",
+        "7802932240",
+        "3666269345"
+      ],
+      "evaluation_set": "main"
+    },
+    {
+      "group_id": "G06",
+      "run_id": "r1",
+      "inns": [
+        "421412008124",
+        "2364004929",
+        "501207152100",
+        "3664234989",
+        "7708332207"
+      ],
+      "evaluation_set": "main"
+    },
+    {
+      "group_id": "G07",
+      "run_id": "r1",
+      "inns": [
+        "592061218009",
+        "0278949271"
+      ],
+      "evaluation_set": "main"
+    },
+    {
+      "group_id": "G08",
+      "run_id": "r1",
+      "inns": [
+        "7805327192",
+        "3123346195",
+        "620417452834"
+      ],
+      "evaluation_set": "main"
+    },
+    {
+      "group_id": "G09",
+      "run_id": "r1",
+      "inns": [
+        "5032257375",
+        "2368001703",
+        "301110278577",
+        "5074059470",
+        "6311087260"
+      ],
+      "evaluation_set": "main"
+    },
+    {
+      "group_id": "G09",
+      "run_id": "r2",
+      "inns": [
+        "5032257375",
+        "2368001703",
+        "301110278577",
+        "5074059470",
+        "6311087260"
+      ],
+      "evaluation_set": "stability"
+    },
+    {
+      "group_id": "G09",
+      "run_id": "r3",
+      "inns": [
+        "5032257375",
+        "2368001703",
+        "301110278577",
+        "5074059470",
+        "6311087260"
+      ],
+      "evaluation_set": "stability"
+    },
+    {
+      "group_id": "G10",
+      "run_id": "r1",
+      "inns": [
+        "2311304742",
+        "7816085851"
+      ],
+      "evaluation_set": "main"
+    },
+    {
+      "group_id": "G11",
+      "run_id": "r1",
+      "inns": [
+        "8622002583",
+        "6164137887",
+        "505305266801"
+      ],
+      "evaluation_set": "main"
+    },
+    {
+      "group_id": "G12",
+      "run_id": "r1",
+      "inns": [
+        "7708336868",
+        "2312263270",
+        "773467509356",
+        "9721079780",
+        "2466275727"
+      ],
+      "evaluation_set": "main"
+    },
+    {
+      "group_id": "G13",
+      "run_id": "r1",
+      "inns": [
+        "9727128465",
+        "7813664770"
+      ],
+      "evaluation_set": "main"
+    },
+    {
+      "group_id": "G14",
+      "run_id": "r1",
+      "inns": [
+        "7728380537",
+        "7826131151",
+        "616205958623"
+      ],
+      "evaluation_set": "main"
+    },
+    {
+      "group_id": "G15",
+      "run_id": "r1",
+      "inns": [
+        "3711039473",
+        "4720028039",
+        "5261137785",
+        "7103029029",
+        "6732241319"
+      ],
+      "evaluation_set": "main"
+    },
+    {
+      "group_id": "G16",
+      "run_id": "r1",
+      "inns": [
+        "010701412150",
+        "9713021306"
+      ],
+      "evaluation_set": "main"
+    },
+    {
+      "group_id": "G17",
+      "run_id": "r1",
+      "inns": [
+        "9724033310",
+        "9721159668",
+        "7449088645"
+      ],
+      "evaluation_set": "main"
+    },
+    {
+      "group_id": "G18",
+      "run_id": "r1",
+      "inns": [
+        "7720966601",
+        "9701318454",
+        "6452924721",
+        "1327036448",
+        "7714497158"
+      ],
+      "evaluation_set": "main"
+    },
+    {
+      "group_id": "G19",
+      "run_id": "r1",
+      "inns": [
+        "9701166515",
+        "770804624926"
+      ],
+      "evaluation_set": "main"
+    },
+    {
+      "group_id": "G20",
+      "run_id": "r1",
+      "inns": [
+        "7810984404",
+        "233000064283",
+        "9714038662"
+      ],
+      "evaluation_set": "main"
+    },
+    {
+      "group_id": "G20",
+      "run_id": "r2",
+      "inns": [
+        "7810984404",
+        "233000064283",
+        "9714038662"
+      ],
+      "evaluation_set": "stability"
+    },
+    {
+      "group_id": "G20",
+      "run_id": "r3",
+      "inns": [
+        "7810984404",
+        "233000064283",
+        "9714038662"
+      ],
+      "evaluation_set": "stability"
+    },
+    {
+      "group_id": "G21",
+      "run_id": "r1",
+      "inns": [
+        "1901132406",
+        "234803704704",
+        "7714729497",
+        "7104080194",
+        "9727071240"
+      ],
+      "evaluation_set": "main"
+    },
+    {
+      "group_id": "G22",
+      "run_id": "r1",
+      "inns": [
+        "7720901442",
+        "771965001547"
+      ],
+      "evaluation_set": "main"
+    },
+    {
+      "group_id": "G23",
+      "run_id": "r1",
+      "inns": [
+        "666201003180",
+        "2901324364",
+        "5001146298"
+      ],
+      "evaluation_set": "main"
+    },
+    {
+      "group_id": "G24",
+      "run_id": "r1",
+      "inns": [
+        "6165169320",
+        "772377037026",
+        "9703030189",
+        "7751352552",
+        "5837083280"
+      ],
+      "evaluation_set": "main"
+    },
+    {
+      "group_id": "G25",
+      "run_id": "r1",
+      "inns": [
+        "780216530635",
+        "615513451530"
+      ],
+      "evaluation_set": "main"
+    },
+    {
+      "group_id": "G25",
+      "run_id": "r2",
+      "inns": [
+        "780216530635",
+        "615513451530"
+      ],
+      "evaluation_set": "stability"
+    },
+    {
+      "group_id": "G25",
+      "run_id": "r3",
+      "inns": [
+        "780216530635",
+        "615513451530"
+      ],
+      "evaluation_set": "stability"
+    },
+    {
+      "group_id": "G26",
+      "run_id": "r1",
+      "inns": [
+        "7724398540",
+        "540325003268",
+        "0278917431"
+      ],
+      "evaluation_set": "main"
+    },
+    {
+      "group_id": "G27",
+      "run_id": "r1",
+      "inns": [
+        "9703198304",
+        "4000036100",
+        "6731007348",
+        "8905068592",
+        "1684017097"
+      ],
+      "evaluation_set": "main"
+    },
+    {
+      "group_id": "G27",
+      "run_id": "r2",
+      "inns": [
+        "9703198304",
+        "4000036100",
+        "6731007348",
+        "8905068592",
+        "1684017097"
+      ],
+      "evaluation_set": "stability"
+    },
+    {
+      "group_id": "G27",
+      "run_id": "r3",
+      "inns": [
+        "9703198304",
+        "4000036100",
+        "6731007348",
+        "8905068592",
+        "1684017097"
+      ],
+      "evaluation_set": "stability"
+    },
+    {
+      "group_id": "G28",
+      "run_id": "r1",
+      "inns": [
+        "7447131126",
+        "120705254031"
+      ],
+      "evaluation_set": "main"
+    },
+    {
+      "group_id": "G29",
+      "run_id": "r1",
+      "inns": [
+        "9201513489",
+        "470606601830",
+        "9705152496"
+      ],
+      "evaluation_set": "main"
+    },
+    {
+      "group_id": "G30",
+      "run_id": "r1",
+      "inns": [
+        "5036158015",
+        "503200230096",
+        "3100037306",
+        "5244026965",
+        "1650051822"
+      ],
+      "evaluation_set": "main"
+    }
+  ],
+  "production": {
+    "git_commit": "5077110daf91e8b55f941ba5f9cb4effca812960",
+    "code_sha256": "8aaae1355eb990e5fb70ddd6e65e45357f0e2f9dea1346cc5a958af9affe9b84",
+    "file_hashes": {
+      "Dockerfile": "a80f88299d52c5c377a7998c96c74e05074ecaafb1c4bd6984a41914b5128fd6",
+      "docker-compose.yml": "cc88d19cbcf8f561dfba65f6623c46bf3fdc5e12d50a101190cc651064f7428b",
+      "pyproject.toml": "50b8b4153806da284b6d60915b16b732d44357c38af3d9e31fb635c951a8e1ff",
+      "requirements.lock.txt": "22086585191e396bb044d6ad450a7387f664508020b9f886a5639b32a6518d31",
+      "scripts/mongo/build_read_model.js": "f6726d8acf41ebbf9371b65a7bc275d9b45552cccd624d4b52beaa4deafbdee3",
+      "src/counterparty_verification/__init__.py": "c90970e0b89de753bf43e5c65992c9d6d617ac6c647d2512abfaaced6ad01d30",
+      "src/counterparty_verification/agents/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "src/counterparty_verification/agents/chat.py": "de53ad7ea34719d1e1af4e7836a4ba76c87fe4ee69749c33d22c50f72e5ca6c6",
+      "src/counterparty_verification/agents/comparison.py": "beb00be048512e4dfa22b2aee099ef61d66f769de86614f749a9009f95629e68",
+      "src/counterparty_verification/agents/evaluator.py": "2adb18353925df59e9a5908e0358bbfe4ebb490a7e57499e6ca90e7cc0925a4c",
+      "src/counterparty_verification/agents/prompts.py": "9b09c0867487aaf2c91c125debc7f22df66b62a08520fcaf952f1974578025eb",
+      "src/counterparty_verification/agents/provider.py": "feeaf425471ea4ef417ee669cdffdf0cf7728665b9b5a0fd044e63f7c9a66f71",
+      "src/counterparty_verification/agents/question_answer.py": "61b50efda24d822e854354c4c9f606f92fe767adde54294c93d0a451ba6186db",
+      "src/counterparty_verification/agents/reputation.py": "38b2300fba7d675e0c0aa73419b2dfa43a12b1afa32e3ac144ef2147c6e5e1c3",
+      "src/counterparty_verification/agents/summary_context.py": "3d140e44a0a1ea1c84ea2cec73d9504b64cab6fc3ce33999e6d86fd8443a1227",
+      "src/counterparty_verification/analysis/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "src/counterparty_verification/analysis/analyzers.py": "f3ac7f8122036e42856d8c471e2873ab4da99274800403aecb549efa000d9ad2",
+      "src/counterparty_verification/analysis/comparison.py": "1826516cee6307ede6eb6997d04b6f0421a0cd3df51a67f120cc71c277775c58",
+      "src/counterparty_verification/analysis/presentation.py": "7f43c3757db998ee42a9445f6022fe4f6ba65f6bd1dca4dcc1bd9753d317d88e",
+      "src/counterparty_verification/analysis/rules/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "src/counterparty_verification/analysis/rules/finance.py": "5736aa6c598c9571976bf3052a9749a1a4a595d992d56cf65cf9bdbf97e9fd3e",
+      "src/counterparty_verification/analysis/rules/general.py": "e38e69e805169afe19a47151f40e0a1bcf5dc86475e7ad7ff46f551972953283",
+      "src/counterparty_verification/analysis/rules/legal.py": "94647fb21dc9e0e8d517f9246ef2161c45c239be4db97b507d0849ae4a1fc6fb",
+      "src/counterparty_verification/analysis/rules/procurement.py": "02fe925450013cd4264959c8a60e21ffe60494e6683e5fa213e3047e573f4a86",
+      "src/counterparty_verification/analysis/rules/reputation.py": "3dd00413ae91091001bb3a8979dbd6172030b31a33595139a3a4a7242d282c27",
+      "src/counterparty_verification/analysis/rules/structure.py": "cfe9ddc15c2613c2ba4264e632f84dd16cd535f36d8c09306b4c7fcc5c7b72bc",
+      "src/counterparty_verification/analysis/service.py": "bcec0555f86b96bb113a8a02807b9db2c29e2484f49a443acee67320ebb41379",
+      "src/counterparty_verification/analysis/timing.py": "e603d4b01b0a0c1fc1af91ae9a06ad71c03f2a47d732846d907f2ec28a2a90e4",
+      "src/counterparty_verification/api.py": "6e1bbb31dfce5a28c2ba8077d8b17f94ab5fe8744391c0fd32298062881689ea",
+      "src/counterparty_verification/chat/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "src/counterparty_verification/chat/models.py": "e2dd04f7969ac8f41c41c7c2e51bd956c35efe50c5388322f0d1edd6fd5e0489",
+      "src/counterparty_verification/chat/questions.py": "87ee7fe525cbde6dfc43b815cefbdb1616219c567c4e29125afc4fd499cd92c4",
+      "src/counterparty_verification/chat/service.py": "6448e69d623ca285f41b4bd1d89c5031e158d13ee450adbac31d96015ae5b003",
+      "src/counterparty_verification/domain.py": "9d55b78c90ada9e10e31145eef51f06d196bd720fe8fdcf2db2cdef309b73cb2",
+      "src/counterparty_verification/mcp/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "src/counterparty_verification/mcp/client.py": "63469b2b77c3be545a889a8ba94dc20a64d1dc11e22d913b2bece0e8df4c5d54",
+      "src/counterparty_verification/mcp/server.py": "4491c6cb1c9898da22552c0ddf0125894be386619f3ab11ddd9ec79d3047e35c",
+      "src/counterparty_verification/settings.py": "08d48e56c66dcb2e4b6e7bf884bd0af9ec722f2b88dd59c420d66b85ac5df1d6",
+      "src/counterparty_verification/storage/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "src/counterparty_verification/storage/interfaces.py": "0d47b97c55053dfe996c923c98569a6d95315f79b7536ac11490e29282eed04e",
+      "src/counterparty_verification/storage/mongo.py": "06988c0afe32b9d6772780821455c8e81baf53aa5377d4fdcd1cef0e692123b2",
+      "src/counterparty_verification/storage/postgres.py": "dea01839b54633d4e13a42a01aacb1efaa34ab55bc2a11404df739fd4e2696d8",
+      "src/counterparty_verification/storage/sessions.py": "36ab765baa8726a4d6a4fb3be8f9289a1ea145e52d9c026f98a82cc44b0406a1"
+    },
+    "prompt_hashes": {
+      "src/counterparty_verification/agents/prompts.py": "9b09c0867487aaf2c91c125debc7f22df66b62a08520fcaf952f1974578025eb",
+      "src/counterparty_verification/agents/summary_context.py": "3d140e44a0a1ea1c84ea2cec73d9504b64cab6fc3ce33999e6d86fd8443a1227",
+      "src/counterparty_verification/agents/evaluator.py": "2adb18353925df59e9a5908e0358bbfe4ebb490a7e57499e6ca90e7cc0925a4c",
+      "src/counterparty_verification/agents/comparison.py": "beb00be048512e4dfa22b2aee099ef61d66f769de86614f749a9009f95629e68"
+    }
+  },
+  "benchmark": {
+    "code_sha256": "375e9ff0860ea18c1d2cf94e474e1e6d5157db77abd1b2f40ec8b839905056f2",
+    "file_hashes": {
+      "eval/__init__.py": "e405aa879f16a08311866c5aabf210d648f2c4d08aabde54c4815e4c1ffcd04e",
+      "eval/__main__.py": "11a536cf61e4c6249fc50d5d8655d9ec5c486f1562b758be1792fc1bfdd1d921",
+      "eval/capture.py": "573650e215fed1d4eb60ba08250bbe2d1bf26c4c0ae343ffa6c72f4e2b9c85bd",
+      "eval/common.py": "d24fb316ae476d73c2419cced1f17380705fa4c05e3dc508ddba85386f94b2f8",
+      "eval/export.py": "e157462ce2159b66a9210d930b5a5c2515e58e061472789735013e6ba07a6473",
+      "eval/projection.py": "fb99e02803e724c2c62b2a28cb94cddb7b71d575e47d9c5a120cc81ab5e4d94d",
+      "eval/protocol.py": "82732f50507e19efcb0a16369c9db2e490b0e67f732ad8e22dd0e18dca437f0e",
+      "eval/runner.py": "67587fb177491871d24000d1aa8817c080e2fa7b70ca5dc119912b6131f3bd4c"
+    }
+  },
+  "runtime_config": {
+    "model_slug": "~deepseek/deepseek-v4-flash-latest",
+    "batch_chapter_concurrency": 10,
+    "batch_llm_concurrency": 3
+  },
+  "methodology": {
+    "source_of_truth": "raw report",
+    "judge": "external blind LLM reviewer; not run by this benchmark",
+    "quality_denominators": {
+      "individual": 100,
+      "comparison": 30
+    },
+    "stability_excluded_from_quality_metrics": true
+  }
+}

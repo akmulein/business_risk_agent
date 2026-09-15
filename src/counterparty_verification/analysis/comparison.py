@@ -37,15 +37,24 @@ def _provider_status(
     return VerificationStatus.NO_DATA
 
 
-def _defendant_cases(card: CounterpartyCard) -> int | None:
+def _defendant_cases(card: CounterpartyCard, status: str = "pending") -> int | None:
     status_rows = [row for row in card.arbitration if row.source in STATUS_SOURCES]
     if not status_rows:
         return None
     return sum(
         row.case_count
         for row in status_rows
-        if row.role == "defendant" and row.case_status == "pending"
+        if row.role == "defendant" and row.case_status == status
     )
+
+
+def _historical_defendant_cases_present(
+    card: CounterpartyCard,
+) -> bool | None:
+    historical = [row for row in card.arbitration if row.source not in STATUS_SOURCES]
+    if not historical:
+        return None
+    return any(row.role == "defendant" and row.case_count > 0 for row in historical)
 
 
 def _active_enforcements(card: CounterpartyCard) -> int | None:
@@ -58,6 +67,17 @@ def _active_enforcements(card: CounterpartyCard) -> int | None:
     if provider_status == VerificationStatus.OK:
         return 0
     return None
+
+
+def _enforcement_count(card: CounterpartyCard, *, active: bool | None) -> int | None:
+    executions = [
+        event for event in card.legal_events if event.event_type == "execution"
+    ]
+    if not executions or not any(event.active is not None for event in executions):
+        return None
+    if active is None:
+        return len(executions)
+    return sum(event.active is active for event in executions)
 
 
 def _revenue_change(card: CounterpartyCard) -> float | None:
@@ -97,6 +117,12 @@ def _company_row(card: CounterpartyCard) -> ComparisonCompany:
         active_enforcements=_active_enforcements(card),
         fns_status=_provider_status(card.risk_factors, FNS_CODES),
         bankruptcy_status=_provider_status(card.risk_factors, {"liquidationStatus"}),
+        finished_defendant_cases=_defendant_cases(card, "finished"),
+        appealed_defendant_cases=_defendant_cases(card, "appealed"),
+        historical_defendant_cases_present=_historical_defendant_cases_present(card),
+        total_enforcements=_enforcement_count(card, active=None),
+        inactive_enforcements=_enforcement_count(card, active=False),
+        legal_data_sufficient=bool(card.arbitration or card.legal_events),
     )
 
 

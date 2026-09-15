@@ -695,7 +695,7 @@ def _check_okved_breadth(view: StructureView) -> Observation | None:
 
 
 def _check_license_gap(view: StructureView) -> Observation | None:
-    """Основной вид деятельности требует разрешения, а его нет в отчёте."""
+    """Основной вид деятельности может требовать отдельной проверки разрешений."""
     if view.has_active_license or view.main_activity is None:
         return None
     code = view.main_activity.item.code or ""
@@ -713,11 +713,12 @@ def _check_license_gap(view: StructureView) -> Observation | None:
         return None
     return _observed(
         "license_gap",
-        "Основной вид деятельности требует разрешения, его нет в отчёте",
-        f"Основной ОКВЭД {code} «{_activity_name(view.main_activity)}» обычно "
-        f"требует {permit}, а действующих лицензий в отчёте не указано. Перечень "
-        "укрупнённый, и конкретные работы контрагента могут разрешения не "
-        "требовать, поэтому подтверждающие документы стоит просто запросить.",
+        "Требуется проверить разрешения для вида деятельности",
+        f"Основной ОКВЭД {code} «{_activity_name(view.main_activity)}» может "
+        f"относиться к работам, для которых нужны специальные разрешения или "
+        f"{permit}. Представленные данные их наличие не подтверждают, но сам "
+        "ОКВЭД не доказывает применимость такого требования к конкретной "
+        "сделке; это нужно проверить отдельно.",
         [
             view.main_activity.evidence("code"),
             view.main_activity.evidence("description"),

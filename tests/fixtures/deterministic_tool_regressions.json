@@ -1,0 +1,123 @@
+{
+  "finance_albero_g17_9724033310": {
+    "case_id": "G17",
+    "inn": "9724033310",
+    "company_name": "ООО \"АЛЬБЕРО\"",
+    "card": {
+      "company_reports": {
+        "report_id": "fixture-finance-albero",
+        "inn": "9724033310",
+        "short_name": "ООО \"АЛЬБЕРО\"",
+        "status": "CURRENT"
+      },
+      "financial_reports": [
+        {
+          "report_id": "fixture-finance-albero",
+          "company_inn": "9724033310",
+          "year": 2025,
+          "total_assets": 10000,
+          "total_liabilities": 10000,
+          "capitals": 10000,
+          "accounts_payable": 0
+        }
+      ]
+    }
+  },
+  "legal_lzso_g08_7805327192": {
+    "case_id": "G08",
+    "inn": "7805327192",
+    "company_name": "ООО \"ЛЗСО\"",
+    "card": {
+      "company_reports": {
+        "report_id": "fixture-legal-lzso",
+        "report_date": "2026-08-10",
+        "inn": "7805327192",
+        "short_name": "ООО \"ЛЗСО\"",
+        "status": "CURRENT"
+      },
+      "legal_events": [
+        {
+          "report_id": "fixture-legal-lzso",
+          "company_inn": "7805327192",
+          "event_type": "execution",
+          "item_index": 0,
+          "active": true,
+          "amount": 800000,
+          "external_id": "12345/24/78004-ИП",
+          "event_date": "2025-11-01"
+        }
+      ],
+      "financial_reports": [
+        {
+          "report_id": "fixture-legal-lzso",
+          "company_inn": "7805327192",
+          "year": 2025,
+          "proceeds": 10000000,
+          "profit": 100000
+        }
+      ]
+    }
+  },
+  "structure_busov_g21_234803704704": {
+    "case_id": "G21",
+    "inn": "234803704704",
+    "company_name": "ИП БУСОВ Д.А.",
+    "card": {
+      "company_reports": {
+        "report_id": "fixture-structure-busov",
+        "report_date": "2026-08-01",
+        "inn": "234803704704",
+        "short_name": "ИП БУСОВ Д.А.",
+        "status": "CURRENT"
+      },
+      "structure_items": [
+        {
+          "id": "activity-0",
+          "report_id": "fixture-structure-busov",
+          "company_inn": "234803704704",
+          "item_type": "activity",
+          "item_index": 0,
+          "role": "main",
+          "code": "43.21",
+          "description": "Производство электромонтажных работ"
+        }
+      ]
+    }
+  },
+  "procurement_le_monlid_g01_5029069967": {
+    "case_id": "G01",
+    "inn": "5029069967",
+    "company_name": "ООО \"ЛЕ МОНЛИД\"",
+    "card": {
+      "company_reports": {
+        "report_id": "fixture-procurement-le-monlid",
+        "report_date": "2026-07-30",
+        "inn": "5029069967",
+        "short_name": "ООО \"ЛЕ МОНЛИД\"",
+        "status": "CURRENT"
+      },
+      "procurements": [
+        {
+          "report_id": "fixture-procurement-le-monlid",
+          "company_inn": "5029069967",
+          "item_index": 0,
+          "year": 2024,
+          "federal_law_code": "ФЗ223",
+          "tender_winner_count": 5,
+          "contract_signed_count": 0,
+          "contract_signed_amount": 0
+        },
+        {
+          "report_id": "fixture-procurement-le-monlid",
+          "company_inn": "5029069967",
+          "item_index": 1,
+          "year": 2025,
+          "federal_law_code": "ФЗ223",
+          "tender_winner_count": 1,
+          "contract_signed_count": 0,
+          "contract_signed_amount": 0
+        }
+      ]
+    }
+  }
+}

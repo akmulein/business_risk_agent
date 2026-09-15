@@ -1,93 +1,38 @@
-# MongoDB: база отчётов контрагентов
+# MongoDB seed scripts
 
-## Устройство
+Эта папка содержит скрипты, которые используются корневым `docker-compose.yml` при запуске сервиса.
+Отдельно запускать MongoDB из этой директории не нужно.
 
-- Docker image: `mongo:7.0`.
-- Database: `counterparties`.
-- `reports` — исходные документы без изменений.
-- `counterparty_cards` — готовые карточки для приложения.
-- Один элемент исходного JSON — один документ MongoDB.
-- Источник: `../../data/seed/contractors_audit.snapshot.json`.
-- Данные MongoDB сохраняются в Docker volume `counterparty-mongo_mongo_data`.
-- `mongo-seed` импортирует документы, заново строит `counterparty_cards` и
-  создаёт индексы.
+## Что делает `mongo-seed`
 
-Содержание отчётов не изменяется. Extended JSON (`$date`, `$numberLong`) при
-импорте преобразуется в соответствующие BSON-типы MongoDB.
+При `docker compose up --build` сервис `mongo-seed`:
 
-## Отдельный запуск только MongoDB
+1. импортирует `data/seed/contractors_audit.snapshot.json` в коллекцию `reports`;
+2. строит прикладную read-модель `counterparty_cards`;
+3. создаёт индексы для быстрых запросов по ИНН и ключевым полям.
 
-Для полного приложения используйте `docker-compose.yml` в корне репозитория.
-Этот дополнительный Compose создаёт отдельную базу и том; он не нужен при
-обычном запуске проекта.
+Повторный запуск безопасен: исходные отчёты импортируются через upsert по `_id`, а read-модель пересобирается заново из raw-данных.
 
-Запуск
+## Коллекции
 
-```bash
-cd scripts/mongo
-cp .env.example .env
-nano .env
-```
+- `reports` — исходные отчёты без изменения структуры;
+- `counterparty_cards` — подготовленные карточки, которые читает приложение;
+- `counterparty_cards_building` — временная коллекция во время пересборки read-модели.
 
-В `.env` замените `MONGO_ROOT_PASSWORD=change_me`, затем выполните:
+## Проверка локальной базы
+
+После запуска приложения можно проверить количество документов:
 
 ```bash
-docker compose pull
-docker compose up -d
-docker compose ps -a
-docker compose logs mongo-seed
+docker compose exec mongo sh -lc 'mongosh --quiet   --username "$MONGO_INITDB_ROOT_USERNAME"   --password "$MONGO_INITDB_ROOT_PASSWORD"   --authenticationDatabase admin   "$MONGO_INITDB_DATABASE"   --eval "db.reports.countDocuments({})"'
 ```
 
-Ожидаемое состояние:
-
-- `contractor-mongo` — `healthy`;
-- `mongo-seed` — `Exited (0)`;
-- в логах seed — `100 document(s) imported successfully`.
-
-## Подключение
-
-Из приложения на хосте:
-
-```text
-mongodb://contractors_admin:<password>@localhost:27017/counterparties?authSource=admin
-```
-
-Из контейнера в том же Compose/network:
-
-```text
-mongodb://contractors_admin:<password>@mongo:27017/counterparties?authSource=admin
-```
-
-Проверка количества документов:
-
-```bash
-docker compose exec mongo sh -lc 'mongosh --quiet \
-  --username "$MONGO_INITDB_ROOT_USERNAME" \
-  --password "$MONGO_INITDB_ROOT_PASSWORD" \
-  --authenticationDatabase admin \
-  "$MONGO_INITDB_DATABASE" \
-  --eval "db.reports.countDocuments({})"'
-```
-
-Ожидаемый результат: `100`.
+Ожидаемый результат для текущего seed-файла: `100`.
 
 Проверка подготовленных карточек:
 
 ```bash
-docker compose exec mongo sh -lc 'mongosh --quiet \
-  --username "$MONGO_INITDB_ROOT_USERNAME" \
-  --password "$MONGO_INITDB_ROOT_PASSWORD" \
-  --authenticationDatabase admin \
-  "$MONGO_INITDB_DATABASE" \
-  --eval "db.counterparty_cards.countDocuments({})"'
+docker compose exec mongo sh -lc 'mongosh --quiet   --username "$MONGO_INITDB_ROOT_USERNAME"   --password "$MONGO_INITDB_ROOT_PASSWORD"   --authenticationDatabase admin   "$MONGO_INITDB_DATABASE"   --eval "db.counterparty_cards.countDocuments({})"'
 ```
 
-Приложение читает только `counterparty_cards`. Для подключения добавьте в
-корневой `.env`:
-
-```env
-REPOSITORY_BACKEND=mongo
-MONGODB_URL=mongodb://contractors_admin:<password>@localhost:27017/counterparties?authSource=admin
-```
-
-Коллекция `reports` остаётся источником для функции «Показать исходные данные».
+Ожидаемый результат: `100`.

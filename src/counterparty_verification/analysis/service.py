@@ -245,6 +245,7 @@ class AnalysisService:
                 company_name,
                 bank_risk_level,
                 chapters,
+                build_comparison([card]).companies[0],
             )
         except Exception:
             logger.exception(

@@ -1,0 +1,68 @@
+{
+  "benchmark": "benchmark",
+  "dataset": {
+    "companies": 100,
+    "main_comparisons": 30,
+    "group_sizes": {
+      "2": 10,
+      "3": 10,
+      "5": 10
+    },
+    "stability_groups": 6,
+    "stability_additional_runs": 12
+  },
+  "review": {
+    "type": "external_llm_review",
+    "ground_truth": "raw_reports",
+    "limitations": "LLM review is not absolute ground truth"
+  },
+  "results": {
+    "comparison_factual_accuracy": {
+      "passed": 28,
+      "total": 30,
+      "value": 0.933
+    },
+    "strict_clean_comparison": {
+      "passed": 27,
+      "total": 30,
+      "value": 0.9
+    },
+    "llm_comparison_factual_fidelity": {
+      "passed": 29,
+      "total": 30,
+      "value": 0.967
+    },
+    "individual_factual_accuracy": {
+      "passed": 98,
+      "total": 100,
+      "value": 0.98
+    },
+    "llm_individual_factual_fidelity": {
+      "passed": 99,
+      "total": 100,
+      "value": 0.99
+    },
+    "fallback_rate": {
+      "count": 0,
+      "total": 100,
+      "value": 0.0
+    },
+    "critical_stability": {
+      "passed": 6,
+      "total": 6,
+      "value": 1.0
+    },
+    "generation_success": {
+      "main_comparisons": {
+        "completed": 30,
+        "total": 30,
+        "value": 1.0
+      },
+      "stability_extra_runs": {
+        "completed": 12,
+        "total": 12,
+        "value": 1.0
+      }
+    }
+  }
+}

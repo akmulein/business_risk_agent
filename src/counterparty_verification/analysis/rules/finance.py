@@ -266,21 +266,54 @@ def _check_negative_equity(view: FinanceView) -> Observation | None:
     )
 
 
+def _debt_share(latest: IndexedFinance) -> tuple[float | None, list[str]]:
+    """Return debt/assets without treating total liabilities as debt.
+
+    In the raw reports `total_liabilities` is the balance-sheet liabilities side
+    total: it includes equity and often equals total assets. It must not be used
+    as debt. Prefer explicit debt aggregates; otherwise fall back to
+    assets - capital only when the balance fields are present and consistent.
+    """
+    total_assets = as_float(latest.item.total_assets)
+    if total_assets is None or total_assets <= 0:
+        return None, []
+
+    long_term = as_float(latest.item.long_term_duties_total)
+    short_term = as_float(latest.item.short_term_liabilities_total)
+    if long_term is not None and short_term is not None:
+        debt = long_term + short_term
+        if debt < 0:
+            return None, []
+        return debt / total_assets, [
+            "long_term_duties_total",
+            "short_term_liabilities_total",
+            "total_assets",
+        ]
+
+    capitals = as_float(latest.item.capitals)
+    if capitals is None:
+        return None, []
+    balance_total = as_float(latest.item.total_liabilities)
+    if balance_total is not None:
+        tolerance = max(1.0, abs(total_assets)) * 0.01
+        if abs(balance_total - total_assets) > tolerance:
+            return None, []
+    debt = total_assets - capitals
+    if debt < 0:
+        return None, []
+    fields = ["total_assets", "capitals"]
+    if balance_total is not None:
+        fields.append("total_liabilities")
+    return debt / total_assets, fields
+
+
 def _check_leverage(view: FinanceView) -> Observation | None:
-    """Доля собственного капитала и долгосрочных пассивов в активах."""
+    """Доля долговых обязательств в активах."""
     latest = view.latest
     if latest is None:
         return None
     sustainability = as_float(latest.item.sustainability)
-    total_liabilities = as_float(latest.item.total_liabilities)
-    total_assets = as_float(latest.item.total_assets)
-    computed_debt_share = (
-        total_liabilities / total_assets
-        if total_liabilities is not None
-        and total_assets is not None
-        and total_assets > 0
-        else None
-    )
+    computed_debt_share, debt_fields = _debt_share(latest)
     if sustainability is not None:
         if sustainability >= SUSTAINABILITY_LOW:
             return None
@@ -293,14 +326,11 @@ def _check_leverage(view: FinanceView) -> Observation | None:
     elif computed_debt_share is not None:
         if computed_debt_share < LEVERAGE_HIGH:
             return None
-        evidence = [
-            latest.evidence("total_liabilities"),
-            latest.evidence("total_assets"),
-            latest.evidence("year"),
-        ]
+        evidence = [latest.evidence(name) for name in debt_fields]
+        evidence.append(latest.evidence("year"))
         detail = (
             f"Коэффициент устойчивости в отчёте не указан. По балансу доля "
-            f"обязательств в активах за {latest.item.year} год — "
+            f"долговых обязательств в активах за {latest.item.year} год — "
             f"{computed_debt_share * 100:.1f}%."
         )
     else:

@@ -1,0 +1,44 @@
+{
+  "run": "final_after_deterministic_fixes",
+  "benchmark": "benchmark",
+  "protocol_frozen_at": "2026-09-14T20:26:04.276047+00:00",
+  "created_at": "2026-09-14T20:32:29.020421+00:00",
+  "raw_snapshot": "data/seed/contractors_audit.snapshot.json",
+  "raw_snapshot_sha256": "34bdf82e3286bfbb1c2b0e4d441dde25c90fd58b1d623d6192f2653dd6641f55",
+  "model_slug": "~deepseek/deepseek-v4-flash-latest",
+  "runtime_config": {
+    "model_slug": "~deepseek/deepseek-v4-flash-latest",
+    "batch_chapter_concurrency": 10,
+    "batch_llm_concurrency": 3
+  },
+  "production_git_commit": "5077110daf91e8b55f941ba5f9cb4effca812960",
+  "production_code_sha256": "8aaae1355eb990e5fb70ddd6e65e45357f0e2f9dea1346cc5a958af9affe9b84",
+  "prompt_hashes": {
+    "src/counterparty_verification/agents/prompts.py": "9b09c0867487aaf2c91c125debc7f22df66b62a08520fcaf952f1974578025eb",
+    "src/counterparty_verification/agents/summary_context.py": "3d140e44a0a1ea1c84ea2cec73d9504b64cab6fc3ce33999e6d86fd8443a1227",
+    "src/counterparty_verification/agents/evaluator.py": "2adb18353925df59e9a5908e0358bbfe4ebb490a7e57499e6ca90e7cc0925a4c",
+    "src/counterparty_verification/agents/comparison.py": "beb00be048512e4dfa22b2aee099ef61d66f769de86614f749a9009f95629e68"
+  },
+  "benchmark_code_sha256": "c47e270094bb6cd34638a1be513909d862b9eb5cd60731b4aea4b4488e9e357b",
+  "counts": {
+    "companies": 100,
+    "main_groups": 30,
+    "main_comparisons": 30,
+    "group_sizes": {
+      "2": 10,
+      "3": 10,
+      "5": 10
+    },
+    "stability_groups": 6,
+    "stability_additional_runs": 12
+  },
+  "stability_groups": [
+    "G01",
+    "G02",
+    "G09",
+    "G20",
+    "G25",
+    "G27"
+  ],
+  "generation_complete": true
+}

@@ -9,9 +9,18 @@ from pydantic_ai import Agent
 
 from counterparty_verification.agents.prompts import EVALUATOR_INSTRUCTIONS
 from counterparty_verification.agents.provider import _model
-from counterparty_verification.agents.summary_context import chapter_context
+from counterparty_verification.agents.summary_context import (
+    GroundedSummary,
+    chapter_context,
+    validate_selected_facts,
+)
 from counterparty_verification.analysis.timing import record, record_llm_result, timed
-from counterparty_verification.domain import AnalysisSummary, ChapterResult, RiskLevel
+from counterparty_verification.domain import (
+    AnalysisSummary,
+    ChapterResult,
+    ComparisonCompany,
+    RiskLevel,
+)
 from counterparty_verification.settings import Settings
 
 logger = logging.getLogger(__name__)
@@ -23,7 +32,7 @@ class EvaluatorAgent:
         self.agent = (
             Agent(
                 _model(settings),
-                output_type=str,
+                output_type=GroundedSummary,
                 instructions=EVALUATOR_INSTRUCTIONS,
                 # OpenRouter load-balances across providers serving the same
                 # model; sorting by throughput avoids providers whose token
@@ -47,13 +56,20 @@ class EvaluatorAgent:
         company_name: str,
         risk_level: RiskLevel,
         chapters: list[ChapterResult],
+        company: ComparisonCompany,
     ) -> AnalysisSummary:
         if not self.agent:
             raise RuntimeError("OPENROUTER_API_KEY is not configured")
 
+        facts = chapter_context(chapters, "A", company)
         payload = {
-            "company": company_name,
-            "chapters": chapter_context(chapters),
+            "companies": [
+                {
+                    "company_id": "A",
+                    "company_name": company_name,
+                    "facts": facts,
+                }
+            ],
         }
         started = perf_counter()
         logger.info(
@@ -72,7 +88,8 @@ class EvaluatorAgent:
         with timed("llm", kind="individual", company=company_name):
             result = await self.agent.run(prompt)
         record_llm_result(result, kind="individual", company=company_name)
-        summary = result.output.strip()
+        validate_selected_facts(result.output, facts)
+        summary = result.output.summary.strip()
         if not summary:
             raise RuntimeError("Evaluator returned an empty summary")
         logger.info(
