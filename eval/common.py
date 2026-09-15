@@ -11,7 +11,7 @@ from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_SNAPSHOT = ROOT / "data/seed/contractors_audit.snapshot.json"
+DEFAULT_SNAPSHOT = ROOT / "mongo_db/contractors_audit.snapshot.json"
 DEFAULT_RESULTS = ROOT / "eval/results/run"
 
 
@@ -95,15 +95,14 @@ def file_hashes(paths: list[Path]) -> dict[str, str]:
 
 
 def production_hashes() -> dict[str, str]:
-    paths = list((ROOT / "src/counterparty_verification").rglob("*.py"))
+    paths = list((ROOT / "app").rglob("*.py"))
     paths.extend(
         path
         for path in (
             ROOT / "pyproject.toml",
-            ROOT / "requirements.lock.txt",
             ROOT / "Dockerfile",
             ROOT / "docker-compose.yml",
-            ROOT / "scripts/mongo/build_read_model.js",
+            ROOT / "mongo_db/build_read_model.js",
         )
         if path.exists()
     )

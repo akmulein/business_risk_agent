@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from counterparty_verification.domain import CounterpartyCard
+from app.domain import CounterpartyCard
 
 
 @dataclass(frozen=True)
@@ -278,7 +278,7 @@ CASE_MULTIPLE_NEGATIVE_FACTORS = GoldenCase(
 CASE_MAKSMARKET = GoldenCase(
     id="maksmarket",
     description=(
-        "Partial fixture based on data/seed/contractors_audit.snapshot.json "
+        "Partial fixture based on mongo_db/contractors_audit.snapshot.json "
         "(ИНН 5032257375): bankrupt with конкурсное производство, active "
         "execution proceedings, FNS blocking, invalidAddress=true, "
         "invalidRegistrationData=true, massAddress=false, and a 2024 "

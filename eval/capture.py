@@ -7,12 +7,12 @@ from pathlib import Path
 from time import perf_counter
 from typing import Any
 
-from counterparty_verification.agents.summary_context import (
+from app.agents.summary_context import (
     GroundedSummary,
     chapter_context,
     validate_selected_facts,
 )
-from counterparty_verification.domain import AnalysisSummary
+from app.domain import AnalysisSummary
 
 from .common import load_json, save_json, utc_now
 

@@ -6,7 +6,7 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
-from counterparty_verification.settings import Settings
+from app.settings import Settings
 
 from .common import (
     DEFAULT_RESULTS,
@@ -91,10 +91,10 @@ def build_protocol(snapshot: Path) -> dict[str, Any]:
     prod = production_hashes()
     bench = benchmark_hashes()
     prompt_paths = [
-        "src/counterparty_verification/agents/prompts.py",
-        "src/counterparty_verification/agents/summary_context.py",
-        "src/counterparty_verification/agents/evaluator.py",
-        "src/counterparty_verification/agents/comparison.py",
+        "app/agents/prompts.py",
+        "app/agents/summary_context.py",
+        "app/agents/evaluator.py",
+        "app/agents/comparison.py",
     ]
     return {
         "version": PROTOCOL_VERSION,

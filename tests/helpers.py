@@ -1,4 +1,4 @@
-from counterparty_verification.domain import CounterpartyCard
+from app.domain import CounterpartyCard
 
 
 class InMemoryRepository:

@@ -5,15 +5,15 @@ from typing import Any
 
 import pytest
 
-from counterparty_verification.analysis.analyzers import analyze_reputation
-from counterparty_verification.analysis.rules.reputation import (
+from app.analysis.analyzers import analyze_reputation
+from app.analysis.rules.reputation import (
     CHAPTER_LABELS,
     CODE_ALIASES,
     build_view,
 )
-from counterparty_verification.domain import CounterpartyCard, RiskLevel
+from app.domain import CounterpartyCard, RiskLevel
 
-RULES_DOC = Path(__file__).parents[2] / "docs" / "rules" / "analyze_reputation.md"
+RULES_DOC = Path(__file__).parents[2] / "app" / "analysis" / "rules" / "specs" / "analyze_reputation.md"
 
 COMPANY_REPORT: dict[str, Any] = {
     "report_id": "r-1",

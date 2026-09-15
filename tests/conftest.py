@@ -4,7 +4,7 @@ os.environ["OPENROUTER_API_KEY"] = ""
 
 import pytest
 
-from counterparty_verification.domain import CounterpartyCard
+from app.domain import CounterpartyCard
 
 
 @pytest.fixture
@@ -51,7 +51,7 @@ def repository(card):
 
 @pytest.fixture(autouse=True)
 def disable_live_llm(monkeypatch):
-    from counterparty_verification.settings import get_settings
+    from app.settings import get_settings
 
     monkeypatch.setenv("OPENROUTER_API_KEY", "")
     get_settings.cache_clear()

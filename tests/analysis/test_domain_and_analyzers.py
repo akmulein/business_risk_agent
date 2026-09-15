@@ -3,8 +3,8 @@ import inspect
 import pytest
 from pydantic import ValidationError
 
-from counterparty_verification.analysis.analyzers import ANALYZERS
-from counterparty_verification.domain import (
+from app.analysis.analyzers import ANALYZERS
+from app.domain import (
     AnalysisRequest,
     CounterpartyCard,
     LegalEvent,

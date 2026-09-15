@@ -8,9 +8,9 @@ from __future__ import annotations
 
 import pytest
 
-from counterparty_verification.analysis.service import TOOL_NAMES
-from counterparty_verification.domain import CounterpartyCard
-from counterparty_verification.mcp.client import LocalAnalysisToolClient
+from app.analysis.service import TOOL_NAMES
+from app.domain import CounterpartyCard
+from app.mcp.client import LocalAnalysisToolClient
 from tests.golden.cases import ALL_CASES, GoldenCase
 
 

@@ -13,16 +13,16 @@ from __future__ import annotations
 
 import inspect
 
-from counterparty_verification.analysis.analyzers import ANALYZERS
-from counterparty_verification.analysis.service import TOOL_NAMES
-from counterparty_verification.domain import CounterpartyCard
-from counterparty_verification.mcp.client import LocalAnalysisToolClient
+from app.analysis.analyzers import ANALYZERS
+from app.analysis.service import TOOL_NAMES
+from app.domain import CounterpartyCard
+from app.mcp.client import LocalAnalysisToolClient
 
 # The one legitimate cross-chapter overlap: some risk_factors codes
 # (invalidRegistrationData, disqualifiedAuthpersons, invalidAuthpersonsData,
 # massAuthpersons) are read by both "structure" (rules/structure.py's
 # provider_flags) and "reputation" (which groups *all* risk_factors) --
-# documented in docs/rules/analyze_reputation.md. Everything else below is
+# documented in app/analysis/rules/specs/analyze_reputation.md. Everything else below is
 # expected to be chapter-exclusive.
 ALLOWED_EVIDENCE_PREFIXES: dict[str, set[str]] = {
     "general": {"company_reports"},
@@ -77,7 +77,7 @@ def _rich_card() -> CounterpartyCard:
                 # profit-based fingerprint would show up under both finance
                 # and legal by design, not by leakage. `capitals` is finance
                 # -exclusive (legal.py never reads it) -- see
-                # ALLOWED_EVIDENCE_PREFIXES and the docs/rules research this
+                # ALLOWED_EVIDENCE_PREFIXES and the docs research this
                 # suite is built from.
                 {**identity, "year": 2025, "proceeds": 5_000_000, "profit": -50_000, "capitals": -333_333},
             ],

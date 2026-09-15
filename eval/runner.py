@@ -8,11 +8,11 @@ from typing import Any
 
 import httpx
 
-from counterparty_verification.api import create_app
-from counterparty_verification.domain import CounterpartyCard
-from counterparty_verification.mcp.client import LocalAnalysisToolClient
-from counterparty_verification.settings import Settings
-from counterparty_verification.storage.mongo import MongoCounterpartyRepository
+from app.api import create_app
+from app.domain import CounterpartyCard
+from app.mcp.client import LocalAnalysisToolClient
+from app.settings import Settings
+from app.storage.mongo import MongoCounterpartyRepository
 
 from .capture import CapturingAgent, ResumableComparison, ResumableEvaluator
 from .common import DEFAULT_RESULTS, load_json, raw_reports_by_inn, resolve_repository_path, save_json, utc_now

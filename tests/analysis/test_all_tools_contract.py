@@ -4,7 +4,7 @@ from typing import Any
 
 import pytest
 
-from counterparty_verification.analysis.analyzers import (
+from app.analysis.analyzers import (
     analyze_finance,
     analyze_general,
     analyze_legal,
@@ -12,7 +12,7 @@ from counterparty_verification.analysis.analyzers import (
     analyze_reputation,
     analyze_structure,
 )
-from counterparty_verification.domain import CounterpartyCard, RiskLevel
+from app.domain import CounterpartyCard, RiskLevel
 
 
 BASE_REPORT: dict[str, Any] = {

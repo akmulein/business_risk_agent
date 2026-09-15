@@ -1,9 +1,9 @@
 import pytest
 from fastmcp import Client
 
-from counterparty_verification.analysis.service import TOOL_NAMES
-from counterparty_verification.domain import ChapterResult
-from counterparty_verification.mcp.server import mcp
+from app.analysis.service import TOOL_NAMES
+from app.domain import ChapterResult
+from app.mcp.server import mcp
 
 
 @pytest.mark.asyncio

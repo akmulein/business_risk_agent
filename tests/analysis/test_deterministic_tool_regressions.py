@@ -4,13 +4,13 @@ import json
 from pathlib import Path
 from typing import Any
 
-from counterparty_verification.analysis.analyzers import (
+from app.analysis.analyzers import (
     analyze_finance,
     analyze_legal,
     analyze_procurement,
     analyze_structure,
 )
-from counterparty_verification.domain import CounterpartyCard
+from app.domain import CounterpartyCard
 
 FIXTURES = json.loads(
     (Path(__file__).parents[1] / "fixtures" / "deterministic_tool_regressions.json").read_text(

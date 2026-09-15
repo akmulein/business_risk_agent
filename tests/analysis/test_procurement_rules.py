@@ -5,12 +5,12 @@ from typing import Any
 
 import pytest
 
-from counterparty_verification.agents.question_answer import flatten_field_paths
-from counterparty_verification.analysis.analyzers import analyze_procurement
-from counterparty_verification.analysis.rules.procurement import CHECKS, build_view
-from counterparty_verification.domain import CounterpartyCard, Observation, RiskLevel
+from app.agents.question_answer import flatten_field_paths
+from app.analysis.analyzers import analyze_procurement
+from app.analysis.rules.procurement import CHECKS, build_view
+from app.domain import CounterpartyCard, Observation, RiskLevel
 
-RULES_DOC = Path(__file__).parents[2] / "docs" / "rules" / "analyze_procurement.md"
+RULES_DOC = Path(__file__).parents[2] / "app" / "analysis" / "rules" / "specs" / "analyze_procurement.md"
 
 COMPANY_REPORT: dict[str, Any] = {
     "report_id": "r-1",
