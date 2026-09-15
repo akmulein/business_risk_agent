@@ -33,12 +33,7 @@ export function FactorSummary({ items }: { items: FactorSummaryItem[] }) {
               ) : (
                 <ul className="col-span-2 space-y-2 text-sm leading-6 text-[#444] md:col-span-1">
                   {item.details.map((detail) => (
-                    <li
-                      key={detail}
-                      className="relative pl-4 before:absolute before:left-0 before:content-['•']"
-                    >
-                      {detail}
-                    </li>
+                    <li key={detail}>{detail}</li>
                   ))}
                 </ul>
               )}

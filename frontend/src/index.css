@@ -37,9 +37,7 @@ input {
 
 .analysis-button-loading {
   position: relative;
-  background: linear-gradient(110deg, #111 15%, #3d3d3d 42%, #777 55%, #282828 70%, #111 88%);
-  background-size: 240% 100%;
-  animation: analysis-flow 1.7s linear infinite;
+  background: #111;
 }
 
 .analysis-progress-track {
@@ -62,12 +60,6 @@ input {
   animation: report-progress 1.35s ease-in-out infinite;
 }
 
-@keyframes analysis-flow {
-  to {
-    background-position: -240% 0;
-  }
-}
-
 @keyframes report-progress {
   0% {
     transform: translateX(0);
@@ -78,7 +70,6 @@ input {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .analysis-button-loading,
   .analysis-progress-value {
     animation-duration: 3.5s;
   }
